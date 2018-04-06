@@ -51,4 +51,16 @@ describe WeTransfer::Client do
       expect(client.api_bearer_token?).to be false
     end
   end
+
+  describe '#api_url' do
+    it 'stores the proper url' do
+      expect(described_class.api_url).to eq("https://dev.wetransfer.com")
+    end
+
+    it 'allows the url to be reconfigured' do
+      ENV['WT_API_URL'] = "https://staging-api.example.com"
+      expect(described_class.api_url).to eq("https://staging-api.example.com")
+      ENV['WT_API_URL'] = nil
+    end
+  end
 end

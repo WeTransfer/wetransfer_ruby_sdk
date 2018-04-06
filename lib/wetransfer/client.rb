@@ -1,7 +1,7 @@
 module WeTransfer
   class Client
     attr_accessor :api_key, :api_bearer_token
-    attr_reader   :api_url
+    attr_reader   :api_url, :connection
 
     # Initializes a new Client object
     #
@@ -12,6 +12,16 @@ module WeTransfer
         instance_variable_set("@#{key}", value)
       end
       yield(self) if block_given?
+    end
+
+    # Creates a Faraday connection object for use in requests (not very extensible right now)
+    #
+    # @return [Faraday::Connection]
+    def self.connection
+      Faraday.new(url: api_url) do |faraday|
+        faraday.response :logger                  # log requests to STDOUT
+        faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
+      end
     end
 
     # Convenience method, allows for accessing (and overriding the URL with an envvar if necessary)

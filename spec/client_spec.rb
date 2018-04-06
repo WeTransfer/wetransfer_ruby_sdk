@@ -63,4 +63,18 @@ describe WeTransfer::Client do
       ENV['WT_API_URL'] = nil
     end
   end
+
+  describe '#connection' do
+    it 'creates a connection object' do
+      expect(described_class.connection.class).to eq(Faraday::Connection)
+      expect(described_class.connection.url_prefix.host).to eq("dev.wetransfer.com")
+    end
+
+    it 'creates a connection object with a requested url' do
+      ENV['WT_API_URL'] = "https://staging-api.example.com"
+      expect(described_class.connection.class).to eq(Faraday::Connection)
+      expect(described_class.connection.url_prefix.host).to eq("staging-api.example.com")
+      ENV['WT_API_URL'] = nil
+    end
+  end
 end

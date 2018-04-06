@@ -17,7 +17,7 @@ module WeTransfer
     def credentials
       {
         api_key: api_key,
-        api_bearer_token: api_bearer_token || nil
+        api_bearer_token: api_bearer_token
       }
     end
 
@@ -28,12 +28,12 @@ module WeTransfer
 
     # @return [Boolean]
     def api_key?
-      true if credentials[:api_key]
+      !blank?(credentials[:api_key])
     end
 
     # @return [Boolean]
     def api_bearer_token?
-      true if credentials[:api_key]
+      !blank?(credentials[:api_bearer_token])
     end
 
     private

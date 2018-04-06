@@ -1,4 +1,4 @@
-# Contributing to wetransfer_ruby_sdk
+# Contributing to wetransfer
 
 Please take a moment to review this document in order to make the contribution
 process easy and effective for everyone involved.
@@ -25,7 +25,7 @@ The issue tracker is the preferred mechanism for [bug reports](#bug-reports),
 [feature requests](#feature-requests) and [submitting pull
 requests](#pull-requests), but please respect the following restrictions:
 
-* Please **do not** derail or troll issues. Keep the discussion on topic and respect the opinions of others. Adhere to the principles set out in the [Code of Conduct](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/CODE_OF_CONDUCT.md).
+* Please **do not** derail or troll issues. Keep the discussion on topic and respect the opinions of others. Adhere to the principles set out in the [Code of Conduct](https://github.com/WeTransfer/wetransfer/blob/master/CODE_OF_CONDUCT.md).
 
 ## Bug reports
 
@@ -106,11 +106,11 @@ project:
 
    ```bash
    # Clone your fork of the repo into the current directory
-   git clone git@github.com:WeTransfer/wetransfer_ruby_sdk.git
+   git clone git@github.com:WeTransfer/wetransfer.git
    # Navigate to the newly cloned directory
-   cd wetransfer_ruby_sdk
+   cd wetransfer
    # Assign the original repo to a remote called "upstream"
-   git remote add upstream git@github.com:WeTransfer/wetransfer_ruby_sdk.git
+   git remote add upstream git@github.com:WeTransfer/wetransfer.git
    ```
 
 2. If you cloned a while ago, get the latest changes from upstream:
@@ -148,5 +148,5 @@ project:
 
 **IMPORTANT**: By submitting a patch, you agree to allow the project owner to
 license your work under the same license as that used by the project, which you
-can see by clicking [here](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/LICENSE.txt).
+can see by clicking [here](https://github.com/WeTransfer/wetransfer/blob/master/LICENSE.txt).
 This provision also applies to the test files you include with the changed code as fixtures.

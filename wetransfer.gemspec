@@ -1,11 +1,11 @@
 
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'wetransfer_ruby_sdk/version'
+require 'wetransfer/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'wetransfer_ruby_sdk'
-  spec.version       = WetransferRubySdk::VERSION
+  spec.name          = 'wetransfer'
+  spec.version       = WeTransfer::VERSION
   spec.authors       = ['Noah Berman']
   spec.email         = ['noah@wetransfer.com']
 

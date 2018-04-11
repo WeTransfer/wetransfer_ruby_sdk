@@ -17,6 +17,15 @@ class AuthServlet < HTTPServlet::AbstractServlet
   end
 end
 
+class TransfersServlet < HTTPServlet::AbstractServlet
+  def do_POST(_req, res)
+    content = JSON.parse(_req.body)
+    res['Content-Type'] = 'application/json'
+    res.status = 200
+    res.body = {shortened_url: "https://we.tl/#{SecureRandom.hex(5)}", id: SecureRandom.hex(9), name: content["name"], description: content["description"], items: content["items"]}.to_json
+  end
+end
+
 class TestServer
   def self.start(log_file = nil, port = 9001)
     new(log_file, port).start
@@ -39,6 +48,7 @@ class TestServer
     @server = WEBrick::HTTPServer.new(options)
     @server.mount('/forbidden', ForbiddenServlet)
     @server.mount('/v1/authorize', AuthServlet)
+    @server.mount('/v1/transfers', TransfersServlet)
   end
 
   def start

@@ -1,22 +1,23 @@
 module WeTransfer
   class Client
-    attr_accessor :api_key, :api_bearer_token, :api_connection
-    attr_reader :api_url
+    attr_accessor :api_key, :api_bearer_token
+    attr_reader :api_url, :api_connection
 
     # Initializes a new Client object
     #
     # @param options [Hash]
     # @return [WeTransfer::Client]
-    def initialize(api_key: , api_bearer_token: nil)
+    def initialize(api_key:, api_bearer_token: nil)
       @api_key = api_key
       @api_bearer_token = api_bearer_token
       @api_url = ENV.fetch('WT_API_URL') { 'https://dev.wetransfer.com' }
+      @api_connection = create_api_connection_object!
     end
 
     # Creates a Faraday connection object for use in requests (not very extensible right now)
     #
     # @return [Faraday::Connection]
-    def api_connection
+    def create_api_connection_object!
       conn = Faraday.new(url: @api_url) do |faraday|
         faraday.response :logger                  # log requests to STDOUT
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP

@@ -21,8 +21,8 @@ RSpec.configure do |config|
   config.include SpecHelpers
   config.extend SpecHelpers # makes fixtures_dir available for example groups too
   config.before :suite do
-    TestServer.start(nil, port=9001)
-    ENV['WT_API_URL'] = "http://localhost:9001"
+    TestServer.start(nil)
+    ENV['WT_API_URL'] = 'http://localhost:9001'
   end
 
   config.expect_with :rspec do |c|

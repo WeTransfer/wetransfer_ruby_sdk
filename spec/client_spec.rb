@@ -1,25 +1,8 @@
 require 'spec_helper'
 
 describe WeTransfer::Client do
-  describe '#credentials?' do
-    it 'returns true if all credentials are present' do
-      client = described_class.new(api_key: 'key', api_bearer_token: 'token.token')
-      expect(client.credentials?).to be true
-    end
-
-    it 'returns false if any credentials are missing' do
-      client = described_class.new(api_bearer_token: 'token.token')
-      expect(client.credentials?).to be false
-      client = described_class.new(api_key: 'key')
-      expect(client.credentials?).to be false
-    end
-
-    it 'returns false if any credentials are blank' do
-      client = described_class.new(api_key: "", api_bearer_token: 'token.token')
-      expect(client.credentials?).to be false
-      client = described_class.new(api_key: 'key', api_bearer_token: "")
-      expect(client.credentials?).to be false
-    end
+  before(:each) do
+    ENV['WT_API_URL'] = nil
   end
 
   describe '#api_key?' do
@@ -27,13 +10,9 @@ describe WeTransfer::Client do
       client = described_class.new(api_key: 'key', api_bearer_token: 'token.token')
       expect(client.api_key?).to be true
     end
-    it 'returns true if the api_key is present but the token is not' do
+    it 'returns true if the api_key is present but the token is nil' do
       client = described_class.new(api_key: 'key')
       expect(client.api_key?).to be true
-    end
-    it 'returns false if the api_key is missing' do
-      client = described_class.new(api_bearer_token: 'token.token')
-      expect(client.api_key?).to be false
     end
   end
 
@@ -42,38 +21,45 @@ describe WeTransfer::Client do
       client = described_class.new(api_key: "key", api_bearer_token: 'token.token')
       expect(client.api_bearer_token?).to be true
     end
-    it 'returns true if the api_bearer_token is present but the key is not' do
-      client = described_class.new(api_bearer_token: 'token.token')
-      expect(client.api_bearer_token?).to be true
-    end
-    it 'returns false if the api_bearer_token is missing' do
+
+    it 'returns false if the api_bearer_token is nil' do
       client = described_class.new(api_key: 'key')
       expect(client.api_bearer_token?).to be false
     end
   end
 
   describe '#api_url' do
+    before(:each) do
+      @client = described_class.new(api_key: "key")
+    end
+
     it 'stores the proper url' do
-      expect(described_class.api_url).to eq("https://dev.wetransfer.com")
+      expect(@client.api_url).to eq("https://dev.wetransfer.com")
     end
 
     it 'allows the url to be reconfigured' do
       ENV['WT_API_URL'] = "https://staging-api.example.com"
-      expect(described_class.api_url).to eq("https://staging-api.example.com")
+      client = described_class.new(api_key: "key")
+      expect(client.api_url).to eq("https://staging-api.example.com")
       ENV['WT_API_URL'] = nil
     end
   end
 
-  describe '#connection' do
-    it 'creates a connection object' do
-      expect(described_class.connection.class).to eq(Faraday::Connection)
-      expect(described_class.connection.url_prefix.host).to eq("dev.wetransfer.com")
+  describe '#api_connection' do
+    before(:each) do
+      @client = described_class.new(api_key: "key")
+    end
+
+    it 'creates a api_connection object' do
+      expect(@client.api_connection.class).to eq(Faraday::Connection)
+      expect(@client.api_connection.url_prefix.host).to eq("dev.wetransfer.com")
     end
 
     it 'creates a connection object with a requested url' do
       ENV['WT_API_URL'] = "https://staging-api.example.com"
-      expect(described_class.connection.class).to eq(Faraday::Connection)
-      expect(described_class.connection.url_prefix.host).to eq("staging-api.example.com")
+      client = described_class.new(api_key: "key")
+      expect(client.api_connection.class).to eq(Faraday::Connection)
+      expect(client.api_connection.url_prefix.host).to eq("staging-api.example.com")
       ENV['WT_API_URL'] = nil
     end
   end

@@ -2,6 +2,8 @@ module WeTransfer
   class Transfers
     attr_accessor :transfer
 
+    CHUNK_SIZE = 6_291_456
+
     def initialize(client)
       raise ArgumentError, 'Not a WeTransfer client!' if client.class != WeTransfer::Client
       @client = client
@@ -9,7 +11,7 @@ module WeTransfer
     end
 
 
-    def create_new_transfer(name:, description:, items: [])
+    def create_transfer(name:, description:, items: [])
       request_body = {
         name: name,
         description: description,
@@ -37,7 +39,7 @@ module WeTransfer
         items: api_response['items'])
     end
 
-    def add_items_to_transfer(transfer:, items:[])
+    def add_items(transfer:, items:[])
       request_body = {
         items: items
       }
@@ -55,7 +57,7 @@ module WeTransfer
       return transfer
     end
 
-    def mp_upload_urls(transfer: )
+    def get_upload_urls(transfer: )
       transfer.items.each do |item|
         if item['meta']['multipart_parts'] > 1
           upload_urls = []
@@ -76,6 +78,29 @@ module WeTransfer
       return transfer
     end
 
+    def multi_part_file(transfer:, file:)
+      transfer['upload_url'].each do |url|
+        chunk = file.read(CHUNK_SIZE)
+        upload_file(file: chunk, url: url)
+      end
+    end
+
+    def single_part_file(transfer:, file:)
+      upload_file(file: file, url: transfer['upload_url'])
+    end
+
+    def upload_file(file:, url:)
+      conn = Faraday.new(url: url) do |faraday|
+        faraday.request :multipart
+        faraday.response :logger
+        faraday.adapter :net_http
+      end
+      conn.put do |req|
+        req.headers['Content-Length'] = file.size.to_s
+        req.body = file
+      end
+    end
+
     def complete_file(file:)
       @client.api_connection.post do |req|
         req.url "/api/v1/files/#{file['id']}/uploads/complete"
@@ -86,4 +111,5 @@ module WeTransfer
       puts "File completed"
     end
   end
+
 end

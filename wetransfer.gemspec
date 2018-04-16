@@ -6,8 +6,8 @@ require 'wetransfer/version'
 Gem::Specification.new do |spec|
   spec.name          = 'wetransfer'
   spec.version       = WeTransfer::VERSION
-  spec.authors       = ['Noah Berman']
-  spec.email         = ['noah@wetransfer.com']
+  spec.authors       = ['Noah Berman', 'David Bosveld']
+  spec.email         = ['noah@wetransfer.com', 'david@wetransfer.com']
 
   spec.summary       = "A Ruby SDK for WeTransfer's Public API"
   spec.description   = "Ruby bindings for using WeTransfer's Public API."

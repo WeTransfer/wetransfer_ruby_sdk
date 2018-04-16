@@ -78,15 +78,15 @@ module WeTransfer
       return transfer
     end
 
-    def multi_part_file(transfer:, file:)
-      transfer['upload_url'].each do |url|
+    def multi_part_file(item:, file:)
+      item['upload_url'].each do |url|
         chunk = file.read(CHUNK_SIZE)
         upload_file(file: chunk, url: url)
       end
     end
 
-    def single_part_file(transfer:, file:)
-      upload_file(file: file, url: transfer['upload_url'])
+    def single_part_file(item:, file:)
+      upload_file(file: file, url: item['upload_url'])
     end
 
     def upload_file(file:, url:)
@@ -101,7 +101,8 @@ module WeTransfer
       end
     end
 
-    def complete_file(file:)
+    #there is something with the name of this method which bugs me
+    def complete_file(item:)
       @client.api_connection.post do |req|
         req.url "/api/v1/files/#{file['id']}/uploads/complete"
         req.headers['X-API-Key'] = @client.api_key

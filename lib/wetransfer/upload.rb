@@ -30,26 +30,25 @@ module WeTransfer
 
       @transfer = WeTransfer::Transfers.new(@client).get_upload_urls(transfer: @transfer)
 
-      upload_items
-      Hash[succes: true, message: @transfer.shortened_url]
-    # rescue => e
-    #   binding.pry
-    #   puts Hash[success: false, message: e.message]
+      handle_items
+      puts @transfer.shortened_url
+    rescue => e
+      Hash[success: false, message: e.message]
     end
 
 
     private
 
-    def upload_items
+    def handle_items
       @files.each do |file|
-        transfer_object = @transfer.items.select{|t| t['name'] == file.split('/').last}.first
+        item_object = @transfer.items.select{|t| t['name'] == file.split('/').last}.first
         file_object = File.open(file)
-        if transfer_object['meta']['multipart_parts'] > 1
-          WeTransfer::Transfers.new(@client).multi_part_file(transfer: transfer_object ,file: file_object)
+        if item_object['meta']['multipart_parts'] > 1
+          WeTransfer::Transfers.new(@client).multi_part_file(item: item_object ,file: file_object)
         else
-          WeTransfer::Transfers.new(@client).single_part_file(transfer: transfer_object ,file: file_object)
+          WeTransfer::Transfers.new(@client).single_part_file(item: item_object ,file: file_object)
         end
-        WeTransfer::Transfers.new(@client).complete_file(file: transfer_object)
+        WeTransfer::Transfers.new(@client).complete_file(item: item_object)
       end
     end
   end

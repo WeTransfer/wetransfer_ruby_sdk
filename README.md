@@ -47,14 +47,11 @@ Configure a new client
 @client = WeTransfer::Client.new(api_key: 'api key')
 ```
 
-Retrieve a JWT
-```
-WeTransfer::Authorizer.new(@client).request_jwt
 
-```
+Now you are all setup to create transfers and send files over the web. The simplest approach is to use the Upload class. The response will be a WeTransfer link where you can download the files. Optional you can send a name and description as options.
 
+`WeTransfer::Upload.new(client: @client, files: [], options: {name: 'transfer name', description: 'This can be a description of the content'} )`
 
-Now you are all setup to create transfers and send files over the web. The simplest approach is to use the Upload class. The response will be a WeTransfer link where you can download the files.
 
 ```
 WeTransfer::Upload.new(client: @client, files: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"] )
@@ -64,19 +61,15 @@ WeTransfer::Upload.new(client: @client, files: ["/path/to/local/file_1.jpg", "/p
 
 If you want more freedom you can use these methods:
 
-`create_transfer(name: , description: , items: [])`
+`create_transfer(name:, description:, items: [])`
 
-`add_items(transfer: , items:)`
+`add_items(transfer:, items:)`
 
 `get_upload_urls(transfer:)`
 
-`multi_part_file(transfer: ,file: )`
+`multi_part_file(item:, file: )`
 
-`single_part_file(transfer:, file: )`
-
-`upload_file(file: ,url:)`
-
-`complete_item(file: ,url:)`
+`single_part_file(item:, file: )`
 
 
 #### create_transfer
@@ -84,7 +77,7 @@ The create_transfer method takes 3 arguments, a name, a description and an array
 the items should all have this layout and the local_identifier is limited to 36 characters.
 
 ```
-@transfer = WeTransfer::Transfers.new(@client).create_transfer(name: 'A name', description: 'I want to share these files with you', items: [{"local_identifier": "foo", "content_identifier": "file", "filename": "foo.gif", "filesize": 1024 }])
+@transfer = WeTransfer::Transfers.new(@client).create_transfer(name: 'A name', description: 'I want to share these files with you', items: [{"local_identifier": "Random 36 characters", "content_identifier": "file", "filename": "filename.gif", "filesize": 1024 }])
 ```
 
 #### add_items
@@ -103,4 +96,26 @@ Single part items have their upload url provided in the hash, for multi part fil
 
 ```
 
+
+#### multi_part_file
+The multi part file method is to upload the item to the upload urls stored into the upload_url key. Send the item hash and the file to this method and the method will read the 6MB for every upload url and send it to the pre-signed aws url. After the upload is done the file will be completed
+
+`item` should be the hash containing all hash information
+`file_path` is the path to the local file
+
+```
+WeTransfer::Transfers.new(@client).multi_part_file(item: item file: file_path)
+
+```
+
+#### single_part_file
+The single part file method is to upload singel part files, these are files less then 6MB. They don't need a multi part upload and can be send directly to the provided S3 url. After the upload is done the file will be completed
+
+`item` should be the hash containing all hash information
+`file_path` is the path to the local file
+
+
+```
+WeTransfer::Transfers.new(@client).multi_part_file(item: item file: file_path)
+```
 

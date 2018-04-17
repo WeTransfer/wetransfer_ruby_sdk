@@ -17,7 +17,6 @@ module WeTransfer
         description: description,
         items: items
       }
-
       response = @client.api_connection.post do |req|
         req.url '/api/v1/transfers'
         req.headers['X-API-Key'] = @client.api_key
@@ -79,37 +78,40 @@ module WeTransfer
     end
 
     def multi_part_file(item:, file:)
+      file_object = File.open(file)
       item['upload_url'].each do |url|
-        chunk = file.read(CHUNK_SIZE)
+        chunk = file_object.read(CHUNK_SIZE)
         upload_file(file: chunk, url: url)
       end
+      complete_file(item: item)
     end
 
     def single_part_file(item:, file:)
-      upload_file(file: file, url: item['upload_url'])
+      file_object = File.open(file)
+      upload_file(file: file_object, url: item['upload_url'])
+      complete_file(item: item)
+    end
+
+    private
+
+    def complete_file(item:)
+      resp = @client.api_connection.post do |req|
+        req.url "/api/v1/files/#{item['id']}/uploads/complete"
+        req.headers['X-API-Key'] = @client.api_key
+        req.headers['Authorization'] = 'Bearer ' + @client.api_bearer_token
+        req.headers['Content-Type'] = 'application/json'
+      end
     end
 
     def upload_file(file:, url:)
       conn = Faraday.new(url: url) do |faraday|
         faraday.request :multipart
-        faraday.response :logger
         faraday.adapter :net_http
       end
       conn.put do |req|
         req.headers['Content-Length'] = file.size.to_s
         req.body = file
       end
-    end
-
-    #there is something with the name of this method which bugs me
-    def complete_file(item:)
-      @client.api_connection.post do |req|
-        req.url "/api/v1/files/#{file['id']}/uploads/complete"
-        req.headers['X-API-Key'] = @client.api_key
-        req.headers['Authorization'] = 'Bearer ' + @client.api_bearer_token
-        req.headers['Content-Type'] = 'application/json'
-      end
-      puts "File completed"
     end
   end
 

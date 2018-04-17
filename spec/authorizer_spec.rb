@@ -11,8 +11,8 @@ describe WeTransfer::Authorizer do
 
   context 'with a client' do
     before(:all) do
-      ENV['WT_API_URL'] = 'https://55ckjvf49c.execute-api.eu-west-1.amazonaws.com/api/'
-      @client = WeTransfer::Client.new(api_key: 'e4PC5OmBU46O7oBBq8N3d8d6nudgABPN69wb1PUm')
+      ENV['WT_API_URL'] = 'localhost:7001'
+      @client = WeTransfer::Client.new(api_key: 'api_key')
     end
 
     it 'requests a jwt' do

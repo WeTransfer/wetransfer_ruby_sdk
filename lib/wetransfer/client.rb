@@ -12,6 +12,7 @@ module WeTransfer
       @api_bearer_token = api_bearer_token
       @api_url = ENV.fetch('WT_API_URL') { 'https://dev.wetransfer.com' }
       @api_connection = create_api_connection_object!
+      WeTransfer::Authorizer.request_jwt(client: self)
     end
 
     # Creates a Faraday connection object for use in requests (not very extensible right now)
@@ -19,7 +20,7 @@ module WeTransfer
     # @return [Faraday::Connection]
     def create_api_connection_object!
       conn = Faraday.new(url: @api_url) do |faraday|
-        faraday.response :logger                  # log requests to STDOUT
+        # faraday.response :logger                  # log requests to STDOUT
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       end
       conn

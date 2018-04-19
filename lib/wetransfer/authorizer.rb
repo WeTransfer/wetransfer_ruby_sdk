@@ -3,7 +3,7 @@ module WeTransfer
 
     def self.request_jwt(client:)
       response = client.api_connection.post do |req|
-        req.url '/api/v1/authorize'
+        req.url '/v1/authorize'
         req.headers['X-API-Key'] = client.api_key
         req.headers['Content-Type'] = 'application/json'
       end

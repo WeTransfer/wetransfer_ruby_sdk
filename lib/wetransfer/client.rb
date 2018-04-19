@@ -15,12 +15,35 @@ module WeTransfer
       WeTransfer::Authorizer.request_jwt(client: self)
     end
 
+    # create a new transfer based of the information the client sends
+    #
+    #
+    # return with a shortened url
+    def create_transfer(name: nil, description: nil, items: [])
+      raise 'Not an Array' unless items.is_a?(Array)
+      @transfer = TransferBuilder.build do |builder|
+        builder.duplicate_client(client: self)
+        builder.set_details(name: name, description: description)
+        builder.set_items(items: items) if items.any?
+        builder.create_initial_transfer
+        builder.set_items_upload_url
+        builder.upload_files
+        builder.complete_transfer
+      end
+    end
+
+
+
+    def add_items_to_transfer(transfer:, items:)
+      binding.pry
+    end
+
     # Creates a Faraday connection object for use in requests (not very extensible right now)
     #
     # @return [Faraday::Connection]
     def create_api_connection_object!
       conn = Faraday.new(url: @api_url) do |faraday|
-        # faraday.response :logger                  # log requests to STDOUT
+        faraday.response :logger                  # log requests to STDOUT
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       end
       conn

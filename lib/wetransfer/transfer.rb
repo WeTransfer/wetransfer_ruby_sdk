@@ -6,19 +6,6 @@ module WeTransfer
       @items = []
     end
 
-    def build_items(items:)
-      items.each do |item|
-        item = ItemBuilder.build do |builder|
-          builder.set_path(path: item)
-          builder.set_content_identifier
-          builder.set_local_identifier
-          builder.set_name
-          builder.set_size
-        end
-        self.items.push(item)
-      end
-    end
-
     def transfer_params
       { name: name,
         description: description,

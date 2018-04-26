@@ -10,5 +10,7 @@ module WeTransfer
       :upload_url,
       :upload_id,
       :path
+
+
   end
 end

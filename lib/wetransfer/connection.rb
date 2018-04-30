@@ -1,5 +1,6 @@
 module WeTransfer
   class Connection
+    attr_reader :api_connection, :api_bearer_token, :api_key
 
     def initialize(client:)
       @api_url = ENV.fetch('WT_API_URL') { 'https://dev.wetransfer.com' }

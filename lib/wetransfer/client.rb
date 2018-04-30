@@ -11,7 +11,12 @@ module WeTransfer
     # @return [WeTransfer::Client]
     def initialize(api_key:)
       @api_key = api_key
-      @api_connection ||= WeTransfer::Connection.new(client: self, )
+      @api_connection ||= WeTransfer::Connection.new(client: self)
+    end
+
+    # @return [Boolean]
+    def api_connection?
+      !blank?(@api_connection)
     end
 
     # create a new transfer based of the information the client sends
@@ -23,7 +28,6 @@ module WeTransfer
       transfer_builder = TransferBuilder.new
       transfer_builder.set_details(name: name, description: description)
       @transfer = transfer_builder.transfer
-
       create_transfer_items(items: items) if items.any?
       create_initial_transfer
       handle_file_items if items.any?
@@ -36,7 +40,6 @@ module WeTransfer
       raise StandardError, 'Transfer object is missing' if @transfer.nil?
       create_transfer_items(items: items)
       send_items_to_transfer
-      # update the items with the upload url
       handle_file_items
       return @transfer
     end
@@ -44,16 +47,6 @@ module WeTransfer
     # @return [Boolean]
     def api_key?
       !blank?(@api_key)
-    end
-
-    # @return [Boolean]
-    def api_bearer_token?
-      !blank?(@api_bearer_token)
-    end
-
-    # @return [Boolean]
-    def api_connection?
-      !blank?(@api_connection)
     end
 
     private

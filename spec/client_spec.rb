@@ -2,11 +2,6 @@ require 'spec_helper'
 
 describe WeTransfer::Client do
   describe 'Client#new' do
-    it 'creates a new client with JWT' do
-      client = described_class.new(api_key: 'api-key')
-      expect(client.api_bearer_token?).to be(true)
-    end
-
     it 'returns a error when no api_key is given' do
       expect{
         client = described_class.new
@@ -25,7 +20,7 @@ describe WeTransfer::Client do
 
     it 'create transfer should return a transfer object' do
       transfer = client.create_transfer
-      expect(transfer.shortened_url).to start_with('https://we.tl/s-')
+      expect(transfer.shortened_url).to start_with('http://we.tl/s-')
       expect(transfer).to be_kind_of WeTransfer::Transfer
     end
 
@@ -52,8 +47,6 @@ describe WeTransfer::Client do
     end
 
     it 'when items are sended, the transfer has items' do
-      # skip 'Need to fix this, error: Faraday::ConnectionFailed: end of file reached'
-
       transfer = client.create_transfer(items: ["#{__dir__}/war-end-peace.txt"])
       expect(transfer).to be_kind_of WeTransfer::Transfer
       expect(transfer.items.count).to be(1)
@@ -66,24 +59,24 @@ describe WeTransfer::Client do
     end
 
     it 'completes a item after item upload' do
-      # skip 'Need to fix this, error: Faraday::ConnectionFailed: end of file reached'
-
       transfer = client.create_transfer(items: ["#{__dir__}/war-end-peace.txt"])
-      binding.pry
       expect(transfer).to be_kind_of WeTransfer::Transfer
-
     end
+  end
+
+  describe 'Client#add_item' do
+    let (:client) {described_class.new(api_key: 'api-key')}
 
     it 'add items to an already created transfer' do
       transfer = client.create_transfer
       expect(transfer.items.count).to be(0)
-      transfer = client.add_items_to_transfer(transfer: transfer, items: ["#{__dir__}/war-end-peace.txt"])
+      transfer = client.add_items(transfer: transfer, items: ["#{__dir__}/war-end-peace.txt"])
       expect(transfer.items.count).to be(1)
     end
 
     it 'raises an error when no transfer is being send to add_items_to_transfer method' do
       expect {
-        client.add_items_to_transfer(items: ["#{__dir__}/war-end-peace.txt"])
+        client.add_items(items: ["#{__dir__}/war-end-peace.txt"])
         }.to raise_error(StandardError, 'Transfer object is missing')
     end
 

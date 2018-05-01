@@ -2,7 +2,7 @@ module WeTransfer
   class Client
     attr_accessor :api_key
     # attr_accessor :api_bearer_token
-    # attr_reader :api_url, :api_connection
+    attr_reader :api_connection
     CHUNK_SIZE = 6_291_456
 
     # Initializes a new Client object
@@ -14,15 +14,6 @@ module WeTransfer
       @api_connection ||= WeTransfer::Connection.new(client: self)
     end
 
-    # # @return [Boolean]
-    # def api_connection?
-    #   !blank?(@api_connection)
-    # end
-
-    # create a new transfer based of the information the client sends
-    #
-    #
-    # return with a transfer object
     def create_transfer(name: nil, description: nil, items: [])
       raise StandardError, 'Not an Array' unless items.is_a?(Array)
       transfer_builder = TransferBuilder.new
@@ -43,11 +34,6 @@ module WeTransfer
       handle_file_items
       return @transfer
     end
-
-    # # @return [Boolean]
-    # def api_key?
-    #   !blank?(@api_key)
-    # end
 
     private
 

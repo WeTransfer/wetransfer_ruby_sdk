@@ -10,7 +10,7 @@ describe WeTransfer::Client do
 
     it 'on initialization a active connection object is created' do
       client = described_class.new(api_key: 'api-key')
-      expect(client.api_connection?).to be(true)
+      expect(client.api_connection).to be_kind_of WeTransfer::Connection
     end
   end
 

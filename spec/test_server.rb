@@ -4,16 +4,25 @@ include WEBrick
 
 class ForbiddenServlet < HTTPServlet::AbstractServlet
   def do_GET(_req, res)
-    res['Content-Type'] = 'text/plain'
+    res['Content-Type'] = 'application/json'
+    res.status = 403
+  end
+  def do_POST(_req, res)
+    res['Content-Type'] = 'application/json'
     res.status = 403
   end
 end
 
 class AuthServlet < HTTPServlet::AbstractServlet
-  def do_POST(_req, res)
-    res['Content-Type'] = 'application/json'
-    res.status = 200
-    res.body = {status: 'success', token: SecureRandom.hex(4)}.to_json
+  def do_POST(req, res)
+    if req.header["x-api-key"].empty?
+      res['Content-Type'] = 'application/json'
+      res.status = 401
+    else
+      res['Content-Type'] = 'application/json'
+      res.status = 200
+      res.body = {status: 'success', token: SecureRandom.hex(4)}.to_json
+    end
   end
 end
 
@@ -77,7 +86,7 @@ class UploadUrlServlet < HTTPServlet::AbstractServlet
                   part_number: part_number,
                   upload_id: SecureRandom.hex(9),
                   upload_expires_at: (Time.now + 5).to_i
-                }
+                }.to_json
   end
 end
 
@@ -157,7 +166,7 @@ class TestServer
 
     @server = WEBrick::HTTPServer.new(options)
     # upload_server = WEBrick::HTTPServer.new(server_name:'wetransfer-test.com', Port: 9002)
-    # @server.mount('/forbidden',     ForbiddenServlet)
+    @server.mount('/forbidden',     ForbiddenServlet)
     @server.mount('/v1/authorize',  AuthServlet)
     # This needs to look nicer
     @server.mount_proc('/v1/transfers') do |req, res|

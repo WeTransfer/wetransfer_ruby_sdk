@@ -14,10 +14,10 @@ module WeTransfer
       @api_connection ||= WeTransfer::Connection.new(client: self)
     end
 
-    # @return [Boolean]
-    def api_connection?
-      !blank?(@api_connection)
-    end
+    # # @return [Boolean]
+    # def api_connection?
+    #   !blank?(@api_connection)
+    # end
 
     # create a new transfer based of the information the client sends
     #
@@ -44,10 +44,10 @@ module WeTransfer
       return @transfer
     end
 
-    # @return [Boolean]
-    def api_key?
-      !blank?(@api_key)
-    end
+    # # @return [Boolean]
+    # def api_key?
+    #   !blank?(@api_key)
+    # end
 
     private
 

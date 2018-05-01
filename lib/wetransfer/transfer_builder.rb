@@ -1,12 +1,11 @@
 module WeTransfer
   class TransferBuilder
-
     def initialize(transfer: nil)
-      if transfer.nil?
-        @transfer = Transfer.new
-      else
-        @transfer = transfer
-      end
+      @transfer = if transfer.nil?
+                    Transfer.new
+                  else
+                    transfer
+                  end
     end
 
     def set_details(name: nil, description: nil)
@@ -18,7 +17,7 @@ module WeTransfer
       transfer.id = id
     end
 
-    def self.set_shortened_url(transfer: ,url: )
+    def self.set_shortened_url(transfer:, url:)
       transfer.shortened_url = url
     end
 

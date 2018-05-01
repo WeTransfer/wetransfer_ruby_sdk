@@ -28,7 +28,7 @@ module WeTransfer
       JSON.parse(response.body)
     end
 
-     def upload(file:, url:)
+    def upload(file:, url:)
       conn = Faraday.new(url: url) do |faraday|
         faraday.request :multipart
         faraday.adapter :net_http
@@ -49,11 +49,7 @@ module WeTransfer
     end
 
     def create_api_connection_object!
-      conn = Faraday.new(url: @api_url) do |faraday|
-        faraday.response :logger                  # log requests to STDOUT
-        faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
-      end
-      conn
+      Faraday.new(url: @api_url)
     end
 
     def request_jwt
@@ -62,10 +58,8 @@ module WeTransfer
     end
 
     def response_validation!(response:)
-      raise StandardError, response.reason_phrase if response.status == 401 #unauthorized
-      # raise {status: 401, body: 'You are not Authorized to do this request'} if response.status == 401 #unauthorized
-      raise StandardError, response.reason_phrase if response.status == 403 #forbidden
-      # raise {status: 403, body: ''This request is forbidden on this domain'} if response.status == 403 #forbidden
+      raise StandardError, response.reason_phrase if response.status == 401
+      raise StandardError, response.reason_phrase if response.status == 403
     end
   end
 end

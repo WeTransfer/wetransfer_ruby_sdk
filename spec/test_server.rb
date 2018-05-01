@@ -165,10 +165,8 @@ class TestServer
     }
 
     @server = WEBrick::HTTPServer.new(options)
-    # upload_server = WEBrick::HTTPServer.new(server_name:'wetransfer-test.com', Port: 9002)
     @server.mount('/forbidden',     ForbiddenServlet)
     @server.mount('/v1/authorize',  AuthServlet)
-    # This needs to look nicer
     @server.mount_proc('/v1/transfers') do |req, res|
       if req.path =~ /^(?=.*\bv1\b)(?=.*\btransfers\b)(?=.*\bitems\b).+/
         TransferItemServlet.do_POST(req, res)
@@ -186,7 +184,6 @@ class TestServer
       end
     end
     @server.mount('/upload', UploadServlet)
-
   end
 
   def start

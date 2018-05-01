@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe WeTransfer::Connection do
   describe 'Connection#new' do
-
     it 'creates a new connection when the client is passed' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
@@ -23,7 +22,6 @@ describe WeTransfer::Connection do
     end
   end
 
-
   describe 'Connection#post_request' do
     it 'returns with a response body when a post request is made' do
       client = OpenStruct.new(api_key: 'api-key-12345')
@@ -35,7 +33,7 @@ describe WeTransfer::Connection do
     it 'returns with a StandardError when request is forbidden' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      expect{
+      expect {
         connection.post_request(path: '/forbidden')
       }.to raise_error(StandardError, 'Forbidden')
     end
@@ -44,7 +42,7 @@ describe WeTransfer::Connection do
       skip
       client = OpenStruct.new(api_key: nil)
       connection = described_class.new(client: client)
-      expect{
+      expect {
         connection.post_request(path: '/v1/authorize')
       }.to raise_error(StandardError, 'Unauthorized')
     end
@@ -55,9 +53,7 @@ describe WeTransfer::Connection do
       skip ''
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      response = connection.get_request(path: "/v1/files/1337/uploads/1/7331")
-      binding.pry
-      #this nil check has to go!
+      response = connection.get_request(path: '/v1/files/1337/uploads/1/7331')
       expect(response['upload_url']).to_not be_nil?
       expect(response['part_number']).to be(1)
       expect(response['upload_id']).to_not be_nil?
@@ -67,7 +63,7 @@ describe WeTransfer::Connection do
     it 'returns with a StandardError when request is forbidden' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      expect{
+      expect {
         connection.post_request(path: '/forbidden')
       }.to raise_error(StandardError, 'Forbidden')
     end
@@ -76,7 +72,7 @@ describe WeTransfer::Connection do
       skip
       client = OpenStruct.new(api_key: nil)
       connection = described_class.new(client: client)
-      expect{
+      expect {
         connection.post_request(path: '/v1/authorize')
       }.to raise_error(StandardError, 'Unauthorized')
     end

@@ -1,14 +1,9 @@
 module WeTransfer
   class Client
     attr_accessor :api_key
-    # attr_accessor :api_bearer_token
     attr_reader :api_connection
     CHUNK_SIZE = 6_291_456
 
-    # Initializes a new Client object
-    #
-    # @param options [Hash]
-    # @return [WeTransfer::Client]
     def initialize(api_key:)
       @api_key = api_key
       @api_connection ||= WeTransfer::Connection.new(client: self)
@@ -22,7 +17,7 @@ module WeTransfer
       create_transfer_items(items: items) if items.any?
       create_initial_transfer
       handle_file_items if items.any?
-      return @transfer
+      @transfer
     end
 
     def add_items(transfer: nil, items: [])
@@ -32,7 +27,7 @@ module WeTransfer
       create_transfer_items(items: items)
       send_items_to_transfer
       handle_file_items
-      return @transfer
+      @transfer
     end
 
     private
@@ -40,11 +35,11 @@ module WeTransfer
     def create_transfer_items(items:)
       items.each do |item|
         item_builder = ItemBuilder.new
-        item_builder.set_path(path: item)
-        item_builder.set_content_identifier
-        item_builder.set_local_identifier
-        item_builder.set_name
-        item_builder.set_size
+        item_builder.path(path: item)
+        item_builder.content_identifier
+        item_builder.local_identifier
+        item_builder.name
+        item_builder.size
         @transfer.items.push(item_builder.item)
       end
     end
@@ -63,18 +58,18 @@ module WeTransfer
 
     def update_item_objects(response_items:)
       response_items.each do |item|
-        item_object = @transfer.items.select{|t| t.name == item['name']}.first
+        item_object = @transfer.items.select { |t| t.name == item['name'] }.first
         item_builder = ItemBuilder.new(item: item_object)
-        item_builder.set_id(item: item_object, id: item['id'])
-        item_builder.set_upload_url(item: item_object, url: item['upload_url'])
-        item_builder.set_multipart_parts(item: item_object, part_count: item['meta']['multipart_parts'])
-        item_builder.set_multipart_id(item: item_object, multi_id: item['meta']['multipart_upload_id'])
-        item_builder.set_upload_id(item: item_object, upload_id: item['upload_id'])
-        set_item_upload_url(item: item_builder.item) if item_builder.item.multipart_parts > 1
+        item_builder.id(item: item_object, id: item['id'])
+        item_builder.upload_url(item: item_object, url: item['upload_url'])
+        item_builder.multipart_parts(item: item_object, part_count: item['meta']['multipart_parts'])
+        item_builder.multipart_id(item: item_object, multi_id: item['meta']['multipart_upload_id'])
+        item_builder.upload_id(item: item_object, upload_id: item['upload_id'])
+        add_item_upload_url(item: item_builder.item) if item_builder.item.multipart_parts > 1
       end
     end
 
-    def set_item_upload_url(item:)
+    def add_item_upload_url(item:)
       upload_urls = []
       item.multipart_parts.times do |part|
         part += 1
@@ -94,7 +89,7 @@ module WeTransfer
         file_object = File.open(item.path)
         item.upload_url.each do |url|
           chunk = file_object.read(CHUNK_SIZE)
-          res = @api_connection.upload(file: chunk, url: url)
+          @api_connection.upload(file: chunk, url: url)
         end
       end
     end
@@ -105,10 +100,8 @@ module WeTransfer
       end
     end
 
-
     def blank?(s)
       s.respond_to?(:empty?) ? s.empty? : !s
     end
-
   end
 end

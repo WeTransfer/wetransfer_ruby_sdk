@@ -48,8 +48,13 @@ module WeTransfer
       req.headers['Content-Type'] = 'application/json'
     end
 
+    # If you need extra logging for your requests, switch it on by setting WT_API_LOGGING_ON in your .env file.
     def create_api_connection_object!
-      Faraday.new(url: @api_url)
+      conn = Faraday.new(url: @api_url) do |faraday|
+        faraday.response :logger if ENV.fetch('WT_API_LOGGING_ON') { nil } # log requests to STDOUT if ENVVAR is present
+        faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
+      end
+      conn
     end
 
     def request_jwt

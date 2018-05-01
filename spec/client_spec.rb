@@ -54,7 +54,7 @@ describe WeTransfer::Client do
     it 'returns an error when items are not sended inside an array' do
       expect {
         client.create_transfer(items: "#{__dir__}/war-end-peace.txt")
-      }.to raise_error(StandardError, 'Not an Array')
+        }.to raise_error(StandardError, 'The items field must be an array')
     end
 
     it 'completes a item after item upload' do

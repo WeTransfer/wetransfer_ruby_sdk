@@ -9,28 +9,43 @@ module WeTransfer
       @api_connection ||= WeTransfer::Connection.new(client: self)
     end
 
+    # If you pass in items to the transfer it'll create the transfer with them,
+    # otherwise it creates a "blank" transfer.
     def create_transfer(name: nil, description: nil, items: [])
-      raise StandardError, 'Not an Array' unless items.is_a?(Array)
-      transfer_builder = TransferBuilder.new
-      transfer_builder.set_details(name: name, description: description)
-      @transfer = transfer_builder.transfer
-      create_transfer_items(items: items) if items.any?
-      create_initial_transfer
-      handle_file_items if items.any?
-      @transfer
+      raise ArgumentError, 'The items field must be an array' unless items.is_a?(Array)
+      @transfer = build_transfer_object(name, description).transfer
+      if items.any?
+        create_transfer_with_items(items)
+      else
+        create_initial_transfer
+      end
+      return @transfer
     end
 
     def add_items(transfer: nil, items: [])
       @transfer ||= transfer
-      raise StandardError, 'No items found' if items.empty?
-      raise StandardError, 'Transfer object is missing' if @transfer.nil?
+      raise ArgumentError, 'No items found' if items.empty?
+      raise ArgumentError, 'Transfer object is missing' if @transfer.nil?
       create_transfer_items(items: items)
       send_items_to_transfer
       handle_file_items
       @transfer
     end
 
+    def create_transfer_with_items(items)
+      raise ArgumentError, 'Items array cannot be empty' if items.empty?
+      create_transfer_items(items: items)
+      create_initial_transfer
+      handle_file_items
+    end
+
     private
+
+    def build_transfer_object(name, description)
+      transfer_builder = TransferBuilder.new
+      transfer_builder.set_details(name: name, description: description)
+      transfer_builder
+    end
 
     def create_transfer_items(items:)
       items.each do |item|

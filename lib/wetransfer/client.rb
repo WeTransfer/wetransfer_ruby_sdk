@@ -111,6 +111,5 @@ module WeTransfer
         @api_connection.post_request(path: "/v1/files/#{item.id}/uploads/complete")
       end
     end
-
   end
 end

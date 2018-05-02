@@ -56,7 +56,7 @@ module WeTransfer
     end
 
     def validate_file
-      raise FileDoesNotExistError, "#{@item} does not exist" unless File.exists?(@item.path)
+      raise FileDoesNotExistError, "#{@item} does not exist" unless File.exist?(@item.path)
     end
   end
 end

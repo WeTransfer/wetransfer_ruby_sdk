@@ -15,7 +15,7 @@ module WeTransfer
     def create_transfer(name: nil, description: nil, items: [])
       raise ArgumentError, 'The items field must be an array' unless items.is_a?(Array)
       @transfer = build_transfer_object(name, description).transfer
-      items.any? ? create_transfer_with_items(items) : create_initial_transfer
+      items.any? ? create_transfer_with_items(items: items) : create_initial_transfer
       @transfer
     end
 
@@ -29,7 +29,7 @@ module WeTransfer
       @transfer
     end
 
-    def create_transfer_with_items(items)
+    def create_transfer_with_items(items: [])
       raise ArgumentError, 'Items array cannot be empty' if items.empty?
       create_transfer_items(items: items)
       create_initial_transfer

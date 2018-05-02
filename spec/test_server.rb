@@ -152,7 +152,7 @@ class TestServer
 
   def initialize(log_file = nil, port = 9001)
     log_file ||= StringIO.new
-    log = WEBrick::Log.new(log_file)
+    log = WEBrick::BasicLog.new(log_file, WEBrick::BasicLog::WARN)
 
     options = {
       Port: port,

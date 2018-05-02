@@ -4,33 +4,45 @@ module WeTransfer
     attr_reader :api_connection
     CHUNK_SIZE = 6_291_456
 
+    # Initializes a new Client object
     def initialize(api_key:)
       @api_key = api_key
       @api_connection ||= WeTransfer::Connection.new(client: self)
     end
 
+    # If you pass in items to the transfer it'll create the transfer with them,
+    # otherwise it creates a "blank" transfer.
     def create_transfer(name: nil, description: nil, items: [])
-      raise StandardError, 'Not an Array' unless items.is_a?(Array)
-      transfer_builder = TransferBuilder.new
-      transfer_builder.set_details(name: name, description: description)
-      @transfer = transfer_builder.transfer
-      create_transfer_items(items: items) if items.any?
-      create_initial_transfer
-      handle_file_items if items.any?
+      raise ArgumentError, 'The items field must be an array' unless items.is_a?(Array)
+      @transfer = build_transfer_object(name, description).transfer
+      items.any? ? create_transfer_with_items(items: items) : create_initial_transfer
       @transfer
     end
 
     def add_items(transfer: nil, items: [])
       @transfer ||= transfer
-      raise StandardError, 'No items found' if items.empty?
-      raise StandardError, 'Transfer object is missing' if @transfer.nil?
+      raise ArgumentError, 'No items found' if items.empty?
+      raise ArgumentError, 'Transfer object is missing' if @transfer.nil?
       create_transfer_items(items: items)
       send_items_to_transfer
       handle_file_items
       @transfer
     end
 
+    def create_transfer_with_items(items: [])
+      raise ArgumentError, 'Items array cannot be empty' if items.empty?
+      create_transfer_items(items: items)
+      create_initial_transfer
+      handle_file_items
+    end
+
     private
+
+    def build_transfer_object(name, description)
+      transfer_builder = TransferBuilder.new
+      transfer_builder.set_details(name: name, description: description)
+      transfer_builder
+    end
 
     def create_transfer_items(items:)
       items.each do |item|
@@ -98,10 +110,6 @@ module WeTransfer
       @transfer.items.each do |item|
         @api_connection.post_request(path: "/v1/files/#{item.id}/uploads/complete")
       end
-    end
-
-    def blank?(s)
-      s.respond_to?(:empty?) ? s.empty? : !s
     end
   end
 end

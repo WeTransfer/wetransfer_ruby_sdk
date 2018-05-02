@@ -4,6 +4,7 @@ module WeTransfer
     attr_reader :api_connection
     CHUNK_SIZE = 6_291_456
 
+    # Initializes a new Client object
     def initialize(api_key:)
       @api_key = api_key
       @api_connection ||= WeTransfer::Connection.new(client: self)
@@ -14,12 +15,8 @@ module WeTransfer
     def create_transfer(name: nil, description: nil, items: [])
       raise ArgumentError, 'The items field must be an array' unless items.is_a?(Array)
       @transfer = build_transfer_object(name, description).transfer
-      if items.any?
-        create_transfer_with_items(items)
-      else
-        create_initial_transfer
-      end
-      return @transfer
+      items.any? ? create_transfer_with_items(items) : create_initial_transfer
+      @transfer
     end
 
     def add_items(transfer: nil, items: [])
@@ -115,8 +112,5 @@ module WeTransfer
       end
     end
 
-    def blank?(s)
-      s.respond_to?(:empty?) ? s.empty? : !s
-    end
   end
 end

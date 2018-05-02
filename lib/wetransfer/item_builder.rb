@@ -1,5 +1,7 @@
 module WeTransfer
   class ItemBuilder
+    class FileDoesNotExistError < ArgumentError; end
+
     def initialize(item: nil)
       @item = if item.nil?
                 Item.new
@@ -54,7 +56,7 @@ module WeTransfer
     end
 
     def validate_file
-      raise StandardError, 'File does not exists' if File.exist?(@item.path) == false
+      raise FileDoesNotExistError, "#{@item} does not exist" unless File.exists?(@item.path)
     end
   end
 end

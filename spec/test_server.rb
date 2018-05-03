@@ -29,6 +29,7 @@ end
 class TransfersServlet < HTTPServlet::AbstractServlet
   def self.do_POST(req, res)
     content = JSON.parse(req.body)
+    items_count = content["items"].count || 0
     res['Content-Type'] = 'application/json'
     res.status = 200
     res.body = {shortened_url: "http://we.tl/s-#{SecureRandom.hex(5)}",
@@ -79,11 +80,11 @@ end
 
 class UploadUrlServlet < HTTPServlet::AbstractServlet
   def self.do_GET(_req, res)
-    part_number = res.request_uri.to_s.split('/').last
+    part_number = res.request_uri.to_s.split('/')[-2]
     res['Content-Type'] = 'application/json'
     res.status = 200
     res.body = {  upload_url: "#{ENV.fetch('WT_API_URL')}/upload/#{SecureRandom.hex(9)}",
-                  part_number: part_number,
+                  part_number: part_number.to_i,
                   upload_id: SecureRandom.hex(9),
                   upload_expires_at: (Time.now + 5).to_i
                 }.to_json

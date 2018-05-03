@@ -20,7 +20,7 @@ module WeTransfer
 
     def local_identifier
       # only take the file name and shorten it to 36 characters if it's longer
-      @item.local_identifier = @item.path.split('/').last.gsub(' ', '')[0..36]
+      @item.local_identifier = @item.path.split('/').last.gsub(' ', '')[0..35]
     end
 
     def name

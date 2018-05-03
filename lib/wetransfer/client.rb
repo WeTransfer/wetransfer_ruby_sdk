@@ -58,8 +58,8 @@ module WeTransfer
 
     def create_initial_transfer
       response = @api_connection.post_request(path: '/v1/transfers', body: @transfer.transfer_params)
-      TransferBuilder.set_id(transfer: @transfer, id: response['id'])
-      TransferBuilder.set_shortened_url(transfer: @transfer, url: response['shortened_url'])
+      TransferBuilder.id(transfer: @transfer, id: response['id'])
+      TransferBuilder.shortened_url(transfer: @transfer, url: response['shortened_url'])
       update_item_objects(response_items: response['items']) if response['items'].any?
     end
 

@@ -76,7 +76,7 @@ describe WeTransfer::Client do
     it 'raises an error when no transfer is being send to add_items_to_transfer method' do
       expect {
         client.add_items(items: ["#{__dir__}/war-end-peace.txt"])
-        }.to raise_error(StandardError, 'Transfer object is missing')
+        }.to raise_error(ArgumentError, 'missing keyword: transfer')
     end
   end
 end

@@ -25,7 +25,7 @@ module WeTransfer
       raise ArgumentError, 'Transfer object is missing' if @transfer.nil?
       create_transfer_items(items: items)
       send_items_to_transfer
-      handle_file_items
+      upload_and_complete_items
       @transfer
     end
 
@@ -33,7 +33,7 @@ module WeTransfer
       raise ArgumentError, 'Items array cannot be empty' if items.empty?
       create_transfer_items(items: items)
       create_initial_transfer
-      handle_file_items
+      upload_and_complete_items
     end
 
     private
@@ -91,7 +91,7 @@ module WeTransfer
       item.upload_url = upload_urls
     end
 
-    def handle_file_items
+    def upload_and_complete_items
       upload_files
       complete_transfer
     end

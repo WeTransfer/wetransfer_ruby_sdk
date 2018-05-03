@@ -40,7 +40,7 @@ module WeTransfer
 
     def build_transfer_object(name, description)
       transfer_builder = TransferBuilder.new
-      transfer_builder.set_details(name: name, description: description)
+      transfer_builder.name_description(name: name, description: description)
       transfer_builder
     end
 

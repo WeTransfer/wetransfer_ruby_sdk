@@ -70,13 +70,13 @@ describe WeTransfer::Client do
       transfer = client.create_transfer
       expect(transfer.items.count).to be(0)
       transfer = client.add_items(transfer: transfer, items: ["#{__dir__}/war-and-peace.txt"])
-      expect(transfer).to have(1).items
+      expect(transfer.items.count).to be(1)
     end
 
     it 'raises an error when no transfer is being send to add_items_to_transfer method' do
       expect {
         client.add_items(items: ["#{__dir__}/war-and-peace.txt"])
-        }.to raise_error(ArgumentError, 'missing keyword: transfer')
+        }.to raise_error(ArgumentError, 'Transfer object is missing')
     end
   end
 end

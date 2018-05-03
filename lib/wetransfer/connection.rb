@@ -5,7 +5,7 @@ module WeTransfer
     def initialize(client:)
       @api_url = ENV.fetch('WT_API_URL') { 'https://dev.wetransfer.com' }
       @api_key = client.api_key
-      @api_connection = create_api_connection_object!
+      @api_connection ||= create_api_connection_object!
       @api_bearer_token ||= request_jwt
     end
 

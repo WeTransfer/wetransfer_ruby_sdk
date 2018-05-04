@@ -1,6 +1,18 @@
 # WetransferRubySdk
 
-Ruby SDK for the WeTransfer Public API. Coming soon!
+An open source Ruby SDK for the WeTransfer Open API
+
+For API Keys etc please visit our [developer portal](https://developers.wetransfer.com).
+
+## Table of Contents
+
+1. [Installation](#installation)
+2. [Usage](#usage)
+3. [Methods](#methods)
+4. [Development](#development)
+5. [Contributing](#contributing)
+6. [License](#license)
+7. [Code of Conduct](#code-of-conduct)
 
 ## Installation
 
@@ -20,6 +32,47 @@ Or install it yourself as:
 
 ## Usage
 
+### Super simple transfers
+
+You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com).
+
+Be sure to not commit this key to github! If you do though, no worries, you can always revoke & create a new key from within the portal.
+
+Now that you've got a wonderful WeTransfer API key, you can create a Client object like so:
+
+```ruby
+@client = WeTransfer::Client.new(api_key: 'api key')
+```
+
+Now that you've got the client set up you can use the `create_transfer` to, well, create a transfer!
+
+If you pass item paths to the method it will handle the upload process itself, otherwise you can omit them and
+use the `add_items` method once the transfer has been created.
+
+```ruby
+@client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this", items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])`
+```
+
+## Item upload flow
+
+N.B. all items must have the following structure:
+
+### Item fields:
+
+All of the following are **mandatory** for each item item.
+
+1. filename - string - the name of the file
+2. filesize - integer - file size in bytes. Must be accurate - no fooling. Don't let us down.
+3. content_identifier - string - must read "file"
+4. local_identifier - string - unique identifier to identify the file to your (or a) system. Must be 36 characters or less!
+
+#### `add_items`
+
+If you want slightly more granular control over your transfer, create it without an `items` array, and then use `add_items` with the resulting transfer object.
+
+```ruby
+@transfer = WeTransfer::Transfers.new(@client).add_items(transfer: @transfer, items: [{"local_identifier": "foo", "content_identifier": "file", "filename": "foo.gif", "filesize": 1024 },{"local_identifier": "bar", "content_identifier": "file", "filename": "bar.gif", "filesize": 8234543 }])
+```
 
 ## Development
 
@@ -38,84 +91,3 @@ The gem is available as open source under the terms of the [MIT License](https:/
 ## Code of Conduct
 
 Everyone interacting in the WetransferRubySdk project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/wetransfer/wetransfer/blob/master/CODE_OF_CONDUCT.md).
-
-
-### Usage Examples
-
-Configure a new client
-```
-@client = WeTransfer::Client.new(api_key: 'api key')
-```
-
-
-Now you are all setup to create transfers and send files over the web. The simplest approach is to use the Upload class. The response will be a WeTransfer link where you can download the files. Optional you can send a name and description as options.
-
-`WeTransfer::Upload.new(client: @client, files: [], options: {name: 'transfer name', description: 'This can be a description of the content'} )`
-
-
-```
-WeTransfer::Upload.new(client: @client, files: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"] )
-
-```
-
-
-If you want more freedom you can use these methods:
-
-`create_transfer(name:, description:, items: [])`
-
-`add_items(transfer:, items:)`
-
-`get_upload_urls(transfer:)`
-
-`multi_part_file(item:, file: )`
-
-`single_part_file(item:, file: )`
-
-
-#### create_transfer
-The create_transfer method takes 3 arguments, a name, a description and an array with items.
-the items should all have this layout and the local_identifier is limited to 36 characters.
-
-```
-@transfer = WeTransfer::Transfers.new(@client).create_transfer(name: 'A name', description: 'I want to share these files with you', items: [{"local_identifier": "Random 36 characters", "content_identifier": "file", "filename": "filename.gif", "filesize": 1024 }])
-```
-
-#### add_items
-If you forgot to add some items to your transfer there's a possibility to always add some more.
-
-```
-@transfer = WeTransfer::Transfers.new(@client).add_items(transfer: @transfer, items: [{"local_identifier": "foo", "content_identifier": "file", "filename": "foo.gif", "filesize": 1024 },{"local_identifier": "bar", "content_identifier": "file", "filename": "bar.gif", "filesize": 8234543 }])
-```
-
-
-#### get_upload_urls
-Single part items have their upload url provided in the hash, for multi part files this endpoint is provided where the upload urls will be stored as an array inside the items upload_url
-
-```
-@transfer = WeTransfer::Transfers.new(@client).get_upload_urls(transfer: @transfer)
-
-```
-
-
-#### multi_part_file
-The multi part file method is to upload the item to the upload urls stored into the upload_url key. Send the item hash and the file to this method and the method will read the 6MB for every upload url and send it to the pre-signed aws url. After the upload is done the file will be completed
-
-`item` should be the hash containing all hash information
-`file_path` is the path to the local file
-
-```
-WeTransfer::Transfers.new(@client).multi_part_file(item: item file: file_path)
-
-```
-
-#### single_part_file
-The single part file method is to upload singel part files, these are files less then 6MB. They don't need a multi part upload and can be send directly to the provided S3 url. After the upload is done the file will be completed
-
-`item` should be the hash containing all hash information
-`file_path` is the path to the local file
-
-
-```
-WeTransfer::Transfers.new(@client).multi_part_file(item: item file: file_path)
-```
-

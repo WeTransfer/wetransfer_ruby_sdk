@@ -55,23 +55,12 @@ use the `add_items` method once the transfer has been created.
 
 ## Item upload flow
 
-N.B. all items must have the following structure:
-
-### Item fields:
-
-All of the following are **mandatory** for each item item.
-
-1. filename - string - the name of the file
-2. filesize - integer - file size in bytes. Must be accurate - no fooling. Don't let us down.
-3. content_identifier - string - must read "file"
-4. local_identifier - string - unique identifier to identify the file to your (or a) system. Must be 36 characters or less!
-
-#### `add_items`
+### `add_items`
 
 If you want slightly more granular control over your transfer, create it without an `items` array, and then use `add_items` with the resulting transfer object.
 
 ```ruby
-@transfer = WeTransfer::Transfers.new(@client).add_items(transfer: @transfer, items: [{"local_identifier": "foo", "content_identifier": "file", "filename": "foo.gif", "filesize": 1024 },{"local_identifier": "bar", "content_identifier": "file", "filename": "bar.gif", "filesize": 8234543 }])
+@transfer = WeTransfer::Transfers.new(@client).add_items(transfer: @transfer, items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])
 ```
 
 ## Development

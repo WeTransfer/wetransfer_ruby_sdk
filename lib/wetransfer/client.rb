@@ -11,7 +11,8 @@ module WeTransfer
     end
 
     # If you pass in items to the transfer it'll create the transfer with them,
-    # otherwise it creates a "blank" transfer.
+    # otherwise it creates a "blank" transfer object. You can also leave off the
+    # name and description, and it will be auto-generated.
     def create_transfer(name: nil, description: nil, items: [])
       raise ArgumentError, 'The items field must be an array' unless items.is_a?(Array)
       @transfer = build_transfer_object(name, description).transfer
@@ -19,10 +20,10 @@ module WeTransfer
       @transfer
     end
 
-    def add_items(transfer: nil, items: [])
+    # Once you've created a "blank" transfer you can use this to add items to it.
+    # Items must have the structure defined in the README, otherwise information will be auto-generated for them.
+    def add_items(transfer:, items:)
       @transfer ||= transfer
-      raise ArgumentError, 'No items found' if items.empty?
-      raise ArgumentError, 'Transfer object is missing' if @transfer.nil?
       create_transfer_items(items: items)
       send_items_to_transfer
       upload_and_complete_items

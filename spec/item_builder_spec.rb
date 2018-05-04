@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 describe WeTransfer::ItemBuilder do
-
   describe 'ItemBuilder process' do
-    let(:item_builder) {described_class.new}
+    let(:item_builder) { described_class.new }
 
     it 'makes a new Item if no item is given on initialze' do
       expect(item_builder).to be_an_instance_of(WeTransfer::ItemBuilder)
@@ -89,14 +88,14 @@ describe WeTransfer::ItemBuilder do
     end
 
     it 'validates the file if it exists on the path given' do
-      expect{
+      expect {
         item_builder.path(path: "#{__dir__}/war-and-peace.txt")
         item_builder.validate_file
       }.to_not raise_error
     end
 
     it 'validates the file if it exists on the path given and returns with FileDoesNotExistError' do
-      expect{
+      expect {
         item_builder.path(path: "#{__dir__}/peace-and-war.txt")
         item_builder.validate_file
       }.to raise_error(WeTransfer::ItemBuilder::FileDoesNotExistError, "#{item_builder.item} does not exist")

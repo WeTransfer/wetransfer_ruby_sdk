@@ -32,7 +32,7 @@ describe WeTransfer::Connection do
     it 'returns with a response body when a post request is made' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      response = connection.post_request(path: '/v1/transfers', body: {name: 'test_transfer', description: 'this is a test transfer', items: []} )
+      response = connection.post_request(path: '/v1/transfers', body: {name: 'test_transfer', description: 'this is a test transfer', items: []})
       expect(response['shortened_url']).to start_with('http://we.tl/s-')
       expect(response['name']).to eq('test_transfer')
       expect(response['description']).to eq('this is a test transfer')

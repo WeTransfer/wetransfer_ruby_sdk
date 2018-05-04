@@ -50,7 +50,9 @@ If you pass item paths to the method it will handle the upload process itself, o
 use the `add_items` method once the transfer has been created.
 
 ```ruby
-@client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this", items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])`
+transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this", items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])
+
+transfer.shortened_url = "https://we.tl/SSBsb3ZlIHJ1Ynk="
 ```
 
 ## Item upload flow
@@ -60,7 +62,11 @@ use the `add_items` method once the transfer has been created.
 If you want slightly more granular control over your transfer, create it without an `items` array, and then use `add_items` with the resulting transfer object.
 
 ```ruby
-@transfer = WeTransfer::Transfers.new(@client).add_items(transfer: @transfer, items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])
+transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this")
+
+transfer = WeTransfer::Transfers.new(@client).add_items(transfer: @transfer, items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])
+
+transfer.shortened_url = "https://we.tl/d2V0cmFuc2Zlci5ob21lcnVuLmNv"
 ```
 
 ## Development

@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "A Ruby SDK for WeTransfer's Public API"
   spec.description   = "Ruby bindings for using WeTransfer's Public API."
-  spec.homepage      = 'https://wetransfer.github.io'
+  spec.homepage      = 'https://developers.wetransfer.com'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

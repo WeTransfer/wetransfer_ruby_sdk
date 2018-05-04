@@ -92,7 +92,7 @@ describe WeTransfer::ItemBuilder do
       expect{
         item_builder.path(path: "#{__dir__}/war-and-peace.txt")
         item_builder.validate_file
-      }.to_not raise_error(WeTransfer::ItemBuilder::FileDoesNotExistError, "#{item_builder.item} does not exist")
+      }.to_not raise_error
     end
 
     it 'validates the file if it exists on the path given and returns with FileDoesNotExistError' do

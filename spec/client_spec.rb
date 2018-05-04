@@ -46,7 +46,7 @@ describe WeTransfer::Client do
     end
 
     it 'when items are sended, the transfer has items' do
-      transfer = client.create_transfer(items: ["#{__dir__}/war-and-peace.txt"])
+      transfer = client.create_transfer(items: ["#{__dir__}/fixtures/war-and-peace.txt"])
       expect(transfer).to be_kind_of WeTransfer::Transfer
       expect(transfer.items.count).to be(1)
     end
@@ -58,7 +58,7 @@ describe WeTransfer::Client do
     end
 
     it 'completes a item after item upload' do
-      transfer = client.create_transfer(items: ["#{__dir__}/war-and-peace.txt"])
+      transfer = client.create_transfer(items: ["#{__dir__}/fixtures/war-and-peace.txt"])
       expect(transfer).to be_kind_of WeTransfer::Transfer
     end
   end
@@ -69,13 +69,13 @@ describe WeTransfer::Client do
     it 'add items to an already created transfer' do
       transfer = client.create_transfer
       expect(transfer.items.count).to be(0)
-      transfer = client.add_items(transfer: transfer, items: ["#{__dir__}/war-and-peace.txt"])
+      transfer = client.add_items(transfer: transfer, items: ["#{__dir__}/fixtures/war-and-peace.txt"])
       expect(transfer.items.count).to be(1)
     end
 
     it 'raises an error when no transfer is being send to add_items_to_transfer method' do
       expect {
-        client.add_items(items: ["#{__dir__}/war-and-peace.txt"])
+        client.add_items(items: ["#{__dir__}/fixtures/war-and-peace.txt"])
         }.to raise_error(ArgumentError, 'missing keyword: transfer')
     end
   end

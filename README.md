@@ -1,4 +1,4 @@
-# WetransferRubySdk
+# WeTransfer's Ruby SDK
 
 An open source Ruby SDK for the WeTransfer Open API
 

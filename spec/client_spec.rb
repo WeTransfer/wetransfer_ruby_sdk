@@ -36,7 +36,7 @@ describe WeTransfer::Client do
         taught the toaster to feel love! Humans dating robots is
         sick. You people wonder why I'm still single? It's 'cause
         all the fine robot sisters are dating humans!")
-      expect(transfer.name).to eql('WeTransfer Test Transfer')
+      expect(transfer.name).to eq('WeTransfer Test Transfer')
       expect(transfer.description).to start_with('Moving along… Good news, everyone!')
     end
 
@@ -68,9 +68,9 @@ describe WeTransfer::Client do
 
     it 'add items to an already created transfer' do
       transfer = client.create_transfer
-      expect(transfer.items.count).to be(0)
+      expect(transfer.items.count).to eq(0)
       transfer = client.add_items(transfer: transfer, items: ["#{__dir__}/fixtures/war-and-peace.txt"])
-      expect(transfer.items.count).to be(1)
+      expect(transfer.items.count).to eq(1)
     end
 
     it 'raises an error when no transfer is being send to add_items_to_transfer method' do

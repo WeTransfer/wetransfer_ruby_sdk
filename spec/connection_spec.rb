@@ -11,7 +11,7 @@ describe WeTransfer::Connection do
     it 'contains the api_key inside the connection' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      expect(connection.api_key).to be(client.api_key)
+      expect(connection.api_key).to eq(client.api_key)
     end
 
     it 'correctly handles the connection path variable' do
@@ -40,7 +40,7 @@ describe WeTransfer::Connection do
       expect(response['shortened_url']).to start_with('http://we.tl/s-')
       expect(response['name']).to eq('test_transfer')
       expect(response['description']).to eq('this is a test transfer')
-      expect(response['items'].count).to be(0)
+      expect(response['items'].count).to eq(0)
     end
 
     it 'returns with a ApiRequestError when request is forbidden' do
@@ -58,7 +58,7 @@ describe WeTransfer::Connection do
       connection = described_class.new(client: client)
       response = connection.get_request(path: '/files/1337/uploads/1/7331')
       expect(response['upload_url']).to include('upload')
-      expect(response['part_number']).to be(1)
+      expect(response['part_number']).to eq(1)
       expect(response['upload_id']).to_not be_nil
       expect(response['upload_expires_at']).to_not be_nil
     end

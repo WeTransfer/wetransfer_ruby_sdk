@@ -6,8 +6,17 @@ module WeTransfer
 
     # Initializes a new Client object
     def initialize(api_key:)
+      @api_path = ENV.fetch('WT_API_CONNECTION_PATH') { '' }
       @api_key = api_key
-      @api_connection ||= WeTransfer::Connection.new(client: self)
+      @api_bearer_token ||= request_jwt
+      @api_connection ||= WeTransfer::Connection.new(client: self, api_bearer_token: @api_bearer_token)
+    end
+
+    def request_jwt
+      # Create a connection request without a bearer token for authorization
+      # since authorization is what you need to do to retrieve the token.
+      auth_connection = WeTransfer::Connection.new(client: self)
+      auth_connection.authorization_request
     end
 
     # If you pass in items to the transfer it'll create the transfer with them,
@@ -58,14 +67,14 @@ module WeTransfer
     end
 
     def create_initial_transfer
-      response = @api_connection.post_request(path: '/v1/transfers', body: @transfer.transfer_params)
+      response = @api_connection.post_request(path: '/transfers', body: @transfer.transfer_params)
       TransferBuilder.id(transfer: @transfer, id: response['id'])
       TransferBuilder.shortened_url(transfer: @transfer, url: response['shortened_url'])
       update_item_objects(response_items: response['items']) if response['items'].any?
     end
 
     def send_items_to_transfer
-      response = @api_connection.post_request(path: "/v1/transfers/#{@transfer.id}/items", body: {items: @transfer.items_params})
+      response = @api_connection.post_request(path: "/transfers/#{@transfer.id}/items", body: {items: @transfer.items_params})
       update_item_objects(response_items: response)
     end
 
@@ -86,7 +95,7 @@ module WeTransfer
       upload_urls = []
       item.multipart_parts.times do |part|
         part += 1
-        response = @api_connection.get_request(path: "/v1/files/#{item.id}/uploads/#{part}/#{item.multipart_id}")
+        response = @api_connection.get_request(path: "/files/#{item.id}/uploads/#{part}/#{item.multipart_id}")
         upload_urls << response['upload_url']
       end
       item.upload_url = upload_urls
@@ -109,7 +118,7 @@ module WeTransfer
 
     def complete_transfer
       @transfer.items.each do |item|
-        @api_connection.post_request(path: "/v1/files/#{item.id}/uploads/complete")
+        @api_connection.post_request(path: "/files/#{item.id}/uploads/complete")
       end
     end
   end

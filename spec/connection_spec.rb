@@ -14,10 +14,14 @@ describe WeTransfer::Connection do
       expect(connection.api_key).to be(client.api_key)
     end
 
-    it 'requests an api bearer token on initialize' do
+    it 'correctly handles the connection path variable' do
+      ENV['WT_API_CONNECTION_PATH'] = '/this_path_does_not_exist'
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      expect(connection.api_bearer_token).to_not be_nil
+      expect(connection.api_path).to eq('/this_path_does_not_exist')
+      ENV['WT_API_CONNECTION_PATH'] = '/v1'
+      connection = described_class.new(client: client)
+      expect(connection.api_path).to eq('/v1')
     end
   end
 
@@ -25,14 +29,14 @@ describe WeTransfer::Connection do
     it 'returns with a response body when a post request is made' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      response = connection.post_request(path: '/v1/authorize')
+      response = connection.post_request(path: '/authorize')
       expect(response['status']).to eq('success')
     end
 
     it 'returns with a response body when a post request is made' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      response = connection.post_request(path: '/v1/transfers', body: {name: 'test_transfer', description: 'this is a test transfer', items: []})
+      response = connection.post_request(path: '/transfers', body: {name: 'test_transfer', description: 'this is a test transfer', items: []})
       expect(response['shortened_url']).to start_with('http://we.tl/s-')
       expect(response['name']).to eq('test_transfer')
       expect(response['description']).to eq('this is a test transfer')
@@ -44,7 +48,7 @@ describe WeTransfer::Connection do
     it 'returns with a response body when a get request is made for upload urls' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
-      response = connection.get_request(path: '/v1/files/1337/uploads/1/7331')
+      response = connection.get_request(path: '/files/1337/uploads/1/7331')
       expect(response['upload_url']).to include('upload')
       expect(response['part_number']).to be(1)
       expect(response['upload_id']).to_not be_nil

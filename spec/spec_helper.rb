@@ -23,6 +23,7 @@ RSpec.configure do |config|
   config.before :suite do
     TestServer.start(nil)
     ENV['WT_API_URL'] = 'http://localhost:9001'
+    ENV['WT_API_CONNECTION_PATH'] = '/v1'
   end
 
   config.expect_with :rspec do |c|

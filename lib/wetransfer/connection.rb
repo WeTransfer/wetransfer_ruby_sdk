@@ -1,17 +1,27 @@
 module WeTransfer
   class Connection
-    attr_reader :api_connection, :api_bearer_token, :api_key
+    attr_reader :api_connection, :api_bearer_token, :api_key, :api_path
 
-    def initialize(client:)
+    def initialize(client:, api_bearer_token: '')
       @api_url = ENV.fetch('WT_API_URL') { 'https://dev.wetransfer.com' }
       @api_key = client.api_key
       @api_connection ||= create_api_connection_object!
-      @api_bearer_token ||= request_jwt
+      @api_bearer_token = api_bearer_token
+      @api_path = ENV.fetch('WT_API_CONNECTION_PATH') { '' }
+    end
+
+    def authorization_request
+      response = @api_connection.post do |req|
+        req.url("#{@api_path}/authorize")
+        request_header_params(req: req)
+      end
+      response_validation!(response: response)
+      response['token']
     end
 
     def post_request(path:, body: nil)
       response = @api_connection.post do |req|
-        req.url(path)
+        req.url(@api_path + path)
         request_header_params(req: req)
         req.body = body.to_json unless body.nil?
       end
@@ -21,7 +31,7 @@ module WeTransfer
 
     def get_request(path:)
       response = @api_connection.get do |req|
-        req.url(path)
+        req.url(@api_path + path)
         request_header_params(req: req)
       end
       response_validation!(response: response)
@@ -55,11 +65,6 @@ module WeTransfer
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       end
       conn
-    end
-
-    def request_jwt
-      response = post_request(path: '/v1/authorize')
-      response['token']
     end
 
     def response_validation!(response:)

@@ -166,7 +166,7 @@ class TestServer
     }
 
     @server = WEBrick::HTTPServer.new(options)
-    @server.mount('/forbidden',     ForbiddenServlet)
+    @server.mount('/v1/forbidden',     ForbiddenServlet)
     @server.mount('/v1/authorize',  AuthServlet)
     @server.mount_proc('/v1/transfers') do |req, res|
       if req.path =~ /^(?=.*\bv1\b)(?=.*\btransfers\b)(?=.*\bitems\b).+/

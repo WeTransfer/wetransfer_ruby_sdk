@@ -69,7 +69,7 @@ class TransfersServlet < HTTPServlet::AbstractServlet
     items.each do |item|
       total_size << item['filesize']
     end
-    total_size.sum
+    total_size.reduce(0, :+)
   end
 
   def self.multipart_calc(item:)

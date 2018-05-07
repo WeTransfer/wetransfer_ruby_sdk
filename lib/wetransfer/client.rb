@@ -113,6 +113,7 @@ module WeTransfer
           chunk = file_object.read(CHUNK_SIZE)
           @api_connection.upload(file: chunk, url: url)
         end
+        file_object.close
       end
     end
 

@@ -78,7 +78,7 @@ If you want slightly more granular control over your transfer, create it without
 ```ruby
 transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this")
 
-transfer = WeTransfer::Transfers.new(@client).add_items(transfer: @transfer, items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])
+@client.add_items(transfer: @transfer, items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])
 
 transfer.shortened_url = "https://we.tl/d2V0cmFuc2Zlci5ob21lcnVuLmNv"
 ```

@@ -42,6 +42,14 @@ describe WeTransfer::Connection do
       expect(response['description']).to eq('this is a test transfer')
       expect(response['items'].count).to be(0)
     end
+
+    it 'returns with a ApiRequestError when request is forbidden' do
+      client = OpenStruct.new(api_key: 'api-key-12345')
+      connection = described_class.new(client: client)
+      expect {
+        connection.post_request(path: '/forbidden')
+      }.to raise_error(WeTransfer::Connection::ApiRequestError, 'Forbidden')
+    end
   end
 
   describe 'Connection#get_request' do
@@ -55,12 +63,12 @@ describe WeTransfer::Connection do
       expect(response['upload_expires_at']).to_not be_nil
     end
 
-    it 'returns with a StandardError when request is forbidden' do
+    it 'returns with a ApiRequestError when request is forbidden' do
       client = OpenStruct.new(api_key: 'api-key-12345')
       connection = described_class.new(client: client)
       expect {
-        connection.post_request(path: '/forbidden')
-      }.to raise_error(StandardError, 'Forbidden')
+        connection.get_request(path: '/forbidden')
+      }.to raise_error(WeTransfer::Connection::ApiRequestError, 'Forbidden')
     end
   end
 end

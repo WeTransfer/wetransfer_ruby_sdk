@@ -1,5 +1,7 @@
 module WeTransfer
   class Connection
+    class ApiRequestError < StandardError; end
+
     attr_reader :api_connection, :api_bearer_token, :api_key, :api_path
 
     def initialize(client:, api_bearer_token: '')
@@ -68,8 +70,8 @@ module WeTransfer
     end
 
     def response_validation!(response:)
-      raise StandardError, response.reason_phrase if response.status == 401
-      raise StandardError, response.reason_phrase if response.status == 403
+      raise ApiRequestError, response.reason_phrase if response.status == 401
+      raise ApiRequestError, response.reason_phrase if response.status == 403
     end
   end
 end

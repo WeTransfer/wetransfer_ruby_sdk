@@ -11,5 +11,5 @@ matrix:
   allow_failures:
     - rvm: jruby-9.0
 script:
-  - bundle exec rubocop
+  - bundle exec rubocop -c .rubocop.yml --force-exclusion
   - bundle exec rspec

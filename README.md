@@ -2,7 +2,7 @@
 
 An open source Ruby SDK for the WeTransfer Open API
 
-For API Keys etc please visit our [developer portal](https://developers.wetransfer.com).
+For your API key please visit our [developer portal](https://developers.wetransfer.com).
 
 ## Table of Contents
 

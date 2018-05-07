@@ -1,6 +1,7 @@
 module WeTransfer
   class ItemBuilder
     class FileDoesNotExistError < ArgumentError; end
+    attr_reader :item
 
     def initialize(item: nil)
       @item = if item.nil?
@@ -49,10 +50,6 @@ module WeTransfer
 
     def upload_id(item:, upload_id:)
       item.upload_id = upload_id
-    end
-
-    def item
-      @item
     end
 
     def validate_file

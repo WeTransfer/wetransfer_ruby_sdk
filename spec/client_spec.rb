@@ -25,8 +25,8 @@ describe WeTransfer::Client do
 
     it 'when no name/description is send, a default name/description is generated' do
       transfer = client.create_transfer
-      expect(transfer.name).to eql("File Transfer: #{Time.now.strftime('%d-%m-%Y')}")
-      expect(transfer.description).to eql('Transfer generated with WeTransfer Ruby SDK')
+      expect(transfer.name).to eq("File Transfer: #{Time.now.strftime('%d-%m-%Y')}")
+      expect(transfer.description).to eq('Transfer generated with WeTransfer Ruby SDK')
     end
 
     it 'when a name/description is send, transfer has that name/description' do
@@ -48,7 +48,7 @@ describe WeTransfer::Client do
     it 'when items are sended, the transfer has items' do
       transfer = client.create_transfer(items: ["#{__dir__}/fixtures/war-and-peace.txt"])
       expect(transfer).to be_kind_of WeTransfer::Transfer
-      expect(transfer.items.count).to be(1)
+      expect(transfer.items.count).to eq(1)
     end
 
     it 'returns an error when items are not sended inside an array' do

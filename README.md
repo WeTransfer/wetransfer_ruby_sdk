@@ -8,7 +8,7 @@ For your API key please visit our [developer portal](https://developers.wetransf
 
 1. [Installation](#installation)
 2. [Usage](#usage)
-3. [Methods](#methods)
+3. [Configuration](#configuration)
 4. [Development](#development)
 5. [Contributing](#contributing)
 6. [License](#license)

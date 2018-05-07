@@ -3,3 +3,4 @@ inherit_gem:
 AllCops:
   Exclude:
     - './spec/test_server.rb'
+    - '/vendor/bundle/*'

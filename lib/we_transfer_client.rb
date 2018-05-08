@@ -39,6 +39,7 @@ class WeTransferClient
     def add_file(name:, io:)
       ensure_io_compliant!(io)
       @items << FutureFileItem.new(name: name, io: io)
+      true
     end
 
     def add_file_at(path:)

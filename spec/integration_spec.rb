@@ -28,13 +28,16 @@ describe WeTransferClient do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
       # Upload ourselves
-      builder.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+      add_result = builder.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+      expect(add_result).to eq(true)
 
       # Upload ourselves again, but using add_file_at
-      builder.add_file_at(path: __FILE__) # Upload ourselves again, but this time via path
+      add_result = builder.add_file_at(path: __FILE__) # Upload ourselves again, but this time via path
+      expect(add_result).to eq(true)
 
       # Upload the large file
-      builder.add_file(name: 'large.bin', io: very_large_file)
+      add_result = builder.add_file(name: 'large.bin', io: very_large_file)
+      expect(add_result).to eq(true)
     end
 
     expect(transfer.id).to be_kind_of(String)

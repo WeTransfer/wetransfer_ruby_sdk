@@ -50,7 +50,7 @@ class WeTransferClient
       io.read(1) # Will cause things like Errno::EACCESS to happen early, before the upload begins
       io.seek(0)
       size = io.size # Will cause a NoMethodError
-      raise ArgumentError, "The IO object given to add_file has a size of 0" if size == 0
+      raise ArgumentError, 'The IO object given to add_file has a size of 0' if size == 0
     rescue NoMethodError
       raise ArgumentError, "The IO object given to add_file must respond to seek(), read() and size(), but #{io.inspect} did not"
     end
@@ -78,7 +78,7 @@ class WeTransferClient
     @bearer_token = nil
     @logger = logger
   end
-  
+
   def create_transfer(title:, message:)
     builder = TransferBuilder.new
     yield(builder)
@@ -90,7 +90,7 @@ class WeTransferClient
   def create_and_upload(xfer)
     authorize_if_no_bearer_token!
     response = faraday.post(
-      "/v1/transfers",
+      '/v1/transfers',
       JSON.pretty_generate(xfer.to_create_transfer_params),
       auth_headers.merge('Content-Type' => 'application/json')
     )
@@ -104,9 +104,8 @@ class WeTransferClient
 
     item_id_map = Hash[xfer.items.map(&:local_identifier).zip(xfer.items)]
     create_transfer_response.fetch(:items).each do |remote_item|
-      local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
-      upload_url = remote_item.fetch(:upload_url)
 
+      local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
       remote_item_id = remote_item.fetch(:id)
       put_io_in_parts(
         remote_item_id,
@@ -156,7 +155,7 @@ class WeTransferClient
 
   def put_io(to_url, io)
     io.seek(0)
-    faraday.put(to_url, io, {'Content-Type' => 'binary/octet-stream', 'Content-Length' => io.size.to_s})
+    faraday.put(to_url, io, 'Content-Type' => 'binary/octet-stream', 'Content-Length' => io.size.to_s)
   end
 
   def faraday
@@ -165,10 +164,10 @@ class WeTransferClient
       c.adapter Faraday.default_adapter
     end
   end
-  
+
   def authorize_if_no_bearer_token!
     return if @bearer_token
-    response = faraday.post("/v1/authorize", '{}', {'Content-Type'=> 'application/json', 'X-API-Key' => @api_key})
+    response = faraday.post('/v1/authorize', '{}', 'Content-Type' => 'application/json', 'X-API-Key' => @api_key)
     ensure_ok_status!(response)
     @bearer_token = JSON.parse(response.body).fetch('token')
   end
@@ -184,7 +183,7 @@ class WeTransferClient
   def ensure_ok_status!(response)
     case response.status
     when 200..299
-      return
+      nil
     when 400..499
       @logger.error { response.body }
       raise "Response had a #{response.status} code, the server will not accept this request even if retried"

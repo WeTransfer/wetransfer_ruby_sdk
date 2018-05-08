@@ -170,6 +170,8 @@ class WeTransferClient
     response = faraday.post('/v1/authorize', '{}', 'Content-Type' => 'application/json', 'X-API-Key' => @api_key)
     ensure_ok_status!(response)
     @bearer_token = JSON.parse(response.body).fetch('token')
+  rescue KeyError
+    @logger.error { "The authorization call returned #{response.body} and no :token key could be found there"}
   end
 
   def auth_headers

@@ -8,6 +8,10 @@ Dotenv.load
 require_relative '../lib/we_transfer_client.rb'
 
 describe WeTransferClient do
+  let :test_logger do
+    Logger.new($stderr).tap {|log| log.level = Logger::WARN }
+  end
+
   let :very_large_file do
     tf = Tempfile.new('test-upload')
     20.times { tf << Random.new.bytes(1024 * 1024) }
@@ -21,7 +25,7 @@ describe WeTransferClient do
   end
 
   it 'is able to create a transfer start to finish, both with small and large files' do
-    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY')) # , logger: Logger.new($stderr))
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
       # Upload ourselves
       builder.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))

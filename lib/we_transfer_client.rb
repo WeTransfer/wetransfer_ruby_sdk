@@ -5,6 +5,8 @@ require 'securerandom'
 require 'json'
 
 class WeTransferClient
+  require_relative 'we_transfer_client/version'
+
   NULL_LOGGER = Logger.new(nil)
   MAGIC_PART_SIZE = 6 * 1024 * 1024
   EXPOSED_COLLECTION_ATTRIBUTES = [:id, :version_identifier, :state, :shortened_url, :name, :description, :size, :items]
@@ -47,7 +49,8 @@ class WeTransferClient
       io.seek(0)
       io.read(1) # Will cause things like Errno::EACCESS to happen early, before the upload begins
       io.seek(0)
-      io.size # Will cause a NoMethodError
+      size = io.size # Will cause a NoMethodError
+      raise ArgumentError, "The IO object given to add_file has a size of 0" if size == 0
     rescue NoMethodError
       raise ArgumentError, "The IO object given to add_file must respond to seek(), read() and size(), but #{io.inspect} did not"
     end

@@ -19,7 +19,7 @@ For your API key please visit our [developer portal](https://developers.wetransf
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'wetransfer'
+gem 'we_transfer_client'
 ```
 
 And then execute:
@@ -55,33 +55,22 @@ Now that you've got a wonderful WeTransfer API key, you can create a Client obje
 WT_API_KEY=<your API key>
 
 # In your project file:
-@client = WeTransfer::Client.new(api_key: ENV['WT_API_KEY'])
+@client = WeTransferClient.new(api_key: ENV['WT_API_KEY'])
 ```
 
 Now that you've got the client set up you can use the `create_transfer` to, well, create a transfer!
 
-If you pass item paths to the method it will handle the upload process itself, otherwise you can omit them and
-use the `add_items` method once the transfer has been created.
-
 ```ruby
-transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this", items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])
+transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this") do |upload|
+  upload.add_file_at(path: '/path/to/local/file.jpg')
+  upload.add_file_at(path: '/path/to/another/local/file.jpg')
+  upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
+end
 
 transfer.shortened_url = "https://we.tl/SSBsb3ZlIHJ1Ynk="
 ```
 
-## Item upload flow
-
-### `add_items`
-
-If you want slightly more granular control over your transfer, create it without an `items` array, and then use `add_items` with the resulting transfer object.
-
-```ruby
-transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this")
-
-@client.add_items(transfer: @transfer, items: ["/path/to/local/file_1.jpg", "/path/to/local/file_2.png", "/path/to/local/file_3.key"])
-
-transfer.shortened_url = "https://we.tl/d2V0cmFuc2Zlci5ob21lcnVuLmNv"
-```
+The upload will be performed at the end of the block.
 
 ## Development
 

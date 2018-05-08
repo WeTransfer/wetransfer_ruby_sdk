@@ -124,18 +124,6 @@ class WeTransferClient
     RemoteTransfer.new(**remote_transfer_attrs)
   end
 
-  def find_transfer(id)
-    authorize_if_no_bearer_token!
-    response = faraday.get("/v1/transfers/#{id}", {}, auth_headers)
-    ensure_ok_status!(response)
-
-    remote_transfer_attrs = hash_to_struct(create_transfer_response, RemoteTransfer)
-    remote_transfer_attrs[:items] = remote_transfer_attrs[:items].map do |remote_item_hash|
-      hash_to_struct(remote_item_hash, RemoteItem)
-    end
-    RemoteTransfer.new(**remote_transfer_attrs)
-  end
-
   def hash_to_struct(hash, struct_class)
     Hash[struct_class.members.zip(hash.values_at(*struct_class.members))]
   end
@@ -169,8 +157,9 @@ class WeTransferClient
     response = faraday.post('/v1/authorize', '{}', 'Content-Type' => 'application/json', 'X-API-Key' => @api_key)
     ensure_ok_status!(response)
     @bearer_token = JSON.parse(response.body).fetch('token')
+    raise "The bearer token given to us by the API was null" if @bearer_token.nil? || @bearer_token.empty?
   rescue KeyError
-    @logger.error { "The authorization call returned #{response.body} and no :token key could be found there" }
+    raise "The authorization call returned #{response.body} and no :token key could be found there"
   end
 
   def auth_headers

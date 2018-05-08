@@ -67,7 +67,7 @@ class WeTransferClient
     builder = TransferBuilder.new
     yield(builder)
     future_transfer = FutureTransfer.new(name: title, description: message, items: Array(builder.items))
-    remote_transfer =create_and_upload(future_transfer)
+    remote_transfer = create_and_upload(future_transfer)
     remote_transfer
   end
 
@@ -97,6 +97,7 @@ class WeTransferClient
       )
       ensure_ok_status!(complete_response)
     end
+
     remote_transfer_attrs = hash_to_struct(create_transfer_response, RemoteTransfer)
     remote_transfer_attrs[:items] = remote_transfer_attrs[:items].map do |remote_item_hash|
       hash_to_struct(remote_item_hash, RemoteItem)

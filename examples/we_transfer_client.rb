@@ -32,11 +32,17 @@ class WeTransferClient
     end
 
     def add_file(name:, io:)
-      # File access checks etc. can go here
-      unless io.respond_to?(:read) && io.respond_to?(:seek) && io.respond_to?(:size)
-        raise ArgumentError, "The IO object given to add_file must respond to seek(), read() and size() at the minimum"
-      end
+      ensure_io_compliant!(io)
       @items << FutureFileItem.new(name: name, io: io)
+    end
+
+    def ensure_io_compliant!(io)
+      io.seek(0)
+      io.read(1) # Will cause things like Errno::EACCESS to happen early, before the upload begins
+      io.seek(0)
+      io.size # Will cause a NoMethodError
+    rescue NoMethodError
+      raise ArgumentError, "The IO object given to add_file must respond to seek(), read() and size(), but #{io.inspect} did not"
     end
   end
 

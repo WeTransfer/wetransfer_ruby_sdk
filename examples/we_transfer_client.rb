@@ -6,6 +6,9 @@ require 'json'
 
 class WeTransferClient
   NULL_LOGGER = Logger.new(nil)
+  MAGIC_PART_SIZE = 6 * 1024 * 1024
+  EXPOSED_COLLECTION_ATTRIBUTES = [:id, :version_identifier, :state, :shortened_url, :name, :description, :size, :items]
+  EXPOSED_ITEM_ATTRIBUTES = [:id, :local_identifier, :content_identifier, :name, :size, :mime_type]
 
   class FutureFileItem < Ks.strict(:name, :io, :local_identifier)
     def initialize(**kwargs)
@@ -36,6 +39,10 @@ class WeTransferClient
       @items << FutureFileItem.new(name: name, io: io)
     end
 
+    def add_file_at(path:)
+      add_file(name: File.basename(path), io: File.open(path, 'rb'))
+    end
+
     def ensure_io_compliant!(io)
       io.seek(0)
       io.read(1) # Will cause things like Errno::EACCESS to happen early, before the upload begins
@@ -56,10 +63,10 @@ class WeTransferClient
     end
   end
 
-  class RemoteTransfer < Ks.strict(:id, :version_identifier, :state, :shortened_url, :name, :description, :size, :items)
+  class RemoteTransfer < Ks.strict(*EXPOSED_COLLECTION_ATTRIBUTES)
   end
 
-  class RemoteItem < Ks.strict(:id, :local_identifier, :content_identifier, :name, :size, :mime_type)
+  class RemoteItem < Ks.strict(*EXPOSED_ITEM_ATTRIBUTES)
   end
 
   def initialize(api_key:, logger: NULL_LOGGER)
@@ -86,23 +93,27 @@ class WeTransferClient
     )
     ensure_ok_status!(response)
     create_transfer_response = JSON.parse(response.body, symbolize_names: true)
-    item_id_map = Hash[xfer.items.map(&:local_identifier).zip(xfer.items)]
 
     remote_transfer_attrs = hash_to_struct(create_transfer_response, RemoteTransfer)
     remote_transfer_attrs[:items] = remote_transfer_attrs[:items].map do |remote_item_hash|
       hash_to_struct(remote_item_hash, RemoteItem)
     end
 
+    item_id_map = Hash[xfer.items.map(&:local_identifier).zip(xfer.items)]
     create_transfer_response.fetch(:items).each do |remote_item|
       local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
       upload_url = remote_item.fetch(:upload_url)
 
-      put_response = put_io(upload_url, local_item.io)
-      ensure_ok_status!(put_response)
+      remote_item_id = remote_item.fetch(:id)
+      put_io_in_parts(
+        remote_item_id,
+        remote_item.fetch(:meta).fetch(:multipart_parts),
+        remote_item.fetch(:meta).fetch(:multipart_upload_id),
+        local_item.io
+      )
 
-      remote_id = remote_item.fetch(:id)
       complete_response = faraday.post(
-        "/v1/files/#{remote_id}/uploads/complete",
+        "/v1/files/#{remote_item_id}/uploads/complete",
         '{}',
         auth_headers.merge('Content-Type' => 'application/json')
       )
@@ -112,8 +123,32 @@ class WeTransferClient
     RemoteTransfer.new(**remote_transfer_attrs)
   end
 
+  def find_transfer(id)
+    authorize_if_no_bearer_token!
+    response = faraday.get("/v1/transfers/#{id}", {}, auth_headers)
+    ensure_ok_status!(response)
+
+    remote_transfer_attrs = hash_to_struct(create_transfer_response, RemoteTransfer)
+    remote_transfer_attrs[:items] = remote_transfer_attrs[:items].map do |remote_item_hash|
+      hash_to_struct(remote_item_hash, RemoteItem)
+    end
+    RemoteTransfer.new(**remote_transfer_attrs)
+  end
+
   def hash_to_struct(hash, struct_class)
     Hash[struct_class.members.zip(hash.values_at(*struct_class.members))]
+  end
+
+  def put_io_in_parts(item_id, n_parts, multipart_id, io)
+    chunk_size = MAGIC_PART_SIZE
+    (1..n_parts).each do |part_n_one_based|
+      response = faraday.get("/v1/files/#{item_id}/uploads/#{part_n_one_based}/#{multipart_id}", {}, auth_headers)
+      ensure_ok_status!(response)
+      response = JSON.parse(response.body, symbolize_names: true)
+      upload_url = response.fetch(:upload_url)
+      part_io = StringIO.new(io.read(chunk_size)) # needs a lens
+      put_io(upload_url, part_io)
+    end
   end
 
   def put_io(to_url, io)
@@ -148,10 +183,13 @@ class WeTransferClient
     when 200..299
       return
     when 400..499
+      @logger.error { response.body }
       raise "Response had a #{response.status} code, the server will not accept this request even if retried"
     when 500..504
+      @logger.error { response.body }
       raise "Response had a #{response.status} code, we should retry"
     else
+      @logger.error { response.body }
       raise "Response had a #{response.status} code, no idea what to do with that"
     end
   end

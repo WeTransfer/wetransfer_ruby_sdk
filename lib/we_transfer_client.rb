@@ -156,10 +156,10 @@ class WeTransferClient
     return if @bearer_token
     response = faraday.post('/v1/authorize', '{}', 'Content-Type' => 'application/json', 'X-API-Key' => @api_key)
     ensure_ok_status!(response)
-    @bearer_token = JSON.parse(response.body).fetch('token')
-    raise "The bearer token given to us by the API was null" if @bearer_token.nil? || @bearer_token.empty?
-  rescue KeyError
-    raise "The authorization call returned #{response.body} and no :token key could be found there"
+    @bearer_token = JSON.parse(response.body, symbolize_names: true)[:token]
+    if @bearer_token.nil? || @bearer_token.empty?
+      raise "The authorization call returned #{response.body} and no usable :token key could be found there"
+    end
   end
 
   def auth_headers

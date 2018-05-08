@@ -9,7 +9,7 @@ require_relative '../lib/we_transfer_client.rb'
 
 describe WeTransferClient do
   let :test_logger do
-    Logger.new($stderr).tap {|log| log.level = Logger::WARN }
+    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
   end
 
   let :very_large_file do

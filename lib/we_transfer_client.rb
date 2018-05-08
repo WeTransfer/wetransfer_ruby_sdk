@@ -104,7 +104,6 @@ class WeTransferClient
 
     item_id_map = Hash[xfer.items.map(&:local_identifier).zip(xfer.items)]
     create_transfer_response.fetch(:items).each do |remote_item|
-
       local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
       remote_item_id = remote_item.fetch(:id)
       put_io_in_parts(
@@ -171,7 +170,7 @@ class WeTransferClient
     ensure_ok_status!(response)
     @bearer_token = JSON.parse(response.body).fetch('token')
   rescue KeyError
-    @logger.error { "The authorization call returned #{response.body} and no :token key could be found there"}
+    @logger.error { "The authorization call returned #{response.body} and no :token key could be found there" }
   end
 
   def auth_headers

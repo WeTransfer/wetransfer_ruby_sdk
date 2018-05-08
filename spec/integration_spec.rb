@@ -38,8 +38,11 @@ describe WeTransferClient do
       # Upload the large file
       add_result = builder.add_file(name: 'large.bin', io: very_large_file)
       expect(add_result).to eq(true)
+
+      expect(add_result).to eq(true)
     end
 
+    expect(transfer).to be_kind_of(WeTransferClient::RemoteTransfer)
     expect(transfer.id).to be_kind_of(String)
 
     # expect(transfer.version_identifier).to be_kind_of(String)
@@ -47,6 +50,10 @@ describe WeTransferClient do
     expect(transfer.name).to eq('My amazing board')
     expect(transfer.description).to eq('Hi there!')
     expect(transfer.items).to be_kind_of(Array)
+    expect(transfer.items.length).to eq(3)
+
+    item = transfer.items.first
+    expect(item).to be_kind_of(WeTransferClient::RemoteItem)
 
     expect(transfer.shortened_url).to be_kind_of(String)
     response = Faraday.get(transfer.shortened_url)
@@ -54,7 +61,38 @@ describe WeTransferClient do
     expect(response['location']).to start_with('https://wetransfer')
   end
 
-  it 'refuses to create a transfer with no items'
-  it 'refuses to create a transfer when reading an IO raises an error'
-  it 'refuses to create a transfer when given an IO of 0 size'
+  it 'refuses to create a transfer with no items' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    expect {
+      client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
+        #...do nothing
+      end
+    }.to raise_error(/no items/)
+  end
+
+  it 'refuses to create a transfer when reading an IO raises an error' do
+    broken = StringIO.new("hello")
+    def broken.read(*)
+      raise "This failed somehow"
+    end
+
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    expect(client).not_to receive(:faraday) # Since we will not be doing any requests - we fail earlier
+    expect {
+      client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
+        builder.add_file(name: 'broken', io: broken)
+      end
+    }.to raise_error(/failed somehow/)
+  end
+
+  it 'refuses to create a transfer when given an IO of 0 size' do
+    broken = StringIO.new("")
+
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    expect {
+      client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
+        builder.add_file(name: 'broken', io: broken)
+      end
+    }.to raise_error(/has a size of 0/)
+  end
 end

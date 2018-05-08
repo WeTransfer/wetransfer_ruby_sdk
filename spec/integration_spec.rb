@@ -65,15 +65,15 @@ describe WeTransferClient do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     expect {
       client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
-        #...do nothing
+        # ...do nothing
       end
     }.to raise_error(/no items/)
   end
 
   it 'refuses to create a transfer when reading an IO raises an error' do
-    broken = StringIO.new("hello")
+    broken = StringIO.new('hello')
     def broken.read(*)
-      raise "This failed somehow"
+      raise 'This failed somehow'
     end
 
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
@@ -86,7 +86,7 @@ describe WeTransferClient do
   end
 
   it 'refuses to create a transfer when given an IO of 0 size' do
-    broken = StringIO.new("")
+    broken = StringIO.new('')
 
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     expect {

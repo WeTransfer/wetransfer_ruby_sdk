@@ -54,7 +54,7 @@ transfer = @client.create_transfer(name: "My wonderful transfer", description: "
   upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
 end
 
-transfer.shortened_url = "https://we.tl/SSBsb3ZlIHJ1Ynk="
+transfer.shortened_url => "https://we.tl/SSBsb3ZlIHJ1Ynk="
 ```
 
 The upload will be performed at the end of the block.

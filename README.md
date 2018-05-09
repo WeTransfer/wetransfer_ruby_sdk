@@ -32,30 +32,17 @@ Or install it yourself as:
 
 ## Usage
 
-### Configuration
-
-The gem allows you to configure several settings using environment variables.
-
-- `WT_API_LOGGING_ON` can be set to (a string) "true" if you want to switch Faraday's default logging on.
-
-- `WT_API_URL` can be set to a staging or test URL (something we do not offer yet, but plan to in the future)
-
-- `WT_API_CONNECTION_PATH` can be set to prefix the paths passed to faraday - for example if you're testing against a test API or a different version.
-
 ### Super simple transfers
 
 You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com).
 
-Be sure to not commit this key to github! If you do though, no worries, you can always revoke & create a new key from within the portal. You will most likely want to pass this to the client setter using an environment variable.
+Be sure to not commit this key to Github! If you do though, no worries, you can always revoke & create a new key from within the portal. You will most likely want to pass this to the client setter using an environment variable.
 
 Now that you've got a wonderful WeTransfer API key, you can create a Client object like so:
 
 ```ruby
-# In a .env or other secret handling file, not checked in to version control:
-WT_API_KEY=<your API key>
-
 # In your project file:
-@client = WeTransferClient.new(api_key: ENV['WT_API_KEY'])
+@client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
 
 Now that you've got the client set up you can use the `create_transfer` to, well, create a transfer!

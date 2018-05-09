@@ -154,6 +154,7 @@ class WeTransferClient
     Faraday.new(@api_url_base) do |c|
       c.response :logger, @logger
       c.adapter Faraday.default_adapter
+      c.headers = { 'User-Agent' => "WetransferRubySdk/#{WeTransferClient::VERSION} Ruby #{RUBY_VERSION}"}
     end
   end
 

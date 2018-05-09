@@ -4,6 +4,8 @@ An open source Ruby SDK for the WeTransfer Open API
 
 For your API key please visit our [developer portal](https://developers.wetransfer.com).
 
+[![Build Status](https://travis-ci.com/WeTransfer/wetransfer_ruby_sdk.svg?token=fYsuJT8hjJt2hyWqaLsM&branch=master)](https://travis-ci.com/WeTransfer/wetransfer_ruby_sdk) [![Gem Version](https://badge.fury.io/rb/wetransfer.svg)](https://badge.fury.io/rb/wetransfer)
+
 ## Table of Contents
 
 1. [Installation](#installation)

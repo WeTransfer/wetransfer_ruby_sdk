@@ -21,7 +21,7 @@ For your API key please visit our [developer portal](https://developers.wetransf
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'we_transfer_client'
+gem 'wetransfer'
 ```
 
 And then execute:

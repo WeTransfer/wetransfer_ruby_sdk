@@ -106,11 +106,11 @@ project:
 
    ```bash
    # Clone your fork of the repo into the current directory
-   git clone git@github.com:WeTransfer/wetransfer.git
+   git clone git@github.com:WeTransfer/wetransfer_ruby_sdk.git
    # Navigate to the newly cloned directory
-   cd wetransfer
+   cd wetransfer_ruby_sdk
    # Assign the original repo to a remote called "upstream"
-   git remote add upstream git@github.com:WeTransfer/wetransfer.git
+   git remote add upstream git@github.com:WeTransfer/wetransfer_ruby_sdk.git
    ```
 
 2. If you cloned a while ago, get the latest changes from upstream:
@@ -148,5 +148,5 @@ project:
 
 **IMPORTANT**: By submitting a patch, you agree to allow the project owner to
 license your work under the same license as that used by the project, which you
-can see by clicking [here](https://github.com/WeTransfer/wetransfer/blob/master/LICENSE.txt).
+can see by clicking [here](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/LICENSE.txt).
 This provision also applies to the test files you include with the changed code as fixtures.

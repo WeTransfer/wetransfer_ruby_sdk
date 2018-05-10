@@ -1,4 +1,4 @@
-# WeTransfer's Ruby SDK
+# WeTransfer Ruby SDK
 
 An open source Ruby SDK for the WeTransfer Open API
 
@@ -10,7 +10,7 @@ For your API key please visit our [developer portal](https://developers.wetransf
 
 1. [Installation](#installation)
 2. [Usage](#usage)
-3. [Configuration](#configuration)
+3. [Super simple transfers](#super-simple-transfers)
 4. [Development](#development)
 5. [Contributing](#contributing)
 6. [License](#license)
@@ -44,13 +44,15 @@ Now that you've got a wonderful WeTransfer API key, you can create a Client obje
 
 ```ruby
 # In your project file:
+require 'we_transfer_client'
+
 @client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
 
-Now that you've got the client set up you can use the `create_transfer` to, well, create a transfer!
+Now that you've got the client set up you can use  `create_transfer` to, well, create a transfer!
 
 ```ruby
-transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this") do |upload|
+transfer = @client.create_transfer(title: "My wonderful transfer", message: "I'm so excited to share this") do |upload|
   upload.add_file_at(path: '/path/to/local/file.jpg')
   upload.add_file_at(path: '/path/to/another/local/file.jpg')
   upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
@@ -77,4 +79,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the WetransferRubySdk project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CODE_OF_CONDUCT.md).
+Everyone interacting in the WeTransfer Ruby SDK project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CODE_OF_CONDUCT.md).

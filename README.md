@@ -1,8 +1,8 @@
 # WeTransfer Ruby SDK
 
-An open source Ruby SDK for the WeTransfer Open API
+An open source Ruby SDK for the WeTransfer Public API
 
-For your API key please visit our [developer portal](https://developers.wetransfer.com).
+For your API key and additional info please visit our [developer portal](https://developers.wetransfer.com).
 
 [![Build Status](https://travis-ci.com/WeTransfer/wetransfer_ruby_sdk.svg?token=fYsuJT8hjJt2hyWqaLsM&branch=master)](https://travis-ci.com/WeTransfer/wetransfer_ruby_sdk) [![Gem Version](https://badge.fury.io/rb/wetransfer.svg)](https://badge.fury.io/rb/wetransfer)
 
@@ -64,8 +64,15 @@ transfer.shortened_url => "https://we.tl/SSBsb3ZlIHJ1Ynk="
 The upload will be performed at the end of the block.
 
 ## Development
+You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com), and store it in a local `.env` file. As always, do not commit this file to github! :) 
 
-After forking and cloning down the repo, run `bin/setup` to install dependencies. Then, run `bundle exec rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After forking and cloning down the repo, run `bundle install` to install dependencies. Then, run `bundle exec rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+```
+$ git clone <your fork>
+$ cd wetransfer_ruby_sdk
+$ bundle install
+```
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 

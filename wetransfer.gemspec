@@ -27,6 +27,13 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
+  spec.post_install_message = %q{
+    Warning: We have changed the syntax for the create_transfer method.
+
+    create_transfer(title:, message:) is now create_transfer(name:, description:)
+
+    Please update your usage accordingly. Thank you and our apologies for the disruption.
+  }
 
   spec.add_dependency 'faraday', '~> 0.15'
   spec.add_dependency 'ks', '~> 0.0.1'

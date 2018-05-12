@@ -3,7 +3,7 @@ require 'dotenv'
 Dotenv.load
 
 client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY')) # , logger: Logger.new($stderr))
-transfer = client.create_transfer(title: 'My amazing transfer', message: 'Hi there!') do |builder|
+transfer = client.create_transfer(name: 'My amazing transfer', description: 'Hi there!') do |builder|
   builder.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
   builder.add_file(name: 'amazing.txt', io: StringIO.new('This is unbelievable'))
   builder.add_file(name: 'huge.bin', io: File.open('/path/to/local/file.jpg', 'rb'))

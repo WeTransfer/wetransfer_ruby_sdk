@@ -83,11 +83,11 @@ class WeTransferClient
     @logger = logger
   end
 
-  def create_transfer(title:, message:)
+  def create_transfer(name:, description:)
     builder = TransferBuilder.new
     yield(builder)
     raise 'The transfer you have tried to create contains no items' if builder.items.empty?
-    future_transfer = FutureTransfer.new(name: title, description: message, items: builder.items)
+    future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
     create_and_upload(future_transfer)
   end
 

@@ -52,7 +52,7 @@ require 'we_transfer_client'
 Now that you've got the client set up you can use  `create_transfer` to, well, create a transfer!
 
 ```ruby
-transfer = @client.create_transfer(title: "My wonderful transfer", message: "I'm so excited to share this") do |upload|
+transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this") do |upload|
   upload.add_file_at(path: '/path/to/local/file.jpg')
   upload.add_file_at(path: '/path/to/another/local/file.jpg')
   upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
@@ -75,6 +75,12 @@ $ bundle install
 ```
 
 To install this gem onto your local machine, run `bundle exec rake install`.
+
+To execute to ruby specs, run:
+
+```
+$ WT_API_KEY=your-api-key-here bundle exec rspec
+```
 
 ## Contributing
 

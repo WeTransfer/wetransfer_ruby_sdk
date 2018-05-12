@@ -90,6 +90,11 @@ class WeTransferClient
     create_and_upload(future_transfer)
   end
 
+  def create_empty_transfer(name:,description:)
+    future_transfer = FutureTransfer.new(name: name, description: description, items: [])
+    create_and_upload(future_transfer)
+  end
+
   def create_and_upload(xfer)
     authorize_if_no_bearer_token!
     response = faraday.post(

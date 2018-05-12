@@ -38,9 +38,19 @@ Or install it yourself as:
 
 You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com).
 
-Be sure to not commit this key to Github! If you do though, no worries, you can always revoke & create a new key from within the portal. You will most likely want to pass this to the client setter using an environment variable.
+Be sure to not commit this key to Github! If you do though, no worries, you can always revoke & create a new key from within the portal. You will most likely want to pass this to the client using an environment variable.
 
-Now that you've got a wonderful WeTransfer API key, you can create a Client object like so:
+Now that you've got a wonderful WeTransfer API key, create a .env file in your project folder:
+
+    $ touch .env
+
+Check your `.gitignore` file and make sure it has `.env` listed!
+
+Now, open the file in your text editor and add this line:
+
+`WT_API_KEY=<your api key>` (without the <> brackets!)
+
+Great! Now you can go to your project file and create the client:
 
 ```ruby
 # In your project file:

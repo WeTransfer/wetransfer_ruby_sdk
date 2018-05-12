@@ -1,9 +1,4 @@
-require 'tempfile'
-require 'bundler'
-Bundler.setup
-
-require 'dotenv'
-Dotenv.load
+require 'spec_helper'
 
 require_relative '../lib/we_transfer_client.rb'
 

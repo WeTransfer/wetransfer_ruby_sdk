@@ -26,7 +26,7 @@ describe WeTransferClient do
 
   it 'is able to create a transfer start to finish, both with small and large files' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
+    transfer = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
       # Upload ourselves
       add_result = builder.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
       expect(add_result).to eq(true)
@@ -64,7 +64,7 @@ describe WeTransferClient do
   it 'refuses to create a transfer with no items' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     expect {
-      client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
+      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
         # ...do nothing
       end
     }.to raise_error(/no items/)
@@ -79,7 +79,7 @@ describe WeTransferClient do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     expect(client).not_to receive(:faraday) # Since we will not be doing any requests - we fail earlier
     expect {
-      client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
+      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
         builder.add_file(name: 'broken', io: broken)
       end
     }.to raise_error(/failed somehow/)
@@ -90,7 +90,7 @@ describe WeTransferClient do
 
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     expect {
-      client.create_transfer(title: 'My amazing board', message: 'Hi there!') do |builder|
+      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
         builder.add_file(name: 'broken', io: broken)
       end
     }.to raise_error(/has a size of 0/)

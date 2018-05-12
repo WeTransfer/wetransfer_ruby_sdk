@@ -90,7 +90,7 @@ class WeTransferClient
     create_and_upload(future_transfer)
   end
 
-  def create_empty_transfer(name:,description:)
+  def create_empty_transfer(name:, description:)
     future_transfer = FutureTransfer.new(name: name, description: description, items: [])
     create_and_upload(future_transfer)
   end

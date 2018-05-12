@@ -38,7 +38,9 @@ Or install it yourself as:
 
 You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com).
 
-Be sure to not commit this key to Github! If you do though, no worries, you can always revoke & create a new key from within the portal. You will most likely want to pass this to the client using an environment variable.
+Be sure to not commit this key to Github! If you do though, no worries, you can always revoke & create a new key from within the portal.
+
+For configuring and storing secrets - like this API key - there are a variety of solutions. The smoothest here is creating a .env file:
 
 Now that you've got a wonderful WeTransfer API key, create a .env file in your project folder:
 

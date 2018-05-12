@@ -61,13 +61,15 @@ describe WeTransferClient do
     expect(response['location']).to start_with('https://wetransfer')
   end
 
-  it 'refuses to create a transfer with no items' do
+  it 'refuses to create a transfer with no items', :focus => true do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    expect {
-      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
+      response = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
         # ...do nothing
       end
-    }.to raise_error(/no items/)
+      expect(response[:size]).to eq(0)
+      # expect(response[:total_items]).to eq(0)
+      expect(response[:items]).to eq([])
+
   end
 
   it 'refuses to create a transfer when reading an IO raises an error' do

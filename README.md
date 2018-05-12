@@ -94,6 +94,16 @@ To execute to ruby specs, run:
 $ bundle exec rspec
 ```
 
+Please note that we use rubocop to lint this gem -- be sure to run it prior to submitting a PR for maximum mergeability.
+
+    $ bundle exec rubocop
+
+If any violations can be handled by rubocop, you can run auto-fix and it'll handle them for you, though do run the tests again and make sure it hasn't done something ... unexpected.
+
+    $ bundle exec rubocop -a
+
+Hooray!
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/wetransfer/wetransfer_ruby_sdk. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct. More extensive contribution guidelines can be found [here](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CONTRIBUTING.md).

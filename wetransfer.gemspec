@@ -29,9 +29,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.post_install_message = %q{
     Warning: We have changed the syntax for the create_transfer method.
-
     create_transfer(title:, message:) is now create_transfer(name:, description:)
-
     Please update your usage accordingly. Thank you and our apologies for the disruption.
   }
 

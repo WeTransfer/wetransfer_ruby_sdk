@@ -91,7 +91,7 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 To execute to ruby specs, run:
 
 ```
-$ WT_API_KEY=your-api-key-here bundle exec rspec
+$ bundle exec rspec
 ```
 
 ## Contributing

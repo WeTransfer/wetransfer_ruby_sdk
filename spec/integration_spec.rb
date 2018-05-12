@@ -61,7 +61,7 @@ describe WeTransferClient do
     expect(response['location']).to start_with('https://wetransfer')
   end
 
-  it 'refuses to create a transfer with no items' do
+  it 'is able to create a transfer with no items' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     response = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
     end

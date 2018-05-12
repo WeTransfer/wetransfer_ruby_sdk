@@ -63,13 +63,10 @@ describe WeTransferClient do
 
   it 'refuses to create a transfer with no items' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-      response = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
-        # ...do nothing
-      end
-      expect(response[:size]).to eq(0)
-      # expect(response[:total_items]).to eq(0)
-      expect(response[:items]).to eq([])
-
+    response = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
+    end
+    expect(response[:size]).to eq(0)
+    expect(response[:items]).to eq([])
   end
 
   it 'refuses to create a transfer when reading an IO raises an error' do

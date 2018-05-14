@@ -34,7 +34,7 @@ Or install it yourself as:
 
 ## Usage
 
-### Super simple transfers
+### Minimalist transfers
 
 You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com).
 
@@ -76,7 +76,7 @@ transfer.shortened_url => "https://we.tl/SSBsb3ZlIHJ1Ynk="
 The upload will be performed at the end of the block.
 
 ## Development
-You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com), and store it in a local `.env` file. As always, do not commit this file to github! :) 
+You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com), and as described above, store it in a local `.env` file. As always, do not commit this file to github! :)
 
 After forking and cloning down the repo, run `bundle install` to install dependencies. Then, run `bundle exec rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
@@ -93,6 +93,16 @@ To execute to ruby specs, run:
 ```
 $ bundle exec rspec
 ```
+
+Please note that we use rubocop to lint this gem -- be sure to run it prior to submitting a PR for maximum mergeability.
+
+    $ bundle exec rubocop
+
+If any violations can be handled by rubocop, you can run auto-fix and it'll handle them for you, though do run the tests again and make sure it hasn't done something ... unexpected.
+
+    $ bundle exec rubocop -a
+
+Hooray!
 
 ## Contributing
 

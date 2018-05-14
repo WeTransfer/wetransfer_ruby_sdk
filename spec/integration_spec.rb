@@ -1,9 +1,4 @@
-require 'tempfile'
-require 'bundler'
-Bundler.setup
-
-require 'dotenv'
-Dotenv.load
+require 'spec_helper'
 
 require_relative '../lib/we_transfer_client.rb'
 
@@ -129,13 +124,19 @@ describe WeTransferClient do
     expect(asyncflow_time).to be < syncflow_time
   end
 
-  it 'refuses to create a transfer with no items' do
+  it 'is able to create a transfer with no items even if passed a block' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    expect {
-      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
-        # ...do nothing
-      end
-    }.to raise_error(/no items/)
+    response = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
+    end
+    expect(response[:size]).to eq(0)
+    expect(response[:items]).to eq([])
+  end
+
+  it 'is able to create a transfer with no items without a block' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    response = client.create_empty_transfer(name: 'My amazing board', description: 'Hi there!')
+    expect(response[:size]).to eq(0)
+    expect(response[:items]).to eq([])
   end
 
   it 'refuses to create a transfer when reading an IO raises an error' do

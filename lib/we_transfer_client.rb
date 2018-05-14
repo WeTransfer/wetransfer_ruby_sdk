@@ -148,9 +148,13 @@ class WeTransferClient
       promises = (1..n_parts).map do |part_n_one_based|
         part_io = StringIO.new(io.read(MAGIC_PART_SIZE))
         part_io.rewind
-        Concurrent::Promise.execute(:executor => @pool) do
-          upload_chunk(item_id, multipart_id, part_io, part_n_one_based)
-        end
+        lambda do |part_io, item_id, part_n_one_based, multipart_id|
+          Concurrent::Promise.execute(:executor => @pool) do
+            get_upload_url(item_id, part_n_one_based, multipart_id)
+          end.then do |upload_url|
+            upload_chunk(upload_url, part_io)
+          end
+        end.call(part_io, item_id, part_n_one_based, multipart_id)
       end
       unless Concurrent::Promise.zip(*promises).value
         # Raise the first error found
@@ -160,17 +164,20 @@ class WeTransferClient
       (1..n_parts).each do |part_n_one_based|
         part_io = StringIO.new(io.read(MAGIC_PART_SIZE))
         part_io.rewind
-        upload_chunk(item_id, multipart_id, part_io, part_n_one_based)
+        upload_chunk(get_upload_url(item_id, part_n_one_based, multipart_id), part_io)
       end
     end
   end
 
-  def upload_chunk(item_id, multipart_id, io, part)
+  def get_upload_url(item_id, part, multipart_id)
     response = faraday.get("/v1/files/#{item_id}/uploads/#{part}/#{multipart_id}", {}, auth_headers)
     ensure_ok_status!(response)
     response = JSON.parse(response.body, symbolize_names: true)
 
-    upload_url = response.fetch(:upload_url)
+    response.fetch(:upload_url)
+  end
+
+  def upload_chunk(upload_url, io)
     response = faraday.put(upload_url, io, 'Content-Type' => 'binary/octet-stream', 'Content-Length' => io.size.to_s)
     ensure_ok_status!(response)
   end

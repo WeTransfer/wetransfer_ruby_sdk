@@ -100,7 +100,7 @@ describe WeTransferClient do
   end
 
   it 'can transfer files async faster' do
-    syncflow_time =  timeit do
+    syncflow_time = timeit do
       client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
       client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
         # Upload the large file

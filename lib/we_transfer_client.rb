@@ -84,10 +84,10 @@ class WeTransferClient
     @api_key = api_key.to_str
     @bearer_token = nil
     @logger = logger
-    if async
-      @pool = Concurrent::FixedThreadPool.new(POOL_SIZE)
+    @pool = if async
+      Concurrent::FixedThreadPool.new(POOL_SIZE)
     else
-      @pool = nil
+      nil
     end
   end
 
@@ -153,7 +153,7 @@ class WeTransferClient
         part_io = StringIO.new(io.read(MAGIC_PART_SIZE))
         part_io.rewind
         lambda do |part_io, item_id, part_n_one_based, multipart_id|
-          Concurrent::Promise.execute(:executor => @pool) do
+          Concurrent::Promise.execute(executor: @pool) do
             get_upload_url(item_id, part_n_one_based, multipart_id)
           end.then do |upload_url|
             upload_chunk(upload_url, part_io)

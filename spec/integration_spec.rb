@@ -7,6 +7,12 @@ Dotenv.load
 
 require_relative '../lib/we_transfer_client.rb'
 
+def timeit
+  start = Time.now
+  yield
+  Time.now - start
+end
+
 describe WeTransferClient do
   let :test_logger do
     Logger.new($stderr).tap { |log| log.level = Logger::WARN }
@@ -59,6 +65,31 @@ describe WeTransferClient do
     response = Faraday.get(transfer.shortened_url)
     expect(response.status).to eq(302)
     expect(response['location']).to start_with('https://wetransfer')
+  end
+
+  it 'can transfer files async faster' do
+    syncflow_time =  timeit do
+      client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
+        # Upload the large file
+        add_result = builder.add_file(name: 'large.bin', io: very_large_file)
+        expect(add_result).to eq(true)
+
+        expect(add_result).to eq(true)
+      end
+    end
+
+    asyncflow_time = timeit do
+      client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger, async: true)
+      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
+        # Upload the large file
+        add_result = builder.add_file(name: 'large.bin', io: very_large_file)
+        expect(add_result).to eq(true)
+
+        expect(add_result).to eq(true)
+      end
+    end
+    expect(asyncflow_time).to be < syncflow_time
   end
 
   it 'refuses to create a transfer with no items' do

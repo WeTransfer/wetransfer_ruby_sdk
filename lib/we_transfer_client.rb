@@ -3,12 +3,15 @@ require 'logger'
 require 'ks'
 require 'securerandom'
 require 'json'
+require 'concurrent'
 
 class WeTransferClient
   require_relative 'we_transfer_client/version'
 
   class Error < StandardError
   end
+
+  POOL_SIZE = 5
 
   NULL_LOGGER = Logger.new(nil)
   MAGIC_PART_SIZE = 6 * 1024 * 1024
@@ -76,11 +79,16 @@ class WeTransferClient
   class RemoteItem < Ks.strict(*EXPOSED_ITEM_ATTRIBUTES)
   end
 
-  def initialize(api_key:, logger: NULL_LOGGER)
+  def initialize(api_key:, logger: NULL_LOGGER, async: false)
     @api_url_base = 'https://dev.wetransfer.com'
     @api_key = api_key.to_str
     @bearer_token = nil
     @logger = logger
+    if async
+      @pool = Concurrent::FixedThreadPool.new(POOL_SIZE)
+    else
+      @pool = nil
+    end
   end
 
   def create_transfer(name:, description:)
@@ -136,18 +144,35 @@ class WeTransferClient
   end
 
   def put_io_in_parts(item_id, n_parts, multipart_id, io)
-    chunk_size = MAGIC_PART_SIZE
-    (1..n_parts).each do |part_n_one_based|
-      response = faraday.get("/v1/files/#{item_id}/uploads/#{part_n_one_based}/#{multipart_id}", {}, auth_headers)
-      ensure_ok_status!(response)
-      response = JSON.parse(response.body, symbolize_names: true)
-
-      upload_url = response.fetch(:upload_url)
-      part_io = StringIO.new(io.read(chunk_size)) # needs a lens
-      part_io.rewind
-      response = faraday.put(upload_url, part_io, 'Content-Type' => 'binary/octet-stream', 'Content-Length' => part_io.size.to_s)
-      ensure_ok_status!(response)
+    if @pool  # will refactor once the idea is approved
+      promises = (1..n_parts).map do |part_n_one_based|
+        part_io = StringIO.new(io.read(MAGIC_PART_SIZE))
+        part_io.rewind
+        Concurrent::Promise.execute(:executor => @pool) do
+          upload_chunk(item_id, multipart_id, part_io, part_n_one_based)
+        end
+      end
+      unless Concurrent::Promise.zip(*promises).value
+        # Raise the first error found
+        raise promises.map(&:reason).compact.first
+      end
+    else
+      (1..n_parts).each do |part_n_one_based|
+        part_io = StringIO.new(io.read(MAGIC_PART_SIZE))
+        part_io.rewind
+        upload_chunk(item_id, multipart_id, part_io, part_n_one_based)
+      end
     end
+  end
+
+  def upload_chunk(item_id, multipart_id, io, part)
+    response = faraday.get("/v1/files/#{item_id}/uploads/#{part}/#{multipart_id}", {}, auth_headers)
+    ensure_ok_status!(response)
+    response = JSON.parse(response.body, symbolize_names: true)
+
+    upload_url = response.fetch(:upload_url)
+    response = faraday.put(upload_url, io, 'Content-Type' => 'binary/octet-stream', 'Content-Length' => io.size.to_s)
+    ensure_ok_status!(response)
   end
 
   def faraday

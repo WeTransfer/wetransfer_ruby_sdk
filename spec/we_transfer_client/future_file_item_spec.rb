@@ -29,10 +29,10 @@ describe FutureFileItem do
   end
 
   it 'creates params properly' do
-    future_file_item = described_class.new(name: 'yes', io: 'hello', local_identifier: '4815162342')
+    future_file_item = described_class.new(name: 'yes', io: 'hello')
     item_as_params = future_file_item.to_item_request_params
     expect(item_as_params[:content_identifier]).to eq('file')
-    expect(item_as_params[:local_identifier]).to eq('4815162342')
+    expect(item_as_params[:local_identifier]).to be_kind_of(String)
     expect(item_as_params[:filename]).to eq('yes')
     expect(item_as_params[:filesize]).to eq(5)
   end

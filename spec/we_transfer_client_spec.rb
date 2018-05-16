@@ -6,5 +6,5 @@ describe WeTransferClient do
   it 'exposes VERSION' do
     expect(WeTransferClient::VERSION).to be_kind_of(String)
   end
-
 end
+

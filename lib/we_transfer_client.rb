@@ -6,75 +6,17 @@ require 'json'
 
 class WeTransferClient
   require_relative 'we_transfer_client/version'
+  require_relative 'we_transfer_client/future_file_item'
+  require_relative 'we_transfer_client/future_transfer'
+  require_relative 'we_transfer_client/transfer_builder'
+  require_relative 'we_transfer_client/remote_transfer'
+  require_relative 'we_transfer_client/remote_item'
 
   class Error < StandardError
   end
 
   NULL_LOGGER = Logger.new(nil)
   MAGIC_PART_SIZE = 6 * 1024 * 1024
-  EXPOSED_COLLECTION_ATTRIBUTES = [:id, :version_identifier, :state, :shortened_url, :name, :description, :size, :items]
-  EXPOSED_ITEM_ATTRIBUTES = [:id, :local_identifier, :content_identifier, :name, :size, :mime_type]
-
-  class FutureFileItem < Ks.strict(:name, :io, :local_identifier)
-    def initialize(**kwargs)
-      super(local_identifier: SecureRandom.uuid, **kwargs)
-    end
-
-    def to_item_request_params
-      # Ideally the content identifier should stay the same throughout multiple
-      # calls if the file contents doesn't change.
-      {
-        content_identifier: 'file',
-        local_identifier: local_identifier,
-        filename: name,
-        filesize: io.size,
-      }
-    end
-  end
-
-  class TransferBuilder
-    attr_reader :items
-
-    def initialize
-      @items = []
-    end
-
-    def add_file(name:, io:)
-      ensure_io_compliant!(io)
-      @items << FutureFileItem.new(name: name, io: io)
-      true
-    end
-
-    def add_file_at(path:)
-      add_file(name: File.basename(path), io: File.open(path, 'rb'))
-    end
-
-    def ensure_io_compliant!(io)
-      io.seek(0)
-      io.read(1) # Will cause things like Errno::EACCESS to happen early, before the upload begins
-      io.seek(0) # Also rewinds the IO for later uploading action
-      size = io.size # Will cause a NoMethodError
-      raise Error, 'The IO object given to add_file has a size of 0' if size <= 0
-    rescue NoMethodError
-      raise Error, "The IO object given to add_file must respond to seek(), read() and size(), but #{io.inspect} did not"
-    end
-  end
-
-  class FutureTransfer < Ks.strict(:name, :description, :items)
-    def to_create_transfer_params
-      {
-        name: name,
-        description: description,
-        items: items.map(&:to_item_request_params),
-      }
-    end
-  end
-
-  class RemoteTransfer < Ks.strict(*EXPOSED_COLLECTION_ATTRIBUTES)
-  end
-
-  class RemoteItem < Ks.strict(*EXPOSED_ITEM_ATTRIBUTES)
-  end
 
   def initialize(api_key:, logger: NULL_LOGGER)
     @api_url_base = 'https://dev.wetransfer.com'

@@ -15,10 +15,6 @@ describe WeTransferClient do
     tf
   end
 
-  it 'exposes VERSION' do
-    expect(WeTransferClient::VERSION).to be_kind_of(String)
-  end
-
   it 'is able to create a transfer start to finish, both with small and large files' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
@@ -37,7 +33,7 @@ describe WeTransferClient do
       expect(add_result).to eq(true)
     end
 
-    expect(transfer).to be_kind_of(WeTransferClient::RemoteTransfer)
+    expect(transfer).to be_kind_of(RemoteTransfer)
     expect(transfer.id).to be_kind_of(String)
 
     # expect(transfer.version_identifier).to be_kind_of(String)
@@ -48,7 +44,7 @@ describe WeTransferClient do
     expect(transfer.items.length).to eq(3)
 
     item = transfer.items.first
-    expect(item).to be_kind_of(WeTransferClient::RemoteItem)
+    expect(item).to be_kind_of(RemoteItem)
 
     expect(transfer.shortened_url).to be_kind_of(String)
     response = Faraday.get(transfer.shortened_url)

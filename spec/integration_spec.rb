@@ -15,10 +15,6 @@ describe WeTransferClient do
     tf
   end
 
-  it 'exposes VERSION' do
-    expect(WeTransferClient::VERSION).to be_kind_of(String)
-  end
-
   it 'is able to create a transfer start to finish, both with small and large files' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|

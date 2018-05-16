@@ -7,4 +7,3 @@ describe WeTransferClient do
     expect(WeTransferClient::VERSION).to be_kind_of(String)
   end
 end
-

@@ -1,6 +1,2 @@
 inherit_gem:
   wetransfer_style: ruby/default.yml
-AllCops:
-  Exclude:
-    - 'vendor/**/*'
-    - './spec/test_server.rb'

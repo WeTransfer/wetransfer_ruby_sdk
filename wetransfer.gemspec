@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
     Please update your usage accordingly. Thank you and our apologies for the disruption.
   }
 
-  spec.add_dependency 'faraday', '~> 0.15'
+  spec.add_dependency 'faraday', '~> 0.12'
   spec.add_dependency 'ks', '~> 0.0.1'
 
   spec.add_development_dependency 'dotenv', '~> 2.2'

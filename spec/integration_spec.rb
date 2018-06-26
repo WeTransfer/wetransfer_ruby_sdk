@@ -134,9 +134,11 @@ describe WeTransferClient do
       add_result = builder.add_file(name: 'large.bin', io: very_large_file)
       expect(add_result).to eq(true)
 
+      # upload from url
       add_result = builder.add_file_from_url(path: 'https://images.ctfassets.net/5jh3ceokw2vz/2tKtSoutJ6ua6aEaycOK2i/fe2f32c3228d5a60c7b0ee09a3cb6fdb/Jesse_Draxler_2.jpg')
       expect(add_result).to eq(true)
 
+      # add url to transfer
       add_result = builder.add_web_content(path: 'http://www.wetransfer.com')
       expect(add_result).to eq(true)
     end

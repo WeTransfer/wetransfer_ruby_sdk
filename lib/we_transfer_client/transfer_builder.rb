@@ -39,7 +39,8 @@ class TransferBuilder
   end
 
   def save_to_file(path:)
-    url = open(path).base_uri.to_s
+    # allow_redirection is needed to support http -> https redirection
+    url = open(path, allow_redirections: :safe).base_uri.to_s
     file_name = url.split('/').last
     extension = file_name.split('.').last
     t = Tempfile.new([file_name, ".#{extension}"])

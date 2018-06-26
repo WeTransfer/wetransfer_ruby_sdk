@@ -4,6 +4,7 @@ require 'ks'
 require 'securerandom'
 require 'json'
 require 'open-uri'
+require 'open_uri_redirections'
 
 class WeTransferClient
   require_relative 'we_transfer_client/version'

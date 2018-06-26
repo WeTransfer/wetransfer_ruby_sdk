@@ -41,10 +41,11 @@ class TransferBuilder
   def save_to_file(path:)
     url = open(path).base_uri.to_s
     file_name = url.split('/').last
-    image_file = open("spec/test_images/#{file_name}", 'wb') do |file|
-      file << open(url).read
-    end
-    data = File.open(image_file, 'r')
-    File.absolute_path(data)
+    extension = file_name.split('.').last
+    t = Tempfile.new([file_name, ".#{extension}"])
+    t.write(open(url).read)
+    t.flush
+    t.close
+    t.path
   end
 end

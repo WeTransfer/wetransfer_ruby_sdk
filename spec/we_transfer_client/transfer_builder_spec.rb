@@ -33,7 +33,6 @@ describe TransferBuilder do
     expect(transfer_builder.items.count).to eq(1)
 
     item = transfer_builder.items.first
-    expect(item.name).to eq('pexels-photo-1115804.jpeg')
     expect(item.io).to be_kind_of(File)
     expect(item.local_identifier).to be_kind_of(String)
   end

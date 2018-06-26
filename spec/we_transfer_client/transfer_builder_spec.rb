@@ -49,5 +49,3 @@ describe TransferBuilder do
     expect(item.local_identifier).to be_kind_of(String)
   end
 end
-
-

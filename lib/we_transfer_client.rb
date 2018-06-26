@@ -58,23 +58,22 @@ class WeTransferClient
 
     create_transfer_response.fetch(:items).each do |remote_item|
       local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
-      if local_item.is_a?(FutureFileItem)
-        remote_item_id = remote_item.fetch(:id)
+      next unless local_item.is_a?(FutureFileItem)
+      remote_item_id = remote_item.fetch(:id)
 
-        put_io_in_parts(
-          remote_item_id,
-          remote_item.fetch(:meta).fetch(:multipart_parts),
-          remote_item.fetch(:meta).fetch(:multipart_upload_id),
-          local_item.io
-        )
+      put_io_in_parts(
+        remote_item_id,
+        remote_item.fetch(:meta).fetch(:multipart_parts),
+        remote_item.fetch(:meta).fetch(:multipart_upload_id),
+        local_item.io
+      )
 
-        complete_response = faraday.post(
-          "/v1/files/#{remote_item_id}/uploads/complete",
-          '{}',
-          auth_headers.merge('Content-Type' => 'application/json')
-        )
-        ensure_ok_status!(complete_response)
-      end
+      complete_response = faraday.post(
+        "/v1/files/#{remote_item_id}/uploads/complete",
+        '{}',
+        auth_headers.merge('Content-Type' => 'application/json')
+      )
+      ensure_ok_status!(complete_response)
     end
     remote_transfer
   end

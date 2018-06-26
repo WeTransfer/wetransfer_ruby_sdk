@@ -22,9 +22,9 @@ class TransferBuilder
   end
 
   def add_web_content(path:)
-    url = open(path).base_uri.to_s
-    file_name = url.split('/').last
-    @items << FutureWebItem.new(url: url, title: file_name)
+    url = open(path, allow_redirections: :safe).base_uri.to_s
+    url_title = url.split('/').last
+    @items << FutureWebItem.new(url: url, title: url_title)
     true
   end
 

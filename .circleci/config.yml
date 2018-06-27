@@ -1,14 +1,14 @@
 version: 2
 jobs:
-  "ruby-2.1.0":
-    docker:
-      - image: circleci/ruby:2.1.0
-    steps:
-      - checkout
-      - run: bundle install --path vendor/bundle
-      - run:
-          name: Rubocop
-          command: bundle exec rubocop -c .rubocop.yml --force-exclusion
+  # "ruby-2.1.0":
+  #   docker:
+  #     - image: circleci/ruby:2.1.0
+  #   steps:
+  #     - checkout
+  #     - run: bundle install --path vendor/bundle
+  #     - run:
+  #         name: Rubocop
+  #         command: bundle exec rubocop -c .rubocop.yml --force-exclusion
 
   "ruby-2.5.1":
     docker:
@@ -24,5 +24,5 @@ workflows:
   version: 2
   build:
     jobs:
-      - "ruby-2.1.0"
+      # - "ruby-2.1.0"
       - "ruby-2.5.1"

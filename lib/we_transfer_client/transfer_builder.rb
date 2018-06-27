@@ -16,11 +16,28 @@ class TransferBuilder
     add_file(name: File.basename(path), io: File.open(path, 'rb'))
   end
 
+  def add_file_from_url(path:)
+    image_path = save_to_file(path: path)
+    add_file(name: File.basename(image_path), io: File.open(image_path, 'rb'))
+  end
+
   def add_web_content(path:)
     url = open(path, allow_redirections: :safe).base_uri.to_s
     url_title = url.split('/').last
     @items << FutureWebItem.new(url: url, title: url_title)
     true
+  end
+
+  def save_to_file(path:)
+    # allow_redirection is needed to support http -> https redirection
+    url = open(path, allow_redirections: :safe).base_uri.to_s
+    file_name = url.split('/').last
+    extension = file_name.split('.').last
+    t = Tempfile.new([file_name, ".#{extension}"])
+    t.write(open(url).read)
+    t.flush
+    t.close
+    t.path
   end
 
   def ensure_io_compliant!(io)

@@ -157,4 +157,78 @@ describe WeTransferClient do
     expect(response.status).to eq(302)
     expect(response['location']).to start_with('https://wetransfer')
   end
+
+  it 'is able to create a transfer with files from a url' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.create_transfer(name: 'Url File collection', description: 'Added a file from url') do |builder|
+      # Upload File fromn url
+      add_result = builder.add_file_from_url(path: 'https://cdn.wetransfer.net/assets/about/about-whoweare-c0a2e06eec356294412d5abc95aca52e3df669f71c86dbb0c04230b91eba3e18.png')
+      expect(add_result).to eq(true)
+    end
+    expect(transfer.items.length).to eq(1)
+    expect(transfer.shortened_url).to be_kind_of(String)
+    response = Faraday.get(transfer.shortened_url)
+    expect(response.status).to eq(302)
+  end
+
+  it 'supports images from url with jpg extension' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.create_transfer(name: 'JPG images', description: 'Images from url') do |builder|
+      add_result = builder.add_file_from_url(path: 'https://images.ctfassets.net/5jh3ceokw2vz/2tKtSoutJ6ua6aEaycOK2i/fe2f32c3228d5a60c7b0ee09a3cb6fdb/Jesse_Draxler_2.jpg')
+      expect(add_result).to eq(true)
+      add_result = builder.add_file_from_url(path: 'https://images.pexels.com/photos/1181655/pexels-photo-1181655.jpeg')
+      expect(add_result).to eq(true)
+    end
+    expect(transfer).to be_kind_of(RemoteTransfer)
+    expect(transfer.name).to eq('JPG images')
+    expect(transfer.description).to eq('Images from url')
+    expect(transfer.items).to be_kind_of(Array)
+    expect(transfer.items.length).to eq(2)
+  end
+
+  it 'supports images from url with gif extension' do
+    # although uploading works, the gif is not playing
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.create_transfer(name: 'GIF images', description: 'Images from url') do |builder|
+      add_result = builder.add_file_from_url(path: 'https://media.giphy.com/media/108RlBCR49SDAc/giphy.gif')
+      expect(add_result).to eq(true)
+      add_result = builder.add_file_from_url(path: 'https://media.giphy.com/media/11sBLVxNs7v6WA/giphy.gif')
+      expect(add_result).to eq(true)
+    end
+    expect(transfer).to be_kind_of(RemoteTransfer)
+    expect(transfer.name).to eq('GIF images')
+    expect(transfer.description).to eq('Images from url')
+    expect(transfer.items).to be_kind_of(Array)
+    expect(transfer.items.length).to eq(2)
+  end
+
+  it 'supports images from url with png extension' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.create_transfer(name: 'PNG images', description: 'Images from url') do |builder|
+      add_result = builder.add_file_from_url(path: 'https://cdn.pixabay.com/photo/2017/01/03/02/07/vine-1948358_1280.png')
+      expect(add_result).to eq(true)
+      add_result = builder.add_file_from_url(path: 'https://cdn.pixabay.com/photo/2017/01/03/02/07/vine-1948358_1280.png')
+      expect(add_result).to eq(true)
+    end
+    expect(transfer).to be_kind_of(RemoteTransfer)
+    expect(transfer.name).to eq('PNG images')
+    expect(transfer.description).to eq('Images from url')
+    expect(transfer.items).to be_kind_of(Array)
+    expect(transfer.items.length).to eq(2)
+  end
+
+  it 'supports images from url with pdf extension' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.create_transfer(name: 'PDF images', description: 'Images from url') do |builder|
+      add_result = builder.add_file_from_url(path: 'http://www.africau.edu/images/default/sample.pdf')
+      expect(add_result).to eq(true)
+      add_result = builder.add_file_from_url(path: 'http://www.africau.edu/images/default/sample.pdf')
+      expect(add_result).to eq(true)
+    end
+    expect(transfer).to be_kind_of(RemoteTransfer)
+    expect(transfer.name).to eq('PDF images')
+    expect(transfer.description).to eq('Images from url')
+    expect(transfer.items).to be_kind_of(Array)
+    expect(transfer.items.length).to eq(2)
+  end
 end

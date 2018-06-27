@@ -37,4 +37,14 @@ describe TransferBuilder do
     expect(item.title).to eq('wetransfer.com')
     expect(item.local_identifier).to be_kind_of(String)
   end
+
+  it 'adds a file from url' do
+    transfer_builder = described_class.new
+    transfer_builder.add_file_from_url(path: 'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg')
+    expect(transfer_builder.items.count).to eq(1)
+
+    item = transfer_builder.items.first
+    expect(item.io).to be_kind_of(File)
+    expect(item.local_identifier).to be_kind_of(String)
+  end
 end

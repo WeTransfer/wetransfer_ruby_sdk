@@ -29,7 +29,7 @@ describe TransferBuilder do
 
   it 'should add a url' do
     transfer_builder = described_class.new
-    transfer_builder.add_web_content(path: 'https://www.wetransfer.com')
+    transfer_builder.add_web_content(url: 'https://www.wetransfer.com')
     expect(transfer_builder.items.count).to eq(1)
 
     item = transfer_builder.items.first

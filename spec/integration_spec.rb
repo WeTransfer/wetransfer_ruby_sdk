@@ -97,7 +97,7 @@ describe WeTransferClient do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(name: 'My collection of web content', description: 'link collection') do |builder|
       10.times do
-        builder.add_web_content(path: 'https://www.wetransfer.com')
+        builder.add_web_content(url: 'https://www.wetransfer.com')
       end
     end
     expect(transfer).to be_kind_of(RemoteTransfer)
@@ -135,7 +135,7 @@ describe WeTransferClient do
       expect(add_result).to eq(true)
 
       # add url to transfer
-      add_result = builder.add_web_content(path: 'http://www.wetransfer.com')
+      add_result = builder.add_web_content(url: 'http://www.wetransfer.com')
       expect(add_result).to eq(true)
     end
 

@@ -12,4 +12,3 @@
 # rspec failure tracking
 .rspec_status
 .env
-spec/test_images/*

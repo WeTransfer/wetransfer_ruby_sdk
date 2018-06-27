@@ -157,5 +157,4 @@ describe WeTransferClient do
     expect(response.status).to eq(302)
     expect(response['location']).to start_with('https://wetransfer')
   end
-
 end

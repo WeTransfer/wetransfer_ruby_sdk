@@ -162,7 +162,7 @@ describe WeTransferClient do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(name: 'Url File collection', description: 'Added a file from url') do |builder|
       # Upload File fromn url
-      add_result = builder.add_file_from_url(path: 'https://cdn.wetransfer.net/assets/about/about-whoweare-c0a2e06eec356294412d5abc95aca52e3df669f71c86dbb0c04230b91eba3e18.png' )
+      add_result = builder.add_file_from_url(path: 'https://cdn.wetransfer.net/assets/about/about-whoweare-c0a2e06eec356294412d5abc95aca52e3df669f71c86dbb0c04230b91eba3e18.png')
       expect(add_result).to eq(true)
     end
     expect(transfer.items.length).to eq(1)

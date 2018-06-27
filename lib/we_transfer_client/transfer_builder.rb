@@ -37,16 +37,4 @@ class TransferBuilder
   rescue NoMethodError
     raise TransferIOError, "The IO object given to add_file must respond to seek(), read() and size(), but #{io.inspect} did not"
   end
-
-  def save_to_file(path:)
-    # allow_redirection is needed to support http -> https redirection
-    url = open(path, allow_redirections: :safe).base_uri.to_s
-    file_name = url.split('/').last
-    extension = file_name.split('.').last
-    t = Tempfile.new([file_name, ".#{extension}"])
-    t.write(open(url).read)
-    t.flush
-    t.close
-    t.path
-  end
 end

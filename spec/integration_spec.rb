@@ -97,7 +97,7 @@ describe WeTransferClient do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(name: 'My collection of web content', description: 'link collection') do |builder|
       10.times do
-        builder.add_web_content(path: 'http://www.wetransfer.com')
+        builder.add_web_content(path: 'https://www.wetransfer.com')
       end
     end
     expect(transfer).to be_kind_of(RemoteTransfer)
@@ -134,10 +134,6 @@ describe WeTransferClient do
       add_result = builder.add_file(name: 'large.bin', io: very_large_file)
       expect(add_result).to eq(true)
 
-      # upload from url
-      add_result = builder.add_file_from_url(path: 'https://images.ctfassets.net/5jh3ceokw2vz/2tKtSoutJ6ua6aEaycOK2i/fe2f32c3228d5a60c7b0ee09a3cb6fdb/Jesse_Draxler_2.jpg')
-      expect(add_result).to eq(true)
-
       # add url to transfer
       add_result = builder.add_web_content(path: 'http://www.wetransfer.com')
       expect(add_result).to eq(true)
@@ -151,7 +147,7 @@ describe WeTransferClient do
     expect(transfer.name).to eq('Mixed Board Content')
     expect(transfer.description).to eq('Files and Webcontent')
     expect(transfer.items).to be_kind_of(Array)
-    expect(transfer.items.length).to eq(5)
+    expect(transfer.items.length).to eq(4)
 
     item = transfer.items.first
     expect(item).to be_kind_of(RemoteItem)
@@ -162,64 +158,4 @@ describe WeTransferClient do
     expect(response['location']).to start_with('https://wetransfer')
   end
 
-  it 'supports images from url with jpg extension' do
-    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.create_transfer(name: 'JPG images', description: 'Images from url') do |builder|
-      add_result = builder.add_file_from_url(path: 'https://images.ctfassets.net/5jh3ceokw2vz/2tKtSoutJ6ua6aEaycOK2i/fe2f32c3228d5a60c7b0ee09a3cb6fdb/Jesse_Draxler_2.jpg')
-      expect(add_result).to eq(true)
-      add_result = builder.add_file_from_url(path: 'https://images.pexels.com/photos/1181655/pexels-photo-1181655.jpeg')
-      expect(add_result).to eq(true)
-    end
-    expect(transfer).to be_kind_of(RemoteTransfer)
-    expect(transfer.name).to eq('JPG images')
-    expect(transfer.description).to eq('Images from url')
-    expect(transfer.items).to be_kind_of(Array)
-    expect(transfer.items.length).to eq(2)
-  end
-
-  it 'supports images from url with gif extension' do
-    # although uploading works, the gif is not playing
-    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.create_transfer(name: 'GIF images', description: 'Images from url') do |builder|
-      add_result = builder.add_file_from_url(path: 'https://media.giphy.com/media/108RlBCR49SDAc/giphy.gif')
-      expect(add_result).to eq(true)
-      add_result = builder.add_file_from_url(path: 'https://media.giphy.com/media/11sBLVxNs7v6WA/giphy.gif')
-      expect(add_result).to eq(true)
-    end
-    expect(transfer).to be_kind_of(RemoteTransfer)
-    expect(transfer.name).to eq('GIF images')
-    expect(transfer.description).to eq('Images from url')
-    expect(transfer.items).to be_kind_of(Array)
-    expect(transfer.items.length).to eq(2)
-  end
-
-  it 'supports images from url with png extension' do
-    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.create_transfer(name: 'PNG images', description: 'Images from url') do |builder|
-      add_result = builder.add_file_from_url(path: 'https://cdn.pixabay.com/photo/2017/01/03/02/07/vine-1948358_1280.png')
-      expect(add_result).to eq(true)
-      add_result = builder.add_file_from_url(path: 'https://cdn.pixabay.com/photo/2017/01/03/02/07/vine-1948358_1280.png')
-      expect(add_result).to eq(true)
-    end
-    expect(transfer).to be_kind_of(RemoteTransfer)
-    expect(transfer.name).to eq('PNG images')
-    expect(transfer.description).to eq('Images from url')
-    expect(transfer.items).to be_kind_of(Array)
-    expect(transfer.items.length).to eq(2)
-  end
-
-  it 'supports images from url with pdf extension' do
-    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.create_transfer(name: 'PDF images', description: 'Images from url') do |builder|
-      add_result = builder.add_file_from_url(path: 'http://www.africau.edu/images/default/sample.pdf')
-      expect(add_result).to eq(true)
-      add_result = builder.add_file_from_url(path: 'http://www.africau.edu/images/default/sample.pdf')
-      expect(add_result).to eq(true)
-    end
-    expect(transfer).to be_kind_of(RemoteTransfer)
-    expect(transfer.name).to eq('PDF images')
-    expect(transfer.description).to eq('Images from url')
-    expect(transfer.items).to be_kind_of(Array)
-    expect(transfer.items.length).to eq(2)
-  end
 end

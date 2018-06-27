@@ -135,7 +135,7 @@ describe WeTransferClient do
       expect(add_result).to eq(true)
 
       # add url to transfer
-      add_result = builder.add_web_content(url: 'http://www.wetransfer.com')
+      add_result = builder.add_web_content(url: 'http://www.wetransfer.com', title: 'website used for file transfers')
       expect(add_result).to eq(true)
     end
 

@@ -16,8 +16,9 @@ class TransferBuilder
     add_file(name: File.basename(path), io: File.open(path, 'rb'))
   end
 
-  def add_web_content(url:)
-    @items << FutureWebItem.new(url: url, title: url)
+  def add_web_content(url:, title: nil)
+    title ||= url
+    @items << FutureWebItem.new(url: url, title: title)
     true
   end
 

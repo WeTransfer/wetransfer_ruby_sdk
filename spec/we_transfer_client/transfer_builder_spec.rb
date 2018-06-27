@@ -34,7 +34,29 @@ describe TransferBuilder do
 
     item = transfer_builder.items.first
     expect(item.url).to eq('https://www.wetransfer.com/')
+    expect(item.local_identifier).to be_kind_of(String)
+  end
+
+  it 'should user url for the title when none is given' do
+    transfer_builder = described_class.new
+    transfer_builder.add_web_content(url: 'https://www.wetransfer.com/')
+    expect(transfer_builder.items.count).to eq(1)
+
+    item = transfer_builder.items.first
+
     expect(item.title).to eq('https://www.wetransfer.com/')
     expect(item.local_identifier).to be_kind_of(String)
   end
+
+  it 'should pass title as webcontent title' do
+    transfer_builder = described_class.new
+    transfer_builder.add_web_content(url: 'https://www.wetransfer.com/', title: 'awesome website for file transfering')
+    expect(transfer_builder.items.count).to eq(1)
+
+    item = transfer_builder.items.first
+    expect(item.url).to eq('https://www.wetransfer.com/')
+    expect(item.title).to eq('awesome website for file transfering')
+    expect(item.local_identifier).to be_kind_of(String)
+  end
+
 end

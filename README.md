@@ -68,7 +68,7 @@ transfer = @client.create_transfer(name: "My wonderful transfer", description: "
   upload.add_file_at(path: '/path/to/local/file.jpg')
   upload.add_file_at(path: '/path/to/another/local/file.jpg')
   upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
-  upload.add_web_content(url: "https://www.the.url.you.want.to.share.com"))
+  upload.add_web_content(url: "https://www.the.url.you.want.to.share.com", title: "title of the website"))
 end
 
 transfer.shortened_url => "https://we.tl/SSBsb3ZlIHJ1Ynk="

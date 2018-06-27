@@ -16,11 +16,6 @@ class TransferBuilder
     add_file(name: File.basename(path), io: File.open(path, 'rb'))
   end
 
-  def add_file_from_url(path:)
-    image_path = save_to_file(path: path)
-    add_file_at(path: image_path)
-  end
-
   def add_web_content(path:)
     url = open(path, allow_redirections: :safe).base_uri.to_s
     url_title = url.split('/').last

@@ -2,6 +2,12 @@ require 'spec_helper'
 
 require_relative '../lib/we_transfer_client.rb'
 
+def timeit
+  start = Time.now
+  yield
+  Time.now - start
+end
+
 describe WeTransferClient do
   let :test_logger do
     Logger.new($stderr).tap { |log| log.level = Logger::WARN }
@@ -50,6 +56,68 @@ describe WeTransferClient do
     response = Faraday.get(transfer.shortened_url)
     expect(response.status).to eq(302)
     expect(response['location']).to start_with('https://wetransfer')
+  end
+
+  it 'is able to create a transfer start to finish, both with small and large files with async enabled' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger, async: true)
+    transfer = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
+      # Upload ourselves
+      add_result = builder.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+      expect(add_result).to eq(true)
+
+      # Upload ourselves again, but using add_file_at
+      add_result = builder.add_file_at(path: __FILE__) # Upload ourselves again, but this time via path
+      expect(add_result).to eq(true)
+
+      # Upload the large file
+      add_result = builder.add_file(name: 'large.bin', io: very_large_file)
+      expect(add_result).to eq(true)
+
+      expect(add_result).to eq(true)
+    end
+
+    expect(transfer).to be_kind_of(WeTransferClient::RemoteTransfer)
+    expect(transfer.id).to be_kind_of(String)
+
+    # expect(transfer.version_identifier).to be_kind_of(String)
+    expect(transfer.state).to be_kind_of(String)
+    expect(transfer.name).to eq('My amazing board')
+    expect(transfer.description).to eq('Hi there!')
+    expect(transfer.items).to be_kind_of(Array)
+    expect(transfer.items.length).to eq(3)
+
+    item = transfer.items.first
+    expect(item).to be_kind_of(WeTransferClient::RemoteItem)
+
+    expect(transfer.shortened_url).to be_kind_of(String)
+    response = Faraday.get(transfer.shortened_url)
+    expect(response.status).to eq(302)
+    expect(response['location']).to start_with('https://wetransfer')
+  end
+
+  it 'can transfer files async faster' do
+    syncflow_time = timeit do
+      client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
+        # Upload the large file
+        add_result = builder.add_file(name: 'large.bin', io: very_large_file)
+        expect(add_result).to eq(true)
+
+        expect(add_result).to eq(true)
+      end
+    end
+
+    asyncflow_time = timeit do
+      client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger, async: true)
+      client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
+        # Upload the large file
+        add_result = builder.add_file(name: 'large.bin', io: very_large_file)
+        expect(add_result).to eq(true)
+
+        expect(add_result).to eq(true)
+      end
+    end
+    expect(asyncflow_time).to be < syncflow_time
   end
 
   it 'is able to create a transfer with no items even if passed a block' do

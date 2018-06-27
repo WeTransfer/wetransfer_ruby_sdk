@@ -16,6 +16,13 @@ class TransferBuilder
     add_file(name: File.basename(path), io: File.open(path, 'rb'))
   end
 
+  def add_web_content(path:)
+    url = open(path, allow_redirections: :safe).base_uri.to_s
+    url_title = url.split('/').last
+    @items << FutureWebItem.new(url: url, title: url_title)
+    true
+  end
+
   def ensure_io_compliant!(io)
     io.seek(0)
     io.read(1) # Will cause things like Errno::EACCESS to happen early, before the upload begins

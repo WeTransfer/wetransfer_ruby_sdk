@@ -179,6 +179,7 @@ describe WeTransferClient do
       add_result = builder.add_file_from_url(path: 'https://images.pexels.com/photos/1181655/pexels-photo-1181655.jpeg')
       expect(add_result).to eq(true)
     end
+    binding.pry
     expect(transfer).to be_kind_of(RemoteTransfer)
     expect(transfer.name).to eq('JPG images')
     expect(transfer.description).to eq('Images from url')
@@ -210,6 +211,7 @@ describe WeTransferClient do
       add_result = builder.add_file_from_url(path: 'https://cdn.pixabay.com/photo/2017/01/03/02/07/vine-1948358_1280.png')
       expect(add_result).to eq(true)
     end
+    binding.pry
     expect(transfer).to be_kind_of(RemoteTransfer)
     expect(transfer.name).to eq('PNG images')
     expect(transfer.description).to eq('Images from url')

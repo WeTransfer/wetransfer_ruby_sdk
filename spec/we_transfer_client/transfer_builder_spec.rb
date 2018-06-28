@@ -58,5 +58,4 @@ describe TransferBuilder do
     expect(item.title).to eq('awesome website for file transfering')
     expect(item.local_identifier).to be_kind_of(String)
   end
-
 end

@@ -29,7 +29,7 @@ describe TransferBuilder do
 
   it 'should add a url' do
     transfer_builder = described_class.new
-    transfer_builder.add_web_content(url: 'https://www.wetransfer.com/')
+    transfer_builder.add_web_url(url: 'https://www.wetransfer.com/')
     expect(transfer_builder.items.count).to eq(1)
 
     item = transfer_builder.items.first
@@ -39,7 +39,7 @@ describe TransferBuilder do
 
   it 'should user url for the title when none is given' do
     transfer_builder = described_class.new
-    transfer_builder.add_web_content(url: 'https://www.wetransfer.com/')
+    transfer_builder.add_web_url(url: 'https://www.wetransfer.com/')
     expect(transfer_builder.items.count).to eq(1)
 
     item = transfer_builder.items.first
@@ -50,7 +50,7 @@ describe TransferBuilder do
 
   it 'should pass title as webcontent title' do
     transfer_builder = described_class.new
-    transfer_builder.add_web_content(url: 'https://www.wetransfer.com/', title: 'awesome website for file transfering')
+    transfer_builder.add_web_url(url: 'https://www.wetransfer.com/', title: 'awesome website for file transfering')
     expect(transfer_builder.items.count).to eq(1)
 
     item = transfer_builder.items.first

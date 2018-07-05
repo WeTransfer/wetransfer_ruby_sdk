@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'faraday', '~> 0.12'
   spec.add_dependency 'ks', '~> 0.0.1'
+  spec.add_dependency 'open_uri_redirections'
 
   spec.add_development_dependency 'dotenv', '~> 2.2'
   spec.add_development_dependency 'bundler', '~> 1.16'
@@ -38,5 +39,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'simplecov', '~> 0.15'
   spec.add_development_dependency 'wetransfer_style', '0.5.0'
-  spec.add_development_dependency 'open_uri_redirections'
 end

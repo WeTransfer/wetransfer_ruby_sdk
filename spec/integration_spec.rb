@@ -60,13 +60,6 @@ describe WeTransferClient do
     expect(response[:items]).to eq([])
   end
 
-  it 'is able to create a transfer with no items without a block' do
-    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    response = client.create_empty_transfer(name: 'My amazing board', description: 'Hi there!')
-    expect(response[:size]).to eq(0)
-    expect(response[:items]).to eq([])
-  end
-
   it 'refuses to create a transfer when reading an IO raises an error' do
     broken = StringIO.new('hello')
     def broken.read(*)
@@ -142,7 +135,6 @@ describe WeTransferClient do
     expect(transfer).to be_kind_of(RemoteTransfer)
     expect(transfer.id).to be_kind_of(String)
 
-    # expect(transfer.version_identifier).to be_kind_of(String)
     expect(transfer.state).to be_kind_of(String)
     expect(transfer.name).to eq('Mixed Board Content')
     expect(transfer.description).to eq('Files and Webcontent')
@@ -156,5 +148,36 @@ describe WeTransferClient do
     response = Faraday.get(transfer.shortened_url)
     expect(response.status).to eq(302)
     expect(response['location']).to start_with('https://wetransfer')
+  end
+
+  it 'is able to do create a empty transfer to add items later' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.initialize_transfer(name: 'Async Board', description: 'Test board for async functionality')
+    expect(transfer.size).to eq(0)
+    expect(transfer.items).to eq([])
+  end
+
+  it 'should add items to a previous created transfer' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.initialize_transfer(name: 'Async Board', description: 'Test board for async functionality')
+    expect(transfer.items.size).to eq(0)
+    items = [
+      {name: File.basename(__FILE__), io: File.open(__FILE__, 'rb')},
+      {name: 'large.bin', io: very_large_file},
+      {path: __FILE__},
+      {url: 'http://www.wetransfer.com', title: 'website used for file transfers'}
+    ]
+    transfer = client.add_items_to_transfer(transfer: transfer, items: items)
+    expect(transfer.items.size).to eq(4)
+    expect(transfer.items[0].name).to eq(items[0][:name])
+    expect(transfer.items[1].name).to eq(items[1][:name])
+    expect(transfer.items[3].url).to eq(items[3][:url])
+  end
+
+  it 'is able to create a transfer with no items without a block' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    response = client.initialize_transfer(name: 'My amazing board', description: 'Hi there!')
+    expect(response.size).to eq(0)
+    expect(response.items).to eq([])
   end
 end

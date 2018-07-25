@@ -43,21 +43,12 @@ class WeTransferClient
   end
 
   def add_items_to_transfer(transfer:, items: [])
-    transfer = transfer.to_h
-
-    future_items = items.map do |item|
-      if item.keys == [:name, :io]
-        FutureFileItem.new(name: item[:name], io: item[:io])
-      elsif item.keys == [:path]
-        FutureFileItem.new(name: File.basename(item[:path]), io: File.open(item[:path], 'rb'))
-      elsif item.keys == [:url, :title]
-        FutureWebItem.new(url: item[:url], title: item[:title])
-      end
-    end
-    hased_items = future_items.map(&:to_item_request_params)
-    remote_items = add_items_to_remote_transfer(hased_items, transfer)
-    transfer[:items] = remote_items
-    upload_transfer_items(future_items, transfer)
+    remote_transfer = transfer.to_h
+    future_items = create_itemss_structs(items)
+    hashed_items = future_items.map(&:to_item_request_params)
+    remote_items = add_items_to_remote_transfer(hashed_items, transfer)
+    remote_transfer[:items] = remote_items
+    upload_transfer_items(future_items, remote_transfer)
   end
 
   private
@@ -82,8 +73,8 @@ class WeTransferClient
     JSON.parse(response.body, symbolize_names: true)
   end
 
-  def upload_transfer_items(items, transfer_response)
-    item_id_map = Hash[items.map(&:local_identifier).zip(items)]
+  def upload_transfer_items(future_items, transfer_response)
+    item_id_map = Hash[future_items.map(&:local_identifier).zip(future_items)]
 
     transfer_response.fetch(:items).each do |remote_item|
       local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
@@ -100,15 +91,7 @@ class WeTransferClient
       complete_response!(remote_item_id)
     end
 
-    if transfer_response.is_a?(Hash)
-      transfer_response = hash_to_struct(transfer_response, RemoteTransfer)
-
-      transfer_response.items = transfer_response.items.map do |remote_item_hash|
-        hash_to_struct(remote_item_hash, RemoteItem)
-      end
-    end
-
-    transfer_response
+    return_as_struct(transfer_response)
   end
 
   def complete_response!(remote_item_id)
@@ -181,6 +164,17 @@ class WeTransferClient
       'X-API-Key' => @api_key,
       'Authorization' => ('Bearer %s' % @bearer_token),
     }
+  end
+
+  def return_as_struct(transfer_response)
+    if transfer_response.is_a?(Hash)
+      transfer_response = hash_to_struct(transfer_response, RemoteTransfer)
+
+      transfer_response.items = transfer_response.items.map do |remote_item_hash|
+        hash_to_struct(remote_item_hash, RemoteItem)
+      end
+    end
+    transfer_response
   end
 
   def ensure_ok_status!(response)

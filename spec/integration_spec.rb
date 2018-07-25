@@ -152,14 +152,14 @@ describe WeTransferClient do
 
   it 'is able to do create a empty transfer to add items later' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.initialize_transfer(name: 'Async Board', description: 'Test board for async functionality')
+    transfer = client.initialize_transfer(name: 'Board', description: 'Test board for functionality')
     expect(transfer.size).to eq(0)
     expect(transfer.items).to eq([])
   end
 
   it 'should add items to a previous created transfer' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.initialize_transfer(name: 'Async Board', description: 'Test board for async functionality')
+    transfer = client.initialize_transfer(name: 'Board', description: 'Test board for functionality')
     expect(transfer.items.size).to eq(0)
     items = [
       {name: File.basename(__FILE__), io: File.open(__FILE__, 'rb')},
@@ -179,5 +179,16 @@ describe WeTransferClient do
     response = client.initialize_transfer(name: 'My amazing board', description: 'Hi there!')
     expect(response.size).to eq(0)
     expect(response.items).to eq([])
+  end
+
+  it 'should return an error when files have the wrong keys inside hash' do
+      client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+      transfer = client.initialize_transfer(name: 'Board', description: 'Test board for functionality')
+      items = [
+        {foo: File.basename(__FILE__), bar: File.open(__FILE__, 'rb')}
+      ]
+    expect{
+      transfer = client.add_items_to_transfer(transfer: transfer, items: items)
+    }.to raise_error(WeTransferClient::Error, "Item uses wrong keys: [:foo, :bar], use 'name', 'io', 'path' or 'url' instead")
   end
 end

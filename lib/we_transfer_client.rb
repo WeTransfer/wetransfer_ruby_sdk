@@ -120,6 +120,22 @@ class WeTransferClient
     ensure_ok_status!(complete_response)
   end
 
+  def create_items_structs(items)
+    items.map do |item|
+      case item.keys
+      when [:name, :io]
+        FutureFileItem.new(name: item[:name], io: item[:io])
+      when [:path]
+        FutureFileItem.new(name: File.basename(item[:path]), io: File.open(item[:path], 'rb'))
+      when [:url, :title]
+        FutureWebItem.new(url: item[:url], title: item[:title])
+      else
+        @logger.error { item }
+        raise Error, "Item uses wrong keys: #{item.keys}, use 'name', 'io', 'path' or 'url' instead"
+      end
+    end
+  end
+
   def hash_to_struct(hash, struct_class)
     members = struct_class.members
     struct_attrs = Hash[members.zip(hash.values_at(*members))]

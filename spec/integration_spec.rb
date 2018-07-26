@@ -152,17 +152,17 @@ describe WeTransferClient do
 
   it 'is able to do create a empty transfer to add items later' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.initialize_transfer(name: 'Board', description: 'Test board for functionality')
+    transfer = client.create_transfer(name: 'Board', description: 'Test board for functionality')
     expect(transfer.size).to eq(0)
     expect(transfer.items).to eq([])
   end
 
   it 'add items to a excisting transfer using a block' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.initialize_transfer(name: 'Board', description: 'Test board for functionality')
+    transfer = client.create_transfer(name: 'Board', description: 'Test board for functionality')
     expect(transfer.items).to eq([])
 
-    updated_transfer = client.add_items_transfer(transfer: transfer) do |item|
+    updated_transfer = client.(transfer: transfer) do |item|
       item.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
       item.add_file_at(path: __FILE__)
       item.add_file(name: 'large.bin', io: very_large_file)

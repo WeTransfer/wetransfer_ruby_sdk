@@ -30,21 +30,23 @@ class WeTransferClient
 
   def create_transfer(name:, description:)
     builder = TransferBuilder.new
-    yield(builder)
-    future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
-    remote_transfer = create_remote_transfer(future_transfer)
-    upload_transfer_items(future_transfer.items, remote_transfer)
-  end
-
-  def initialize_transfer(name:, description:, items: [])
-    future_transfer = FutureTransfer.new(name: name, description: description, items: [])
-    transfer_response = create_remote_transfer(future_transfer)
-    hash_to_struct(transfer_response, RemoteTransfer)
+    if block_given?
+      yield(builder)
+      future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
+      remote_transfer = create_remote_transfer(future_transfer)
+      upload_transfer_items(future_transfer.items, remote_transfer)
+    else
+      future_transfer = FutureTransfer.new(name: name, description: description, items: [])
+      transfer_response = create_remote_transfer(future_transfer)
+      return_as_struct(transfer_response)
+    end
   end
 
   def add_items_transfer(transfer:)
     builder = TransferBuilder.new
-    yield(builder)
+    if block_given?
+      yield(builder)
+    end
     updated_transfer = FutureTransfer.new(name: transfer.name, description: transfer.description, items: builder.items)
     remote_items = add_items_to_remote_transfer(updated_transfer.items, transfer)
     remote_transfer = transfer.to_h
@@ -88,10 +90,8 @@ class WeTransferClient
         remote_item.fetch(:meta).fetch(:multipart_upload_id),
         local_item.io
       )
-
       complete_response!(remote_item_id)
     end
-
     return_as_struct(transfer_response)
   end
 
@@ -102,28 +102,6 @@ class WeTransferClient
       auth_headers.merge('Content-Type' => 'application/json')
     )
     ensure_ok_status!(complete_response)
-  end
-
-  def create_items_structs(items)
-    items.map do |item|
-      case item.keys
-      when [:name, :io]
-        FutureFileItem.new(name: item[:name], io: item[:io])
-      when [:path]
-        FutureFileItem.new(name: File.basename(item[:path]), io: File.open(item[:path], 'rb'))
-      when [:url, :title]
-        FutureWebItem.new(url: item[:url], title: item[:title])
-      else
-        @logger.error { item }
-        raise Error, "Item uses wrong keys: #{item.keys}, use 'name', 'io', 'path' or 'url' instead"
-      end
-    end
-  end
-
-  def hash_to_struct(hash, struct_class)
-    members = struct_class.members
-    struct_attrs = Hash[members.zip(hash.values_at(*members))]
-    struct_class.new(**struct_attrs)
   end
 
   def put_io_in_parts(item_id, n_parts, multipart_id, io)
@@ -176,6 +154,12 @@ class WeTransferClient
       end
     end
     transfer_response
+  end
+
+  def hash_to_struct(hash, struct_class)
+    members = struct_class.members
+    struct_attrs = Hash[members.zip(hash.values_at(*members))]
+    struct_class.new(**struct_attrs)
   end
 
   def ensure_ok_status!(response)

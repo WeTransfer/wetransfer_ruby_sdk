@@ -157,38 +157,28 @@ describe WeTransferClient do
     expect(transfer.items).to eq([])
   end
 
-  it 'should add items to a previous created transfer' do
+  it 'add items to a excisting transfer using a block' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.initialize_transfer(name: 'Board', description: 'Test board for functionality')
-    expect(transfer.items.size).to eq(0)
-    items = [
-      {name: File.basename(__FILE__), io: File.open(__FILE__, 'rb')},
-      {name: 'large.bin', io: very_large_file},
-      {path: __FILE__},
-      {url: 'http://www.wetransfer.com', title: 'website used for file transfers'}
-    ]
-    transfer = client.add_items_to_transfer(transfer: transfer, items: items)
-    expect(transfer.items.size).to eq(4)
-    expect(transfer.items[0].name).to eq(items[0][:name])
-    expect(transfer.items[1].name).to eq(items[1][:name])
-    expect(transfer.items[3].url).to eq(items[3][:url])
-  end
+    expect(transfer.items).to eq([])
 
-  it 'is able to create a transfer with no items without a block' do
-    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    response = client.initialize_transfer(name: 'My amazing board', description: 'Hi there!')
-    expect(response.size).to eq(0)
-    expect(response.items).to eq([])
-  end
+    updated_transfer = client.add_items_transfer(transfer: transfer) do |item|
+      item.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+      item.add_file_at(path: __FILE__)
+      item.add_file(name: 'large.bin', io: very_large_file)
+      item.add_web_url(url: 'http://www.wetransfer.com', title: 'website used for file transfers')
+    end
 
-  it 'should return an error when files have the wrong keys inside hash' do
-      client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-      transfer = client.initialize_transfer(name: 'Board', description: 'Test board for functionality')
-      items = [
-        {foo: File.basename(__FILE__), bar: File.open(__FILE__, 'rb')}
-      ]
-    expect{
-      transfer = client.add_items_to_transfer(transfer: transfer, items: items)
-    }.to raise_error(WeTransferClient::Error, "Item uses wrong keys: [:foo, :bar], use 'name', 'io', 'path' or 'url' instead")
+    expect(updated_transfer.items.size).to eq(4)
+    expect(transfer.shortened_url).to eq(updated_transfer.shortened_url)
+    expect(transfer.id).to eq(updated_transfer.id)
+    expect(updated_transfer.items[0].content_identifier).to eq('file')
+    expect(updated_transfer.items[1].content_identifier).to eq('file')
+    expect(updated_transfer.items[2].content_identifier).to eq('file')
+    expect(updated_transfer.items[3].content_identifier).to eq('web_content')
+
+    response = Faraday.get(updated_transfer.shortened_url)
+    expect(response.status).to eq(302)
+    expect(response['location']).to start_with('https://wetransfer')
   end
 end

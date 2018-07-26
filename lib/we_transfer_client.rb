@@ -42,13 +42,14 @@ class WeTransferClient
     hash_to_struct(transfer_response, RemoteTransfer)
   end
 
-  def add_items_to_transfer(transfer:, items: [])
+  def add_items_transfer(transfer:)
+    builder = TransferBuilder.new
+    yield(builder)
+    updated_transfer = FutureTransfer.new(name: transfer.name, description: transfer.description, items: builder.items)
+    remote_items = add_items_to_remote_transfer(updated_transfer.items, transfer)
     remote_transfer = transfer.to_h
-    future_items = create_itemss_structs(items)
-    hashed_items = future_items.map(&:to_item_request_params)
-    remote_items = add_items_to_remote_transfer(hashed_items, transfer)
     remote_transfer[:items] = remote_items
-    upload_transfer_items(future_items, remote_transfer)
+    upload_transfer_items(updated_transfer.items, remote_transfer)
   end
 
   private
@@ -66,8 +67,8 @@ class WeTransferClient
 
   def add_items_to_remote_transfer(items, transfer)
     response = faraday.post(
-      "v1/transfers/#{transfer[:id]}/items",
-      JSON.pretty_generate(items: items.map(&:to_h)),
+      "v1/transfers/#{transfer.id}/items",
+      JSON.pretty_generate(items: items.map(&:to_item_request_params)),
       auth_headers.merge('Content-Type' => 'application/json')
     )
     JSON.parse(response.body, symbolize_names: true)

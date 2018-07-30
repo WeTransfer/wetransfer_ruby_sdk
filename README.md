@@ -61,7 +61,7 @@ require 'we_transfer_client'
 @client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
 
-Now that you've got the client set up you can use  `create_transfer` to, well, create a transfer!
+Now that you've got the client set up you can use `create_transfer` to, well, create a transfer!
 
 ```ruby
 transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this") do |upload|
@@ -75,6 +75,84 @@ transfer.shortened_url => "https://we.tl/SSBsb3ZlIHJ1Ynk="
 ```
 
 The upload will be performed at the end of the block.
+
+#### Manual transfers
+
+Setting the `manual_upload` argument to `true` you prevent the uploading process. This means you manualy have to upload the files to the given `upload_url`.
+
+For creating a manual transfer you can either specify a block, like this:
+
+```ruby
+transfer = @client.create_transfer(name: 'Manual Transfer', description: 'I have to upload the files on my own', manual_upload: true) do |upload|
+  upload.add_file_at(path: '/path/to/local/file.jpg')
+  upload.add_file_at(path: '/path/to/another/local/file.jpg')
+  upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
+  upload.add_web_url(url: "https://www.the.url.you.want.to.share.com", title: "title of the url"))
+end
+```
+
+or you can create just a empty transfer and add items to it afterwards:
+
+```ruby
+transfer = @client.create_transfer(name: 'Manual Transfer', description: 'I have to upload the files on my own')
+
+updated_transfer = @client.add_items_to(transfer: transfer, manual_upload: true) do |upload|
+  upload.add_file_at(path: '/path/to/local/file.jpg')
+  upload.add_file_at(path: '/path/to/another/local/file.jpg')
+  upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
+  upload.add_web_url(url: "https://www.the.url.you.want.to.share.com", title: "title of the url"))
+end
+
+```
+
+The update_transfer reponse is a `Struct` and looks like this:
+```ruby
+#<struct RemoteTransfer
+ id="htahsadn717321701308",
+ version_identifier=nil,
+ state="processing",
+ shortened_url="https://we.tl/s-stysd8dnC",
+ name="Example Transfer",
+ description="Test transfer for example",
+ size=20971750,
+ items=
+  [#<struct RemoteItem
+    id="tyfc2uougsvkot9732167971235",
+    local_identifier="2f2a6f85-8cc4-49fd",
+    content_identifier="file",
+    name="file.bin",
+    size=20971750,
+    mime_type=nil,
+    upload_url=
+     "https://wetransfer-eu-prod-spaceship.s3.eu-west-1.amazonaws.com/htahsadn717321701308/tyfc2uougsvkot9732167971235?partNumber=1&uploadId=XGv",
+    title=nil,
+    upload_id="XGvFClR4WacI434US",
+    meta=
+     {:multipart_parts=>4,
+      :multipart_upload_id=>"XGvFClR4WacI434U.F1hMUwr.IruAJ"
+
+      }
+    >]
+```
+
+After Initializing the transfer you have to get the upload urls for each part. The `create_transfer` or `add_items_to` response tells you how many parts it expects. Parts are calculated on 6MB chunks (e.q. 60MB is 10 parts and 32MB is 6 parts).
+
+The `request_item_upload_url` methods expects two keyword arguments, `item(Struct)` and `part_number(Integer)`. and the response looks like this:
+
+```json
+ {:upload_url=>
+  "https://wetransfer-eu-prod-spaceship.s3.eu-west-1.amazonaws.com/htahsadn717321701308/tyfc2uougsvkot9732167971235?partNumber=1&uploadId=XGvFClR4WacI434U.F1hMUwr.IruAJaVFfeShbayEMOdGs.",
+ :part_number=>1,
+ :upload_id=>
+  "XGvFClR4WacI434U.F1hMUwr.IruAJaVFfeShbayEMOdGs",
+ :upload_expires_at=>1532966650
+ }
+```
+
+Do this request for the required amount of parts as mentioned in the `add_items_to` or `create_transfer` response.
+
+After uploading the file, you have to complete the file. This is needed for AWS to know all the parts are there and need to be glued together. Call the `complete_item!` with the keyword argument `item_id(String)` and pass on the the `id` from the item you've uploaded. The response message will tell you `File is marked as complete` if done right.
+
 
 ## Development
 You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com), and as described above, store it in a local `.env` file. As always, do not commit this file to github! :)

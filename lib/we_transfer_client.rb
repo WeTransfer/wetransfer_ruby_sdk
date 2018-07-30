@@ -42,16 +42,50 @@ class WeTransferClient
     end
   end
 
-  def add_items_transfer(transfer:)
+  def add_items_to(transfer:)
     builder = TransferBuilder.new
-    if block_given?
-      yield(builder)
-    end
+    yield(builder)
     updated_transfer = FutureTransfer.new(name: transfer.name, description: transfer.description, items: builder.items)
     remote_items = add_items_to_remote_transfer(updated_transfer.items, transfer)
     remote_transfer = transfer.to_h
     remote_transfer[:items] = remote_items
     upload_transfer_items(updated_transfer.items, remote_transfer)
+  rescue LocalJumpError
+    raise Error, "No items where added to the transfer"
+  end
+
+  def create_manual_transfer(name:, description:)
+    builder = TransferBuilder.new
+    if block_given?
+      yield(builder)
+      future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
+      remote_transfer = create_remote_transfer(future_transfer)
+      return_as_struct(remote_transfer)
+    else
+      future_transfer = FutureTransfer.new(name: name, description: description, items: [])
+      transfer_response = create_remote_transfer(future_transfer)
+      return_as_struct(transfer_response)
+    end
+  end
+
+  def request_item_upload_url(item:, part_number: )
+    response = faraday.get(
+      "/v1/files/#{item.id}/uploads/#{part_number}/#{item.meta.fetch(:multipart_upload_id)}",
+      {},
+      auth_headers
+    )
+    ensure_ok_status!(response)
+    response = JSON.parse(response.body, symbolize_names: true)
+  end
+
+  def complete_response!(remote_item_id:)
+    response = faraday.post(
+      "/v1/files/#{remote_item_id}/uploads/complete",
+      '{}',
+      auth_headers.merge('Content-Type' => 'application/json')
+    )
+    ensure_ok_status!(response)
+    JSON.parse(response.body, symbolize_names: true)
   end
 
   private
@@ -73,6 +107,7 @@ class WeTransferClient
       JSON.pretty_generate(items: items.map(&:to_item_request_params)),
       auth_headers.merge('Content-Type' => 'application/json')
     )
+    ensure_ok_status!(response)
     JSON.parse(response.body, symbolize_names: true)
   end
 
@@ -80,41 +115,33 @@ class WeTransferClient
     item_id_map = Hash[future_items.map(&:local_identifier).zip(future_items)]
 
     transfer_response.fetch(:items).each do |remote_item|
-      local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
+      remote_item = hash_to_struct(remote_item, RemoteItem) if remote_item.is_a?(Hash)
+      local_item = item_id_map.fetch(remote_item.local_identifier)
       next unless local_item.is_a?(FutureFileItem)
-      remote_item_id = remote_item.fetch(:id)
-
       put_io_in_parts(
-        remote_item_id,
-        remote_item.fetch(:meta).fetch(:multipart_parts),
-        remote_item.fetch(:meta).fetch(:multipart_upload_id),
+        remote_item,
+        remote_item.meta.fetch(:multipart_parts),
         local_item.io
       )
-      complete_response!(remote_item_id)
+      complete_response!(remote_item_id: remote_item.id)
     end
     return_as_struct(transfer_response)
   end
 
-  def complete_response!(remote_item_id)
-    complete_response = faraday.post(
-      "/v1/files/#{remote_item_id}/uploads/complete",
-      '{}',
-      auth_headers.merge('Content-Type' => 'application/json')
-    )
-    ensure_ok_status!(complete_response)
-  end
-
-  def put_io_in_parts(item_id, n_parts, multipart_id, io)
+  def put_io_in_parts(item, n_parts, io)
     chunk_size = MAGIC_PART_SIZE
-    (1..n_parts).each do |part_n_one_based|
-      response = faraday.get("/v1/files/#{item_id}/uploads/#{part_n_one_based}/#{multipart_id}", {}, auth_headers)
-      ensure_ok_status!(response)
-      response = JSON.parse(response.body, symbolize_names: true)
 
+    (1..n_parts).each do |part_n_one_based|
+      response = request_item_upload_url(item: item, part_number: part_n_one_based)
       upload_url = response.fetch(:upload_url)
       part_io = StringIO.new(io.read(chunk_size)) # needs a lens
       part_io.rewind
-      response = faraday.put(upload_url, part_io, 'Content-Type' => 'binary/octet-stream', 'Content-Length' => part_io.size.to_s)
+      response = faraday.put(
+        upload_url,
+        part_io,
+        'Content-Type': 'binary/octet-stream',
+        'Content-Length': part_io.size.to_s
+      )
       ensure_ok_status!(response)
     end
   end
@@ -123,13 +150,18 @@ class WeTransferClient
     Faraday.new(@api_url_base) do |c|
       c.response :logger, @logger
       c.adapter Faraday.default_adapter
-      c.headers = { 'User-Agent' => "WetransferRubySdk/#{WeTransferClient::VERSION} Ruby #{RUBY_VERSION}"}
+      c.headers = { 'User-Agent': "WetransferRubySdk/#{WeTransferClient::VERSION} Ruby #{RUBY_VERSION}"}
     end
   end
 
   def authorize_if_no_bearer_token!
     return if @bearer_token
-    response = faraday.post('/v1/authorize', '{}', 'Content-Type' => 'application/json', 'X-API-Key' => @api_key)
+    response = faraday.post(
+      '/v1/authorize',
+      '{}',
+      'Content-Type': 'application/json',
+      'X-API-Key': @api_key
+    )
     ensure_ok_status!(response)
     @bearer_token = JSON.parse(response.body, symbolize_names: true)[:token]
     if @bearer_token.nil? || @bearer_token.empty?

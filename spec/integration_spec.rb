@@ -162,7 +162,7 @@ describe WeTransferClient do
     transfer = client.create_transfer(name: 'Board', description: 'Test board for functionality')
     expect(transfer.items).to eq([])
 
-    updated_transfer = client.(transfer: transfer) do |item|
+    updated_transfer = client.add_items_to(transfer: transfer) do |item|
       item.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
       item.add_file_at(path: __FILE__)
       item.add_file(name: 'large.bin', io: very_large_file)
@@ -181,4 +181,50 @@ describe WeTransferClient do
     expect(response.status).to eq(302)
     expect(response['location']).to start_with('https://wetransfer')
   end
+
+  it 'should give a error when using add_items_to without block' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.create_transfer(name: 'Board', description: 'Test board for functionality')
+    expect(transfer.items).to eq([])
+
+    expect{
+      updated_transfer = client.add_items_to(transfer: transfer)
+    }.to raise_error WeTransferClient::Error, /No items where added to the transfer/
+  end
+
+  it 'it should support to upload files in a async way' do
+
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.create_manual_transfer(name: 'Board', description: 'Test board for functionality') do |item|
+      item.add_file(name: 'large.bin', io: very_large_file)
+    end
+    expect(transfer).to be_kind_of(RemoteTransfer)
+    expect(transfer.items.size).to eq(1)
+    expect(transfer.items.first.upload_url).to start_with('https://wetransfer-eu-prod-spaceship')
+    expect(transfer.items.first.meta[:multipart_parts]).to eq(4)
+    first_item = transfer.items.first
+
+    chunk_size = 6 * 1024 * 1024
+
+    (1..first_item.meta[:multipart_parts]).each do |part_n_one_based|
+      response = client.request_item_upload_url(item: first_item, part_number: part_n_one_based)
+      upload_url = response.fetch(:upload_url)
+
+      expect(upload_url).to start_with('https://wetransfer-eu-prod-spaceship')
+      part_io = StringIO.new(very_large_file.read(chunk_size)) # needs a lens
+      part_io.rewind
+      req = Faraday.put(upload_url, part_io, 'Content-Type': 'binary/octet-stream', 'Content-Length': part_io.size.to_s)
+      expect(req.status).to eq(200)
+    end
+    complete_response = client.complete_response!(remote_item_id: first_item.id)
+    expect(complete_response[:message]).to match /File is marked as complete./
+
+  end
+
+
+
+
+
+
+
 end

@@ -189,7 +189,7 @@ describe WeTransferClient do
 
     expect {
       client.add_items_to(transfer: transfer)
-    }.to raise_error WeTransferClient::Error, /No items where added to the transfer/
+    }.to raise_error(WeTransferClient::Error, /No items where added to the transfer/)
   end
 
   it 'is should support a manual way for uploading files with a block' do
@@ -217,7 +217,7 @@ describe WeTransferClient do
       expect(upload_response.status).to eq(200)
     end
     complete_response = client.complete_item!(item_id: first_item.id)
-    expect(complete_response[:message]).to match(/ File is marked as complete. /)
+    expect(complete_response[:message]).to match(/File is marked as complete./)
   end
 
   it 'should support a manual way for uploading files without a block' do
@@ -253,7 +253,7 @@ describe WeTransferClient do
         expect(upload_response.status).to eq(200)
       end
       complete_response = client.complete_item!(item_id: item.id)
-      expect(complete_response[:message]).to match(/ File is marked as complete. /)
+      expect(complete_response[:message]).to match(/File is marked as complete./)
     end
   end
 end

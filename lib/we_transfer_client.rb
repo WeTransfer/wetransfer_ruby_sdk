@@ -28,47 +28,33 @@ class WeTransferClient
     @logger = logger
   end
 
-  def create_transfer(name:, description:)
+  def create_transfer(name:, description:, manual_upload: false)
     builder = TransferBuilder.new
     if block_given?
       yield(builder)
       future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
-      remote_transfer = create_remote_transfer(future_transfer)
-      upload_transfer_items(future_transfer.items, remote_transfer)
     else
       future_transfer = FutureTransfer.new(name: name, description: description, items: [])
-      transfer_response = create_remote_transfer(future_transfer)
-      return_as_struct(transfer_response)
     end
+    remote_transfer = create_remote_transfer(future_transfer)
+    upload_transfer_items(future_transfer.items, remote_transfer) if future_transfer.items.any? && !manual_upload
+    return_as_struct(remote_transfer)
   end
 
-  def add_items_to(transfer:)
+  def add_items_to(transfer:, manual_upload: false)
     builder = TransferBuilder.new
     yield(builder)
     updated_transfer = FutureTransfer.new(name: transfer.name, description: transfer.description, items: builder.items)
     remote_items = add_items_to_remote_transfer(updated_transfer.items, transfer)
     remote_transfer = transfer.to_h
     remote_transfer[:items] = remote_items
-    upload_transfer_items(updated_transfer.items, remote_transfer)
+    upload_transfer_items(updated_transfer.items, remote_transfer) unless manual_upload
+    return_as_struct(remote_transfer)
   rescue LocalJumpError
-    raise Error, "No items where added to the transfer"
+    raise Error, 'No items where added to the transfer'
   end
 
-  def create_manual_transfer(name:, description:)
-    builder = TransferBuilder.new
-    if block_given?
-      yield(builder)
-      future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
-      remote_transfer = create_remote_transfer(future_transfer)
-      return_as_struct(remote_transfer)
-    else
-      future_transfer = FutureTransfer.new(name: name, description: description, items: [])
-      transfer_response = create_remote_transfer(future_transfer)
-      return_as_struct(transfer_response)
-    end
-  end
-
-  def request_item_upload_url(item:, part_number: )
+  def request_item_upload_url(item:, part_number:)
     response = faraday.get(
       "/v1/files/#{item.id}/uploads/#{part_number}/#{item.meta.fetch(:multipart_upload_id)}",
       {},
@@ -78,9 +64,9 @@ class WeTransferClient
     response = JSON.parse(response.body, symbolize_names: true)
   end
 
-  def complete_response!(remote_item_id:)
+  def complete_item!(item_id:)
     response = faraday.post(
-      "/v1/files/#{remote_item_id}/uploads/complete",
+      "/v1/files/#{item_id}/uploads/complete",
       '{}',
       auth_headers.merge('Content-Type' => 'application/json')
     )
@@ -123,7 +109,7 @@ class WeTransferClient
         remote_item.meta.fetch(:multipart_parts),
         local_item.io
       )
-      complete_response!(remote_item_id: remote_item.id)
+      complete_item!(item_id: remote_item.id)
     end
     return_as_struct(transfer_response)
   end
@@ -134,13 +120,13 @@ class WeTransferClient
     (1..n_parts).each do |part_n_one_based|
       response = request_item_upload_url(item: item, part_number: part_n_one_based)
       upload_url = response.fetch(:upload_url)
-      part_io = StringIO.new(io.read(chunk_size)) # needs a lens
+      part_io = StringIO.new(io.read(chunk_size))
       part_io.rewind
       response = faraday.put(
         upload_url,
         part_io,
-        'Content-Type': 'binary/octet-stream',
-        'Content-Length': part_io.size.to_s
+        'Content-Type' => 'binary/octet-stream',
+        'Content-Length' => part_io.size.to_s
       )
       ensure_ok_status!(response)
     end
@@ -150,7 +136,7 @@ class WeTransferClient
     Faraday.new(@api_url_base) do |c|
       c.response :logger, @logger
       c.adapter Faraday.default_adapter
-      c.headers = { 'User-Agent': "WetransferRubySdk/#{WeTransferClient::VERSION} Ruby #{RUBY_VERSION}"}
+      c.headers = { 'User-Agent' => "WetransferRubySdk/#{WeTransferClient::VERSION} Ruby #{RUBY_VERSION}"}
     end
   end
 
@@ -159,8 +145,8 @@ class WeTransferClient
     response = faraday.post(
       '/v1/authorize',
       '{}',
-      'Content-Type': 'application/json',
-      'X-API-Key': @api_key
+      'Content-Type' => 'application/json',
+      'X-API-Key' => @api_key
     )
     ensure_ok_status!(response)
     @bearer_token = JSON.parse(response.body, symbolize_names: true)[:token]

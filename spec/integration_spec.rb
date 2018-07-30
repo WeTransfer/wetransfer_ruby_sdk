@@ -187,15 +187,14 @@ describe WeTransferClient do
     transfer = client.create_transfer(name: 'Board', description: 'Test board for functionality')
     expect(transfer.items).to eq([])
 
-    expect{
+    expect {
       updated_transfer = client.add_items_to(transfer: transfer)
     }.to raise_error WeTransferClient::Error, /No items where added to the transfer/
   end
 
-  it 'it should support to upload files in a async way' do
-
+  it 'is should support a manual way for uploading files with a block' do
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-    transfer = client.create_manual_transfer(name: 'Board', description: 'Test board for functionality') do |item|
+    transfer = client.create_transfer(name: 'Board', description: 'Test board for functionality', manual_upload: true) do |item|
       item.add_file(name: 'large.bin', io: very_large_file)
     end
     expect(transfer).to be_kind_of(RemoteTransfer)
@@ -204,27 +203,58 @@ describe WeTransferClient do
     expect(transfer.items.first.meta[:multipart_parts]).to eq(4)
     first_item = transfer.items.first
 
+    # Simulation of obtaining upload urls, and uploading chunks
+
     chunk_size = 6 * 1024 * 1024
 
     (1..first_item.meta[:multipart_parts]).each do |part_n_one_based|
       response = client.request_item_upload_url(item: first_item, part_number: part_n_one_based)
       upload_url = response.fetch(:upload_url)
-
       expect(upload_url).to start_with('https://wetransfer-eu-prod-spaceship')
-      part_io = StringIO.new(very_large_file.read(chunk_size)) # needs a lens
+      part_io = StringIO.new(very_large_file.read(chunk_size))
       part_io.rewind
-      req = Faraday.put(upload_url, part_io, 'Content-Type': 'binary/octet-stream', 'Content-Length': part_io.size.to_s)
-      expect(req.status).to eq(200)
+      upload_response = Faraday.put(upload_url, part_io, 'Content-Type' => 'binary/octet-stream', 'Content-Length' => part_io.size.to_s)
+      expect(upload_response.status).to eq(200)
     end
-    complete_response = client.complete_response!(remote_item_id: first_item.id)
+    complete_response = client.complete_item!(item_id: first_item.id)
+    binding.pry
     expect(complete_response[:message]).to match /File is marked as complete./
-
   end
 
+  it 'should support a manual way for uploading files without a block' do
+    client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    transfer = client.create_transfer(name: 'Board', description: 'Test board for functionality', manual_upload: true)
 
+    updated_transfer = client.add_items_to(transfer: transfer, manual_upload: true) do |item|
+      item.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+      item.add_file_at(path: __FILE__)
+      item.add_file(name: 'large.bin', io: very_large_file)
+      item.add_web_url(url: 'http://www.wetransfer.com', title: 'website used for file transfers')
+    end
 
+    expect(updated_transfer).to be_kind_of(RemoteTransfer)
+    expect(updated_transfer.items.size).to eq(4)
+    expect(updated_transfer.items.first.upload_url).to start_with('https://wetransfer-eu-prod-spaceship')
+    expect(transfer.shortened_url).to be(updated_transfer.shortened_url)
 
+    # Simulation of obtaining upload urls, and uploading chunks
 
+    chunk_size = 6 * 1024 * 1024
+    files = [File.open(__FILE__, 'rb'), File.open(__FILE__, 'rb'), very_large_file]
+    updated_transfer.items.each_with_index do |item, index|
+      next if item.content_identifier == 'web_content'
+      (1..item.meta[:multipart_parts]).each do |part_n_one_based|
+        response = client.request_item_upload_url(item: item, part_number: part_n_one_based)
+        upload_url = response.fetch(:upload_url)
 
-
+        expect(upload_url).to start_with('https://wetransfer-eu-prod-spaceship')
+        part_io = StringIO.new(files[index].read(chunk_size))
+        part_io.rewind
+        upload_response = Faraday.put(upload_url, part_io, 'Content-Type' => 'binary/octet-stream', 'Content-Length' => part_io.size.to_s)
+        expect(upload_response.status).to eq(200)
+      end
+      complete_response = client.complete_item!(item_id: item.id)
+      expect(complete_response[:message]).to match /File is marked as complete./
+    end
+  end
 end

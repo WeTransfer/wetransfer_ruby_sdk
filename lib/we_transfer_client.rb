@@ -61,7 +61,7 @@ class WeTransferClient
       auth_headers
     )
     ensure_ok_status!(response)
-    response = JSON.parse(response.body, symbolize_names: true)
+    JSON.parse(response.body, symbolize_names: true)
   end
 
   def complete_item!(item_id:)

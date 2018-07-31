@@ -1,3 +1,3 @@
 class WeTransferClient
-  VERSION = '0.5.0'
+  VERSION = '0.4.4'
 end

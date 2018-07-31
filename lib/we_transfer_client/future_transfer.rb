@@ -6,4 +6,12 @@ class FutureTransfer < Ks.strict(:name, :description, :items)
       items: items.map(&:to_item_request_params),
     }
   end
+
+  def to_add_items_to_transfer_params
+    {
+      name: name,
+      description: description,
+      items: items.map(&:to_item_request_params),
+    }
+  end
 end

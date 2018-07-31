@@ -3,8 +3,6 @@ require 'logger'
 require 'ks'
 require 'securerandom'
 require 'json'
-require 'open-uri'
-require 'open_uri_redirections'
 
 class WeTransferClient
   require_relative 'we_transfer_client/version'
@@ -28,19 +26,55 @@ class WeTransferClient
     @logger = logger
   end
 
-  def create_transfer(name:, description:)
+  def create_transfer(name:, description:, manual_upload: false)
+    builder = TransferBuilder.new
+    if block_given?
+      yield(builder)
+      future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
+    else
+      future_transfer = FutureTransfer.new(name: name, description: description, items: [])
+    end
+    remote_transfer = create_remote_transfer(future_transfer)
+    upload_transfer_items(future_transfer.items, remote_transfer) if future_transfer.items.any? && !manual_upload
+    return_as_struct(remote_transfer)
+  end
+
+  def add_items_to(transfer:, manual_upload: false)
     builder = TransferBuilder.new
     yield(builder)
-    future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
-    create_and_upload(future_transfer)
+    updated_transfer = FutureTransfer.new(name: transfer.name, description: transfer.description, items: builder.items)
+    remote_items = add_items_to_remote_transfer(updated_transfer.items, transfer)
+    remote_transfer = transfer.to_h
+    remote_transfer[:items] = remote_items
+    upload_transfer_items(updated_transfer.items, remote_transfer) unless manual_upload
+    return_as_struct(remote_transfer)
+  rescue LocalJumpError
+    raise ArgumentError, 'No items where added to the transfer'
   end
 
-  def create_empty_transfer(name:, description:)
-    future_transfer = FutureTransfer.new(name: name, description: description, items: [])
-    create_and_upload(future_transfer)
+  def request_item_upload_url(item:, part_number:)
+    response = faraday.get(
+      "/v1/files/#{item.id}/uploads/#{part_number}/#{item.meta.fetch(:multipart_upload_id)}",
+      {},
+      auth_headers
+    )
+    ensure_ok_status!(response)
+    JSON.parse(response.body, symbolize_names: true)
   end
 
-  def create_and_upload(xfer)
+  def complete_item!(item_id:)
+    response = faraday.post(
+      "/v1/files/#{item_id}/uploads/complete",
+      '{}',
+      auth_headers.merge('Content-Type' => 'application/json')
+    )
+    ensure_ok_status!(response)
+    JSON.parse(response.body, symbolize_names: true)
+  end
+
+  private
+
+  def create_remote_transfer(xfer)
     authorize_if_no_bearer_token!
     response = faraday.post(
       '/v1/transfers',
@@ -48,54 +82,50 @@ class WeTransferClient
       auth_headers.merge('Content-Type' => 'application/json')
     )
     ensure_ok_status!(response)
-    create_transfer_response = JSON.parse(response.body, symbolize_names: true)
+    JSON.parse(response.body, symbolize_names: true)
+  end
 
-    remote_transfer = hash_to_struct(create_transfer_response, RemoteTransfer)
-    remote_transfer.items = remote_transfer.items.map do |remote_item_hash|
-      hash_to_struct(remote_item_hash, RemoteItem)
-    end
+  def add_items_to_remote_transfer(items, transfer)
+    response = faraday.post(
+      "v1/transfers/#{transfer.id}/items",
+      JSON.pretty_generate(items: items.map(&:to_item_request_params)),
+      auth_headers.merge('Content-Type' => 'application/json')
+    )
+    ensure_ok_status!(response)
+    JSON.parse(response.body, symbolize_names: true)
+  end
 
-    item_id_map = Hash[xfer.items.map(&:local_identifier).zip(xfer.items)]
+  def upload_transfer_items(future_items, transfer_response)
+    item_id_map = Hash[future_items.map(&:local_identifier).zip(future_items)]
 
-    create_transfer_response.fetch(:items).each do |remote_item|
-      local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
+    transfer_response.fetch(:items).each do |remote_item|
+      remote_item = hash_to_struct(remote_item, RemoteItem) if remote_item.is_a?(Hash)
+      local_item = item_id_map.fetch(remote_item.local_identifier)
       next unless local_item.is_a?(FutureFileItem)
-      remote_item_id = remote_item.fetch(:id)
-
       put_io_in_parts(
-        remote_item_id,
-        remote_item.fetch(:meta).fetch(:multipart_parts),
-        remote_item.fetch(:meta).fetch(:multipart_upload_id),
+        remote_item,
+        remote_item.meta.fetch(:multipart_parts),
         local_item.io
       )
-
-      complete_response = faraday.post(
-        "/v1/files/#{remote_item_id}/uploads/complete",
-        '{}',
-        auth_headers.merge('Content-Type' => 'application/json')
-      )
-      ensure_ok_status!(complete_response)
+      complete_item!(item_id: remote_item.id)
     end
-    remote_transfer
+    return_as_struct(transfer_response)
   end
 
-  def hash_to_struct(hash, struct_class)
-    members = struct_class.members
-    struct_attrs = Hash[members.zip(hash.values_at(*members))]
-    struct_class.new(**struct_attrs)
-  end
-
-  def put_io_in_parts(item_id, n_parts, multipart_id, io)
+  def put_io_in_parts(item, n_parts, io)
     chunk_size = MAGIC_PART_SIZE
-    (1..n_parts).each do |part_n_one_based|
-      response = faraday.get("/v1/files/#{item_id}/uploads/#{part_n_one_based}/#{multipart_id}", {}, auth_headers)
-      ensure_ok_status!(response)
-      response = JSON.parse(response.body, symbolize_names: true)
 
+    (1..n_parts).each do |part_n_one_based|
+      response = request_item_upload_url(item: item, part_number: part_n_one_based)
       upload_url = response.fetch(:upload_url)
-      part_io = StringIO.new(io.read(chunk_size)) # needs a lens
+      part_io = StringIO.new(io.read(chunk_size))
       part_io.rewind
-      response = faraday.put(upload_url, part_io, 'Content-Type' => 'binary/octet-stream', 'Content-Length' => part_io.size.to_s)
+      response = faraday.put(
+        upload_url,
+        part_io,
+        'Content-Type' => 'binary/octet-stream',
+        'Content-Length' => part_io.size.to_s
+      )
       ensure_ok_status!(response)
     end
   end
@@ -110,7 +140,12 @@ class WeTransferClient
 
   def authorize_if_no_bearer_token!
     return if @bearer_token
-    response = faraday.post('/v1/authorize', '{}', 'Content-Type' => 'application/json', 'X-API-Key' => @api_key)
+    response = faraday.post(
+      '/v1/authorize',
+      '{}',
+      'Content-Type' => 'application/json',
+      'X-API-Key' => @api_key
+    )
     ensure_ok_status!(response)
     @bearer_token = JSON.parse(response.body, symbolize_names: true)[:token]
     if @bearer_token.nil? || @bearer_token.empty?
@@ -124,6 +159,23 @@ class WeTransferClient
       'X-API-Key' => @api_key,
       'Authorization' => ('Bearer %s' % @bearer_token),
     }
+  end
+
+  def return_as_struct(transfer_response)
+    if transfer_response.is_a?(Hash)
+      transfer_response = hash_to_struct(transfer_response, RemoteTransfer)
+
+      transfer_response.items = transfer_response.items.map do |remote_item_hash|
+        hash_to_struct(remote_item_hash, RemoteItem)
+      end
+    end
+    transfer_response
+  end
+
+  def hash_to_struct(hash, struct_class)
+    members = struct_class.members
+    struct_attrs = Hash[members.zip(hash.values_at(*members))]
+    struct_class.new(**struct_attrs)
   end
 
   def ensure_ok_status!(response)

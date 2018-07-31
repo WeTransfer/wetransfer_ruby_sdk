@@ -3,8 +3,6 @@ require 'logger'
 require 'ks'
 require 'securerandom'
 require 'json'
-require 'open-uri'
-require 'open_uri_redirections'
 
 class WeTransferClient
   require_relative 'we_transfer_client/version'
@@ -51,7 +49,7 @@ class WeTransferClient
     upload_transfer_items(updated_transfer.items, remote_transfer) unless manual_upload
     return_as_struct(remote_transfer)
   rescue LocalJumpError
-    raise Error, 'No items where added to the transfer'
+    raise ArgumentError, 'No items where added to the transfer'
   end
 
   def request_item_upload_url(item:, part_number:)

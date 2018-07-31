@@ -78,24 +78,20 @@ The upload will be performed at the end of the block.
 
 #### Manual transfers
 
-Setting the `manual_upload` argument to `true` you prevent the uploading process. This means you manualy have to upload the files to the given `upload_url`.
+Manual uploads are possible by passing `manual_uploads` keyword arguments and setting the value to `true`. This prevents the automatic chunking and uploading of the files. This makes it possible to upload "big" files from your server in a more async way.
 
-For creating a manual transfer you can either specify a block, like this:
 
-```ruby
-transfer = @client.create_transfer(name: 'Manual Transfer', description: 'I have to upload the files on my own', manual_upload: true) do |upload|
-  upload.add_file_at(path: '/path/to/local/file.jpg')
-  upload.add_file_at(path: '/path/to/another/local/file.jpg')
-  upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
-  upload.add_web_url(url: "https://www.the.url.you.want.to.share.com", title: "title of the url"))
-end
-```
+It's also possible to create an empty transfer first and add files to it later.
 
-or you can create just a empty transfer and add items to it afterwards:
+First create an itemless transfer:
 
 ```ruby
 transfer = @client.create_transfer(name: 'Manual Transfer', description: 'I have to upload the files on my own')
+```
 
+Then use the previous created transfer for the `transfer` keyword argument. In this option you can either upload the items yourself by setting the `manual_upload` value to `true` or let be processed automaticaly.
+
+```ruby
 updated_transfer = @client.add_items_to(transfer: transfer, manual_upload: true) do |upload|
   upload.add_file_at(path: '/path/to/local/file.jpg')
   upload.add_file_at(path: '/path/to/another/local/file.jpg')
@@ -137,7 +133,14 @@ The update_transfer reponse is a `Struct` and looks like this:
 
 After Initializing the transfer you have to get the upload urls for each part. The `create_transfer` or `add_items_to` response tells you how many parts it expects. Parts are calculated on 6MB chunks (e.q. 60MB is 10 parts and 32MB is 6 parts).
 
-The `request_item_upload_url` methods expects two keyword arguments, `item(Struct)` and `part_number(Integer)`. and the response looks like this:
+The `request_item_upload_url` methods expects two keyword arguments, `item(Struct)` and `part_number(Integer)`.
+
+```ruby
+@client.request_item_upload_url(item: updated_transfer.items.first, part_number: 2)
+
+```
+
+The response looks like this:
 
 ```json
  {:upload_url=>
@@ -152,6 +155,13 @@ The `request_item_upload_url` methods expects two keyword arguments, `item(Struc
 Do this request for the required amount of parts as mentioned in the `add_items_to` or `create_transfer` response.
 
 After uploading the file, you have to complete the file. This is needed for AWS to know all the parts are there and need to be glued together. Call the `complete_item!` with the keyword argument `item_id(String)` and pass on the the `id` from the item you've uploaded. The response message will tell you `File is marked as complete` if done right.
+
+Example:
+
+```ruby
+@client.complete_item!(item_id: updated_transfer.items.first.id)
+
+```
 
 
 ## Development

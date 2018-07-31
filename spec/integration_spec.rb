@@ -189,7 +189,7 @@ describe WeTransferClient do
 
     expect {
       client.add_items_to(transfer: transfer)
-    }.to raise_error(WeTransferClient::Error, /No items where added to the transfer/)
+    }.to raise_error(WeTransferClient::ArgumentError, /No items where added to the transfer/)
   end
 
   it 'is should support a manual way for uploading files with a block' do

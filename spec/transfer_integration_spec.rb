@@ -16,6 +16,7 @@ describe WeTransferClient do
   end
 
   it 'is able to create a transfer start to finish, both with small and large files' do
+    skip
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
       # Upload ourselves
@@ -53,6 +54,7 @@ describe WeTransferClient do
   end
 
   it 'is able to create a transfer with no items even if passed a block' do
+    skip
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     response = client.create_transfer(name: 'My amazing board', description: 'Hi there!') do |builder|
     end
@@ -61,6 +63,7 @@ describe WeTransferClient do
   end
 
   it 'is able to create a transfer with no items without a block' do
+    skip
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     response = client.create_empty_transfer(name: 'My amazing board', description: 'Hi there!')
     expect(response[:size]).to eq(0)
@@ -68,6 +71,7 @@ describe WeTransferClient do
   end
 
   it 'refuses to create a transfer when reading an IO raises an error' do
+    skip
     broken = StringIO.new('hello')
     def broken.read(*)
       raise 'This failed somehow'
@@ -83,6 +87,7 @@ describe WeTransferClient do
   end
 
   it 'refuses to create a transfer when given an IO of 0 size' do
+    skip
     broken = StringIO.new('')
 
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
@@ -94,6 +99,7 @@ describe WeTransferClient do
   end
 
   it 'is able to create a transfer with only webcontent' do
+    skip
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(name: 'My collection of web content', description: 'link collection') do |builder|
       10.times do
@@ -120,6 +126,7 @@ describe WeTransferClient do
   end
 
   it 'is able to create a transfer with web_content and files' do
+    skip
     client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
     transfer = client.create_transfer(name: 'Mixed Board Content', description: 'Files and Webcontent') do |builder|
       # Upload ourselves

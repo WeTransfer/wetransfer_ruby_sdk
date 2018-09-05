@@ -1,4 +1,6 @@
-class FutureTransfer < Ks.strict(:name, :description, :items)
+class FutureTransfer
+  attr_accessor :name, :description, :items
+
   def to_create_transfer_params
     {
       name: name,

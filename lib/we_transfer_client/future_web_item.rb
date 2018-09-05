@@ -1,14 +1,13 @@
-class FutureWebItem < Ks.strict(:url, :title, :local_identifier)
-  def initialize(**kwargs)
-    super(local_identifier: SecureRandom.uuid, **kwargs)
+class FutureWebItem
+  attr_reader :url, :title
+
+  def initialize(url:, title: url)
+    @url = url
+    @title = title
   end
 
-  def to_item_request_params
-    # Ideally the content identifier should stay the same throughout multiple
-    # calls if the file contents doesn't change.
+  def to_request_params
     {
-      content_identifier: 'web_content',
-      local_identifier: local_identifier,
       url: url,
       meta: {
         title: title

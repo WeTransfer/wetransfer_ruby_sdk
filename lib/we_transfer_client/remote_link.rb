@@ -1,7 +1,9 @@
-class RemoteLink < Dry::Struct::Value
-  attr_accessor :id, :url, :meta, :title, :type
-
-  def initialize
-    # super(meta: Struct.new())
+class RemoteLink
+  attr_reader :type
+  def initialize(id:, url:, meta:, type:)
+    @id = id
+    @url = url
+    @meta = meta
+    @type = type
   end
 end

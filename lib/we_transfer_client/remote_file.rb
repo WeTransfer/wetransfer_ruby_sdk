@@ -1,14 +1,14 @@
 class RemoteFile
-  attr_accessor :id, :name, :size, :url, :type, :multipart
+  attr_reader :multipart, :name, :type, :id
 
-  def initialize(**kwargs)
-    @id ||= kwargs[:id]
-    @name ||= kwargs[:name]
-    @size ||= kwargs[:size]
-    @url ||= kwargs[:url]
-    @type ||= kwargs[:type]
-    @size ||= kwargs[:size]
-    multi ||= Struct.new(*kwargs[:multipart].keys)
-    @multipart = multi.new(*kwargs[:multipart].values)
+  def initialize(id:, name:, size:, url: nil, type:, multipart:)
+    @id = id
+    @name = name
+    @size = size
+    @url = url
+    @type = type
+    @size = size
+    multi = Struct.new(*multipart.keys)
+    @multipart = multi.new(*multipart.values)
   end
 end

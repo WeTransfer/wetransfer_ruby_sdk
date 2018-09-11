@@ -3,10 +3,10 @@ require 'spec_helper'
 describe FutureBoard do
   let (:params) { { name: 'yes', description: 'A description about the board', items: [] } }
 
-  describe "#initilizer" do
+  describe '#initializer' do
     it 'raises ArgumentError when no name is given' do
       params.delete(:name)
-      expect{
+      expect {
         described_class.new(params)
       }.to raise_exception ArgumentError, /name/
     end
@@ -45,7 +45,7 @@ describe FutureBoard do
     end
 
     it 'has items' do
-      file = FutureFile.new(name: 'yes', io: File.open(__FILE__,'rb' ))
+      file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
       params[:items] << file
       as_params = described_class.new(params).to_request_params
       expect(as_params[:items].count).to be(1)

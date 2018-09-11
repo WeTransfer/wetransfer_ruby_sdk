@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe FutureFile do
-  let (:params) { { name: 'yes', io: File.open(__FILE__,'rb' ) } }
+  let (:params) { { name: 'yes', io: File.open(__FILE__, 'rb') } }
 
-  describe "#initilizer" do
+  describe '#initilizer' do
     it 'needs an :io keyword arg' do
       params.delete(:io)
 

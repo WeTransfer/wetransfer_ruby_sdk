@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe TransferBuilder do
   it 'raises if given an item with a size of 0' do
+    skip
     broken = StringIO.new('')
     expect {
       described_class.new.ensure_io_compliant!(broken)
@@ -9,6 +10,7 @@ describe TransferBuilder do
   end
 
   it 'raises if IO raises an error' do
+    skip
     broken = []
 
     expect {
@@ -17,6 +19,7 @@ describe TransferBuilder do
   end
 
   it 'adds a file' do
+    skip
     transfer_builder = described_class.new
     transfer_builder.add_file_at(path: __FILE__)
     expect(transfer_builder.items.count).to eq(1)
@@ -28,6 +31,7 @@ describe TransferBuilder do
   end
 
   it 'should add a url' do
+    skip
     transfer_builder = described_class.new
     transfer_builder.add_web_url(url: 'https://www.wetransfer.com/')
     expect(transfer_builder.items.count).to eq(1)
@@ -38,6 +42,7 @@ describe TransferBuilder do
   end
 
   it 'should user url for the title when none is given' do
+    skip
     transfer_builder = described_class.new
     transfer_builder.add_web_url(url: 'https://www.wetransfer.com/')
     expect(transfer_builder.items.count).to eq(1)
@@ -49,6 +54,7 @@ describe TransferBuilder do
   end
 
   it 'should pass title as webcontent title' do
+    skip
     transfer_builder = described_class.new
     transfer_builder.add_web_url(url: 'https://www.wetransfer.com/', title: 'awesome website for file transfering')
     expect(transfer_builder.items.count).to eq(1)

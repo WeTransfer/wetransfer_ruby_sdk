@@ -1,7 +1,7 @@
 class FutureBoard
   attr_accessor :name, :description, :items
 
-  def initialize(name:, description: nil, items:[])
+  def initialize(name:, description: nil, items: [])
     @name = name
     @description = description
     @items = items

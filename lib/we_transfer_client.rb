@@ -24,30 +24,21 @@ class WeTransferClient
 
   def initialize(api_key:, logger: NULL_LOGGER)
     @api_url_base = 'https://dev.wetransfer.com'
-    # @api_url_base = 'https://dsxxuwxn0j.execute-api.eu-west-1.amazonaws.com/'
     @api_key = api_key.to_str
     @bearer_token = nil
     @logger = logger
   end
 
-  def create_transfer(name:, description:)
+  def create_transfer(name:, description: )
     builder = TransferBuilder.new
     yield(builder)
     future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
     create_and_upload(future_transfer)
   end
 
-  # def create_empty_transfer(name:, description:)
-  #   future_transfer = FutureTransfer.new(name: name, description: description, items: [])
-  #   create_and_upload(future_transfer)
-  # end
-
-  def create_board(name:, description:)
+  def create_board(name:, description: )
     builder = BoardBuilder.new
-    if block_given?
-      yield(builder)
-    end
-    # A board needs to be initialized, without items
+    yield(builder) if block_given?
     future_board = FutureBoard.new(name: name, description: description, items: builder.items)
     create_remote_board(future_board)
   end

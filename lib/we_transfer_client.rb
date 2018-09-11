@@ -8,12 +8,12 @@ class WeTransferClient
   require_relative 'we_transfer_client/transfer_builder'
   require_relative 'we_transfer_client/board_builder'
   require_relative 'we_transfer_client/future_file'
-  require_relative 'we_transfer_client/future_web_item'
+  require_relative 'we_transfer_client/future_link'
   require_relative 'we_transfer_client/future_transfer'
   require_relative 'we_transfer_client/future_board'
   require_relative 'we_transfer_client/remote_transfer'
   require_relative 'we_transfer_client/remote_board'
-  # require_relative 'we_transfer_client/remote_item'
+  require_relative 'we_transfer_client/remote_link'
   require_relative 'we_transfer_client/remote_file'
 
   class Error < StandardError

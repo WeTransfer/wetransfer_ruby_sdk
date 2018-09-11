@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FutureWebItem do
+describe FutureLink do
   let (:params) { { url: 'http://www.wetransfer.com', title: 'WeTransfer' } }
 
   describe '#initializer' do

@@ -149,6 +149,17 @@ class WeTransferClient
     JSON.parse(response.body, symbolize_names: true)
   end
 
+  def request_board(board_id)
+    authorize_if_no_bearer_token!
+    response = faraday.get(
+      "/v2/boards/#{board_id}",
+      {},
+      auth_headers.merge('Content-Type' => 'application/json')
+    )
+    ensure_ok_status!(response)
+    RemoteBoard.new(JSON.parse(response.body, symbolize_names: true))
+  end
+
   def faraday
     Faraday.new(@api_url_base) do |c|
       c.response :logger, @logger

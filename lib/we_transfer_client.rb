@@ -51,8 +51,16 @@ class WeTransferClient
     raise ArgumentError, 'No items where added to the board'
   end
 
-  private
+  def upload_file(board_id:, file:, io: )
+    put_io_in_parts(board_id, file, io)
+    complete_file!(board_id , file.id)
+  end
 
+  def get_board(board_id: )
+    request_board(board_id)
+  end
+
+  private
 
   def create_remote_transfer(xfer)
     authorize_if_no_bearer_token!

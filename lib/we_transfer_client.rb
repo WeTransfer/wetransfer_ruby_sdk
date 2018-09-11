@@ -131,7 +131,7 @@ class WeTransferClient
 
   def request_board_upload_url(board_id:, item:, part_number:)
     response = faraday.get(
-      "/v2/boards/#{board_id}/files/#{item.id}/upload-url/#{part_number}/#{item.multipart.fetch(:id)}",
+      "/v2/boards/#{board_id}/files/#{item.id}/upload-url/#{part_number}/#{item.multipart.id}",
       {},
       auth_headers.merge('Content-Type' => 'application/json')
     )

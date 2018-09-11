@@ -99,85 +99,25 @@ class WeTransferClient
         ensure_ok_status!(response)
         file_item = JSON.parse(response.body, symbolize_names: true).first
         board.items << RemoteFile.new(file_item)
-      elsif item.is_a?(FutureWebItems)
-        binding.pry
+      elsif item.is_a?(FutureLink)
+        response = faraday.post(
+          "/v2/boards/#{board.id}/links",
+          # this needs to be a array with hashes => [{name, filesize}]
+          JSON.pretty_generate([item.to_request_params]),
+          auth_headers.merge('Content-Type' => 'application/json')
+        )
+        ensure_ok_status!(response)
+        file_item = JSON.parse(response.body, symbolize_names: true).first
+        board.items << RemoteLink.new(file_item)
       end
     end
     board
   end
 
-
-  # make this a public method ->
-  def upload_files(future_collection, remote_board)
-  # def upload_item(future_item, remote_item)
-
-    # why do you need future and remote in this method? /-> to get the right IO for upload
-    # the remote part holds the information(upload_url)
-
-    # Future collection is a Struct
-    # Remote collection is a Hash
-    future_items = future_collection.items
-    # get all ids from items to match with local item
-    item_id_map = Hash[future_items.map(&:name).zip(future_items)]
-
-    remote_board.fetch(:files).each do |remote_file|
-
-      remote_file = hash_to_struct(remote_file, RemoteFile)
-      local_item = item_id_map.fetch(remote_file.name)
-      put_io_in_parts(
-        remote_board.fetch(:id),
-        remote_file,
-        local_item.io
-      )
-      complete_file!(board_id: remote_board.fetch(:id), item_id: remote_file.id)
-    end
-    binding.pry
-    return_as_struct(remote_board)
-  end
-
-  # def x_upload_items(xfer)
-  #   remote_transfer.items = remote_transfer.items.map do |remote_item_hash|
-  #     hash_to_struct(remote_item_hash, RemoteItem)
-  #   end
-
-  #   item_id_map = Hash[xfer.items.map(&:local_identifier).zip(xfer.items)]
-
-  #   create_transfer_response.fetch(:items).each do |remote_item|
-  #     local_item = item_id_map.fetch(remote_item.fetch(:local_identifier))
-  #     next unless local_item.is_a?(FutureFileItem)
-  #     remote_item_id = remote_item.fetch(:id)
-
-  #     put_io_in_parts(
-  #       remote_item_id,
-  #       remote_item.fetch(:meta).fetch(:multipart_parts),
-  #       remote_item.fetch(:meta).fetch(:multipart_upload_id),
-  #       local_item.io
-  #     )
-
-  #     complete_response = faraday.post(
-  #       "/v1/files/#{remote_item_id}/uploads/complete",
-  #       '{}',
-  #       auth_headers.merge('Content-Type' => 'application/json')
-  #     )
-  #     ensure_ok_status!(complete_response)
-  #   end
-  #   remote_transfer
-  # end
-
-  # def hash_to_struct(hash, struct_class)
-  #   members = struct_class.schema.keys
-
-  #   struct_attrs = Hash[members.zip(hash.values_at(*members))]
-  #   struct_class.new(**struct_attrs)
-  # end
-
   def put_io_in_parts(board_id, item, io)
-    chunk_size = MAGIC_PART_SIZE
-
-    (1..item.multipart[:part_numbers]).each do |part_n_one_based|
-      response = request_board_upload_url(board_id: board_id, item: item, part_number: part_n_one_based)
-      upload_url = response.fetch(:url)
-      part_io = StringIO.new(io.read(chunk_size))
+    (1..item.multipart.part_numbers).each do |part_n_one_based|
+      upload_url = request_board_upload_url(board_id: board_id, item: item, part_number: part_n_one_based).fetch(:url)
+      part_io = StringIO.new(io.read(MAGIC_PART_SIZE))
       part_io.rewind
       response = faraday.put(
         upload_url,

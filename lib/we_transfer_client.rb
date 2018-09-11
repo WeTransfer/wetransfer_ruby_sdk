@@ -139,7 +139,7 @@ class WeTransferClient
     JSON.parse(response.body, symbolize_names: true)
   end
 
-  def complete_file!(board_id:, item_id:)
+  def complete_file!(board_id, item_id)
     response = faraday.put(
       "/v2/boards/#{board_id}/files/#{item_id}/upload-complete",
       '{}',

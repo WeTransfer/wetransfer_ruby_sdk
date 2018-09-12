@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe BoardBuilder do
-  let (:board) { described_class.new }
+  let(:board) { described_class.new }
 
   describe '#initialize' do
     it 'initializes with an empty array' do
@@ -48,7 +48,7 @@ describe BoardBuilder do
 
     it 'should call #add_file' do
       client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'))
-      board = client.create_board(name: 'Test board', description: 'A board description') do |b|
+      client.create_board(name: 'Test board', description: 'A board description') do |b|
         expect(b).to receive(:add_file).with(name: anything, io: kind_of(::IO))
 
         b.add_file_at(path: __FILE__)

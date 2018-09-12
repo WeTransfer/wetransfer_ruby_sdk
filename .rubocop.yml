@@ -1,5 +1,2 @@
-AllCops:
-  TargetRubyVersion: 2.4
-
 inherit_gem:
   wetransfer_style: ruby/default.yml

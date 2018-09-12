@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe FutureLink do
-  let (:params) { { url: 'http://www.wetransfer.com', title: 'WeTransfer' } }
+  let(:params) { { url: 'http://www.wetransfer.com', title: 'WeTransfer' } }
 
   describe '#initializer' do
     it 'needs a :url keyword arg' do

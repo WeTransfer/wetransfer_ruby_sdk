@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe RemoteFile do
-  let (:params) {
+  let(:params) {
     {
       id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
       name: 'Board name',

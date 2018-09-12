@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe RemoteLink do
-  let (:params) {
+  let(:params) {
     {
       id:     SecureRandom.uuid,
       url:    'http://www.wetransfer.com',
@@ -11,9 +11,9 @@ describe RemoteLink do
   }
 
   describe '#initialize' do
-    ATTRIBUTES = %i[id url title type]
+    attributes = %i[id url title type]
 
-    ATTRIBUTES.each do |atttribute|
+    attributes.each do |atttribute|
       it "raises an ArgumentError when #{atttribute} is missing" do
         params.delete(atttribute)
         expect {
@@ -24,7 +24,7 @@ describe RemoteLink do
   end
 
   describe 'getters' do
-    subject {described_class.new(params)}
+    subject { described_class.new(params) }
 
     it 'responds to #type' do
       expect(subject.type).to eq 'web_content'

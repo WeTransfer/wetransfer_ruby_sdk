@@ -1,9 +1,11 @@
 require 'spec_helper'
 
 describe RemoteBoard do
-  let (:params) {
+  subject { described_class.new(params) }
+
+  let(:params) {
     {
-      id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
+      id: SecureRandom.uuid,
       state: 'downloadable',
       url: 'http://wt.tl/123abcd',
       name: 'RemoteBoard',
@@ -17,86 +19,59 @@ describe RemoteBoard do
             part_numbers: 1,
             chunk_size: 3036
           },
-          type: 'file'
+          type: 'file',
         },
         {
           id: 'storr6ua2l1fsl8lt20180911093826',
           url: 'http://www.wetransfer.com',
-          meta:
-            {
-              title: 'WeTransfer Website'
-            },
-          type: 'link'
+          title: 'WeTransfer Website',
+          type: 'link',
         }
       ]
-    }}
+    }
+  }
 
   describe '#initializer' do
-    it 'initialized when no description is given' do
+    it 'is valid with all params' do
+      subject
+    end
+
+    it 'is valid without description' do
       params.delete(:description)
-      described_class.new(params)
+      subject
     end
 
-    it 'initialized when no item is given' do
+    it 'is valid without items' do
       params.delete(:items)
-      described_class.new(params)
+      subject
     end
 
-    it 'fails when id is missing' do
-      params.delete(:id)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /id/
+    %i[id name state url].each do |param|
+      it "is invalid without #{param}" do
+        params.delete(param)
+        expect {
+          subject
+        }.to raise_error ArgumentError, %r[#{param}]
+      end
     end
 
-    it 'fails when state is missing' do
-      params.delete(:state)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /state/
-    end
+    describe 'items' do
+      it 'are instantiated' do
+        expect(subject.items.map(&:class)).to eq([RemoteFile, RemoteLink])
+      end
 
-    it 'fails when url is missing' do
-      params.delete(:url)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /url/
-    end
-
-    it 'fails when name is missing' do
-      params.delete(:name)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /name/
-    end
-
-    it 'creates new object' do
-      described_class.new(params)
-    end
-
-    it 'creates classes for items' do
-      remote_board = described_class.new(params)
-      expect(remote_board.items.map(&:class)).to eq([RemoteFile, RemoteLink])
+      it 'raises ItemTypeError if the item has a wrong type' do
+        params[:items] = [{ type: 'foo' }]
+        expect { subject }.to raise_error(RemoteBoard::ItemTypeError)
+      end
     end
   end
 
-  describe 'getter' do
-    let (:subject) { described_class.new(params) }
-
-    it '#id' do
-      subject.id
-    end
-
-    it '#items' do
-      subject.items
-    end
-
-    it '#url' do
-      subject.url
-    end
-
-    it '#state' do
-      subject.state
+  describe 'getters' do
+    %i[id items url state].each do |getter|
+      it "responds to ##{getter}" do
+        subject.send getter
+      end
     end
   end
 end

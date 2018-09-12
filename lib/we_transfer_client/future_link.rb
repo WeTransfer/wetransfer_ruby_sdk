@@ -9,9 +9,7 @@ class FutureLink
   def to_request_params
     {
       url: url,
-      meta: {
-        title: title
-      }
+      title: title,
     }
   end
 

@@ -26,7 +26,7 @@ describe FutureLink do
       as_params = described_class.new(params).to_request_params
 
       expect(as_params[:url]).to eq('http://www.wetransfer.com')
-      expect(as_params[:meta][:title]).to be_kind_of(String)
+      expect(as_params[:title]).to be_kind_of(String)
     end
   end
 

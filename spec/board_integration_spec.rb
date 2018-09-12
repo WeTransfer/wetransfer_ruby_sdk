@@ -32,7 +32,7 @@ describe WeTransferClient do
       b.add_file(name: 'two_chunks', io: two_chunks)
       b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
     end
-    expect(board.items.map{|c|c.class}).to eq([RemoteFile, RemoteFile, RemoteLink])
+    expect(board.items.map(&:class)).to eq([RemoteFile, RemoteFile, RemoteLink])
     expect(board.items[1].multipart.part_numbers).to be > 1
     expect(board.items.count).to be(3)
 
@@ -43,13 +43,13 @@ describe WeTransferClient do
       b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
     end
     expect(board.items.count).to be(5)
-    expect(board.items.select{|i| i.type == 'file'}.count).to be(3)
-    expect(board.items.select{|i| i.type == 'link'}.count).to be(2)
+    expect(board.items.select { |i| i.type == 'file' }.count).to be(3)
+    expect(board.items.select { |i| i.type == 'link' }.count).to be(2)
 
     # actual uploading of the files to the board
 
     # You have to upload every file one at the time, can't itterate over it
-    file_items = board.items.select{|i| i.type == 'file'}
+    file_items = board.items.select { |i| i.type == 'file' }
     # File items count is 3 so you have to execute this 3 times.
     client.upload_file(object: board, file: file_items[0], io: File.open(__FILE__, 'rb'))
     client.upload_file(object: board, file: file_items[1], io: two_chunks)

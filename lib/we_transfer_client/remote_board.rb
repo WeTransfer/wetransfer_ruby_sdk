@@ -11,6 +11,6 @@ class RemoteBoard
   end
 
   def item_to_class(items)
-    items.map{|x| x[:type] == 'file' ?  RemoteFile.new(x) : RemoteLink.new(x)}
+    items.map { |x| x[:type] == 'file' ? RemoteFile.new(x) : RemoteLink.new(x) }
   end
 end

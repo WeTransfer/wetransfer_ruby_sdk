@@ -10,6 +10,6 @@ class RemoteTransfer
   end
 
   def files_to_class(files)
-    files.map{|x| RemoteFile.new(x)}
+    files.map { |x| RemoteFile.new(x) }
   end
 end

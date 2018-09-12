@@ -1,7 +1,7 @@
 class FutureTransfer
   attr_accessor :message, :files
 
-  def initialize(message:, files:[])
+  def initialize(message:, files: [])
     @message = message
     @files = files
   end

@@ -6,7 +6,8 @@ describe RemoteLink do
       id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
       url: 'http://www.wetransfer.com',
       meta: {title: 'wetransfer.com'},
-      type: 'web_content'}
+      type: 'web_content'
+    }
     }
 
   describe '#initialize' do
@@ -39,7 +40,7 @@ describe RemoteLink do
     end
   end
   describe 'getters' do
-    let (:object) {described_class.new(params)}
+    let (:object) { described_class.new(params) }
 
     it '#type' do
       object.type

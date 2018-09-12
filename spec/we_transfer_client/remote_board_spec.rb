@@ -1,32 +1,35 @@
 require 'spec_helper'
 
 describe RemoteBoard do
-  let (:params) { { id: [*('a'..'z'),*('0'..'9')].shuffle[0,36].join,
-                    state: 'downloadable',
-                    url: 'http://wt.tl/123abcd',
-                    name:'RemoteBoard',
-                    description: 'Test Description',
-                    items: [{
-                              id: "s7l1urvgqs1b6u9v720180911093825",
-                              name: "board_integration_spec.rb",
-                              size: 3036,
-                              multipart: {
-                                part_numbers: 1,
-                                chunk_size: 3036
-                              },
-                              type: "file"
-                            },
-                            {
-                              id:"storr6ua2l1fsl8lt20180911093826",
-                              url:"http://www.wetransfer.com",
-                              meta:
-                                {
-                                  title: "WeTransfer Website"
-                                },
-                              type:"link"
-                            }
-                          ]
-                  }}
+  let (:params) {
+    {
+      id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
+      state: 'downloadable',
+      url: 'http://wt.tl/123abcd',
+      name: 'RemoteBoard',
+      description: 'Test Description',
+      items: [
+        {
+          id: 's7l1urvgqs1b6u9v720180911093825',
+          name: 'board_integration_spec.rb',
+          size: 3036,
+          multipart: {
+            part_numbers: 1,
+            chunk_size: 3036
+          },
+          type: 'file'
+        },
+        {
+          id: 'storr6ua2l1fsl8lt20180911093826',
+          url: 'http://www.wetransfer.com',
+          meta:
+            {
+              title: 'WeTransfer Website'
+            },
+          type: 'link'
+        }
+      ]
+    }}
 
   describe '#initializer' do
     it 'initialized when no description is given' do
@@ -73,12 +76,12 @@ describe RemoteBoard do
 
     it 'creates classes for items' do
       remote_board = described_class.new(params)
-      expect(remote_board.items.map{|i| i.class}).to eq([RemoteFile, RemoteLink])
+      expect(remote_board.items.map(&:class)).to eq([RemoteFile, RemoteLink])
     end
   end
 
   describe 'getter' do
-    let (:subject) { described_class.new(params)}
+    let (:subject) { described_class.new(params) }
 
     it '#id' do
       subject.id

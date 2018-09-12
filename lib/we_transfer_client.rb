@@ -29,21 +29,21 @@ class WeTransferClient
     @logger = logger
   end
 
-  def create_transfer(message: )
+  def create_transfer(message:)
     builder = TransferBuilder.new
     yield(builder)
     future_transfer = FutureTransfer.new(message: message, files: builder.items)
     create_remote_transfer(future_transfer)
   end
 
-  def create_board(name:, description: )
+  def create_board(name:, description:)
     builder = BoardBuilder.new
     yield(builder) if block_given?
     future_board = FutureBoard.new(name: name, description: description, items: builder.items)
     create_remote_board(future_board)
   end
 
-  def add_items(board: )
+  def add_items(board:)
     builder = BoardBuilder.new
     yield(builder)
     add_items_to_remote_board(builder.items, board)
@@ -51,7 +51,7 @@ class WeTransferClient
     raise ArgumentError, 'No items where added to the board'
   end
 
-  def upload_file(object:, file:, io: )
+  def upload_file(object:, file:, io:)
     put_io_in_parts(object, file, io)
     complete_file!(object, file.id)
   end
@@ -60,11 +60,11 @@ class WeTransferClient
     complete_transfer_call(transfer)
   end
 
-  def get_board(board_id: )
+  def get_board(board_id:)
     request_board(board_id)
   end
 
-  def get_transfer(transfer_id: )
+  def get_transfer(transfer_id:)
     request_transfer(transfer_id)
   end
 
@@ -195,7 +195,7 @@ class WeTransferClient
     authorize_if_no_bearer_token!
     response = faraday.get(
       "/v2/boards/#{board_id}",
-      '',
+      {},
       auth_headers.merge('Content-Type' => 'application/json')
     )
     ensure_ok_status!(response)
@@ -206,7 +206,7 @@ class WeTransferClient
     authorize_if_no_bearer_token!
     response = faraday.get(
       "/v2/transfers/#{transfer_id}",
-      '',
+      {},
       auth_headers.merge('Content-Type' => 'application/json')
     )
     ensure_ok_status!(response)

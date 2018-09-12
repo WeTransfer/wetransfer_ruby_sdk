@@ -29,11 +29,11 @@ class WeTransferClient
     @logger = logger
   end
 
-  def create_transfer(name:, description: )
+  def create_transfer(message: )
     builder = TransferBuilder.new
     yield(builder)
-    future_transfer = FutureTransfer.new(name: name, description: description, items: builder.items)
-    create_and_upload(future_transfer)
+    future_transfer = FutureTransfer.new(message: message, files: builder.items)
+    create_remote_transfer(future_transfer)
   end
 
   def create_board(name:, description: )
@@ -51,9 +51,14 @@ class WeTransferClient
     raise ArgumentError, 'No items where added to the board'
   end
 
-  def upload_file(board_id:, file:, io: )
+  def upload_board_file(board_id:, file:, io: )
     put_io_in_parts(board_id, file, io)
     complete_file!(board_id , file.id)
+  end
+
+  def upload_transfer_file(object:, file:, io: )
+    put_io_in_parts(object, file, io)
+    complete_file!(object, file_id)
   end
 
   def get_board(board_id: )
@@ -70,8 +75,7 @@ class WeTransferClient
       auth_headers.merge('Content-Type' => 'application/json')
     )
     ensure_ok_status!(response)
-    create_transfer_response = JSON.parse(response.body, symbolize_names: true)
-    hash_to_struct(create_transfer_response, RemoteTransfer)
+    RemoteTransfer.new(JSON.parse(response.body, symbolize_names: true))
   end
 
   def create_remote_board(board)
@@ -114,9 +118,17 @@ class WeTransferClient
     board
   end
 
-  def put_io_in_parts(board_id, item, io)
-    (1..item.multipart.part_numbers).each do |part_n_one_based|
-      upload_url = request_board_upload_url(board_id: board_id, item: item, part_number: part_n_one_based).fetch(:url)
+  def put_io_in_parts(object, file, io)
+    binding.pry
+    # board_id could also be a transfer_id!
+    # check for board_upload_url or transfer_upload_url
+
+    (1..file.multipart.part_numbers).each do |part_n_one_based|
+      upload_url = if object.is_a?(RemoteTransfer)
+        request_transfer_upload_url(transfer_id: object.id, file: file, part_number: part_n_one_based).fetch(:url)
+      else
+        request_board_upload_url(board_id: object.id, file: file, part_number: part_n_one_based).fetch(:url)
+      end
       part_io = StringIO.new(io.read(MAGIC_PART_SIZE))
       part_io.rewind
       response = faraday.put(
@@ -129,9 +141,19 @@ class WeTransferClient
     end
   end
 
-  def request_board_upload_url(board_id:, item:, part_number:)
+  def request_board_upload_url(board_id:, file:, part_number:)
     response = faraday.get(
-      "/v2/boards/#{board_id}/files/#{item.id}/upload-url/#{part_number}/#{item.multipart.id}",
+      "/v2/boards/#{board_id}/files/#{file.id}/upload-url/#{part_number}/#{file.multipart.id}",
+      {},
+      auth_headers.merge('Content-Type' => 'application/json')
+    )
+    ensure_ok_status!(response)
+    JSON.parse(response.body, symbolize_names: true)
+  end
+
+  def request_transfer_upload_url(transfer_id:, file:, part_number:)
+    response = faraday.get(
+      "/v2/transfers/#{transfer_id}/files/#{file.id}/upload-url/#{part_number}",
       {},
       auth_headers.merge('Content-Type' => 'application/json')
     )
@@ -140,6 +162,9 @@ class WeTransferClient
   end
 
   def complete_file!(board_id, item_id)
+    # board_id could also be a transfer_id!
+    # check for board_upload_url or transfer_upload_url
+    binding.pry
     response = faraday.put(
       "/v2/boards/#{board_id}/files/#{item_id}/upload-complete",
       '{}',

@@ -51,18 +51,21 @@ class WeTransferClient
     raise ArgumentError, 'No items where added to the board'
   end
 
-  def upload_board_file(board_id:, file:, io: )
-    put_io_in_parts(board_id, file, io)
-    complete_file!(board_id , file.id)
+  def upload_file(object:, file:, io: )
+    put_io_in_parts(object, file, io)
+    complete_file!(object, file.id)
   end
 
-  def upload_transfer_file(object:, file:, io: )
-    put_io_in_parts(object, file, io)
-    complete_file!(object, file_id)
+  def complete_transfer(transfer:)
+    complete_transfer_call(transfer)
   end
 
   def get_board(board_id: )
     request_board(board_id)
+  end
+
+  def get_transfer(transfer_id: )
+    request_transfer(transfer_id)
   end
 
   private
@@ -119,17 +122,15 @@ class WeTransferClient
   end
 
   def put_io_in_parts(object, file, io)
-    binding.pry
-    # board_id could also be a transfer_id!
-    # check for board_upload_url or transfer_upload_url
-
     (1..file.multipart.part_numbers).each do |part_n_one_based|
-      upload_url = if object.is_a?(RemoteTransfer)
-        request_transfer_upload_url(transfer_id: object.id, file: file, part_number: part_n_one_based).fetch(:url)
+      if object.is_a?(RemoteTransfer)
+        upload_url = request_transfer_upload_url(transfer_id: object.id, file: file, part_number: part_n_one_based).fetch(:url)
+        chunk_size = file.multipart.chunk_size
       else
-        request_board_upload_url(board_id: object.id, file: file, part_number: part_n_one_based).fetch(:url)
+        upload_url = request_board_upload_url(board_id: object.id, file: file, part_number: part_n_one_based).fetch(:url)
+        chunk_size = MAGIC_PART_SIZE
       end
-      part_io = StringIO.new(io.read(MAGIC_PART_SIZE))
+      part_io = StringIO.new(io.read(chunk_size))
       part_io.rewind
       response = faraday.put(
         upload_url,
@@ -161,28 +162,55 @@ class WeTransferClient
     JSON.parse(response.body, symbolize_names: true)
   end
 
-  def complete_file!(board_id, item_id)
-    # board_id could also be a transfer_id!
-    # check for board_upload_url or transfer_upload_url
-    binding.pry
+  def complete_file!(object, item_id)
+    response = if object.is_a?(RemoteTransfer)
+      faraday.put(
+        "/v2/transfers/#{object.id}/files/#{item_id}/upload-complete",
+        '',
+        auth_headers.merge('Content-Type' => 'application/json')
+      )
+    else
+      faraday.put(
+        "/v2/boards/#{object.id}/files/#{item_id}/upload-complete",
+        '{}',
+        auth_headers.merge('Content-Type' => 'application/json')
+      )
+    end
+    ensure_ok_status!(response)
+    JSON.parse(response.body, symbolize_names: true)
+  end
+
+  def complete_transfer_call(object)
+    authorize_if_no_bearer_token!
     response = faraday.put(
-      "/v2/boards/#{board_id}/files/#{item_id}/upload-complete",
-      '{}',
+      "/v2/transfers/#{object.id}/finalize",
+      '',
       auth_headers.merge('Content-Type' => 'application/json')
     )
     ensure_ok_status!(response)
-    JSON.parse(response.body, symbolize_names: true)
+    RemoteTransfer.new(JSON.parse(response.body, symbolize_names: true))
   end
 
   def request_board(board_id)
     authorize_if_no_bearer_token!
     response = faraday.get(
       "/v2/boards/#{board_id}",
-      {},
+      '',
       auth_headers.merge('Content-Type' => 'application/json')
     )
     ensure_ok_status!(response)
     RemoteBoard.new(JSON.parse(response.body, symbolize_names: true))
+  end
+
+  def request_transfer(transfer_id)
+    authorize_if_no_bearer_token!
+    response = faraday.get(
+      "/v2/transfers/#{transfer_id}",
+      '',
+      auth_headers.merge('Content-Type' => 'application/json')
+    )
+    ensure_ok_status!(response)
+    RemoteTransfer.new(JSON.parse(response.body, symbolize_names: true))
   end
 
   def faraday
@@ -210,19 +238,6 @@ class WeTransferClient
       'Authorization' => ('Bearer %s' % @bearer_token),
     }
   end
-
-  # def return_as_struct(transfer_response)
-  #   if transfer_response.is_a?(Hash)
-  #     transfer_response = hash_to_struct(transfer_response, RemoteBoard)
-  #     if transfer_response.items.any?
-  #       transfer_response.items.each do |remote_item_hash|
-  #         binding.pry
-  #         transfer_response.items << hash_to_struct(remote_item_hash, RemoteFile)
-  #       end
-  #     end
-  #   end
-  #   transfer_response
-  # end
 
   def ensure_ok_status!(response)
     case response.status

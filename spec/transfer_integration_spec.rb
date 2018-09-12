@@ -36,10 +36,19 @@ describe WeTransferClient do
     expect(transfer.files.first.url).to be(nil)
     expect(transfer.state).to eq('uploading')
 
-    client.upload_transfer_file(object: transfer, file: transfer.files[0], io: File.open(__FILE__, 'rb') )
-    client.upload_transfer_file(object: transfer, file: transfer.files[1], io: two_chunks )
+    client.upload_file(object: transfer, file: transfer.files[0], io: File.open(__FILE__, 'rb') )
+    client.upload_file(object: transfer, file: transfer.files[1], io: two_chunks )
 
+    transfer = client.complete_transfer(transfer: transfer)
+    # if transfer.state == 'processing'
+    #   sleep 30
+    #   expect(transfer.state).to be('completed')
+    # end
+    # expect(transfer.state).to be('completed')
     # binding.pry
+
+    transfer = client.get_transfer(transfer_id: transfer.id)
+    binding.pry
   end
 
 

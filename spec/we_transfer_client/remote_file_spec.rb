@@ -63,10 +63,21 @@ describe RemoteFile do
       remote_file = described_class.new(params)
       expect(remote_file.multipart.members).to eq(params[:multipart].keys)
     end
+
+    it 'has a default type of file' do
+      params.delete(:type)
+      remote_file = described_class.new(params)
+      expect(remote_file.type).to eq('file')
+    end
+
+    it 'contains a type of link when passed' do
+      params[:type] = 'link'
+      remote_file = described_class.new(params)
+      expect(remote_file.type).to eq('link')
+    end
   end
 
   describe 'Getters' do
-    # this is under
     let(:subject) { described_class.new(params) }
 
     it '#multipart' do
@@ -83,6 +94,10 @@ describe RemoteFile do
 
     it '#id' do
       subject.id
+    end
+
+    it '#url' do
+      subject.url
     end
   end
 end

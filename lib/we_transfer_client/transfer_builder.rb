@@ -8,8 +8,7 @@ class TransferBuilder
 
   def add_file(name:, io:)
     ensure_io_compliant!(io)
-    @items << FutureFileItem.new(name: name, io: io)
-    true
+    @items << FutureFile.new(name: name, io: io)
   end
 
   def add_file_at(path:)
@@ -18,8 +17,7 @@ class TransferBuilder
 
   def add_web_url(url:, title: nil)
     title ||= url
-    @items << FutureWebItem.new(url: url, title: title)
-    true
+    @items << FutureWeb.new(url: url, title: title)
   end
 
   def ensure_io_compliant!(io)

@@ -1,12 +1,15 @@
 class RemoteTransfer
-  def initializer(id:, version_identifier:, state:, shortened_url:, name:, description: nil, size:, items: [])
+  attr_reader :files, :url, :state, :id
+
+  def initialize(id:, state:, url:, message:, files: [])
     @id = id
-    @version_identifier = version_identifier
     @state = state
-    @shortened_url = shortened_url
-    @name = name
-    @description = description
-    @size = size
-    @items = items
+    @message = message
+    @url = url
+    @files = files_to_class(files)
+  end
+
+  def files_to_class(files)
+    files.map{|x| RemoteFile.new(x)}
   end
 end

@@ -51,9 +51,9 @@ describe WeTransferClient do
     # You have to upload every file one at the time, can't itterate over it
     file_items = board.items.select{|i| i.type == 'file'}
     # File items count is 3 so you have to execute this 3 times.
-    client.upload_file(board_id: board.id, file: file_items[0], io: File.open(__FILE__, 'rb'))
-    client.upload_file(board_id: board.id, file: file_items[1], io: two_chunks)
-    client.upload_file(board_id: board.id, file: file_items[2], io:  File.open(__FILE__, 'rb'))
+    client.upload_board_file(board_id: board.id, file: file_items[0], io: File.open(__FILE__, 'rb'))
+    client.upload_board_file(board_id: board.id, file: file_items[1], io: two_chunks)
+    client.upload_board_file(board_id: board.id, file: file_items[2], io:  File.open(__FILE__, 'rb'))
 
     expect(board.url).to be_kind_of(String)
     response = Faraday.get(board.url)

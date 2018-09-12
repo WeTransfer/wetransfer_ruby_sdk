@@ -1,7 +1,7 @@
 class RemoteFile
-  attr_reader :multipart, :name, :type, :id
+  attr_reader :multipart, :name, :type, :id, :url
 
-  def initialize(id:, name:, size:, url: nil, type:, multipart:)
+  def initialize(id:, name:, size:, url: nil, type: 'file', multipart:)
     @id = id
     @name = name
     @size = size

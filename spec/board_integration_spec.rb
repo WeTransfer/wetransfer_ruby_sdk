@@ -55,6 +55,10 @@ describe WeTransferClient do
     client.upload_file(object: board, file: file_items[1], io: two_chunks)
     client.upload_file(object: board, file: file_items[2], io:  File.open(__FILE__, 'rb'))
 
+    client.complete_file!(object: board, file: file_items[0])
+    client.complete_file!(object: board, file: file_items[1])
+    client.complete_file!(object: board, file: file_items[2])
+
     expect(board.url).to be_kind_of(String)
     response = Faraday.get(board.url)
     # it hits the short-url with redirect

@@ -40,15 +40,23 @@ describe WeTransferClient do
     client.upload_file(object: transfer, file: transfer.files[0], io: File.open(__FILE__, 'rb'))
     client.upload_file(object: transfer, file: transfer.files[1], io: two_chunks)
 
-    transfer = client.complete_transfer(transfer: transfer)
-    # if transfer.state == 'processing'
-    #   sleep 30
-    #   expect(transfer.state).to be('completed')
-    # end
-    # expect(transfer.state).to be('completed')
-    # binding.pry
+    client.complete_file!(object: transfer, file: transfer.files[0] )
+    client.complete_file!(object: transfer, file: transfer.files[1] )
 
-    transfer = client.get_transfer(transfer_id: transfer.id)
+    transfer = client.complete_transfer(transfer: transfer)
+    if transfer.state == 'processing'
+      sleep 30
+      transfer = client.get_transfer(transfer_id: transfer.id)
+      expect(transfer.state).to eq('downloadable')
+    end
+    expect(transfer.state).to eq('downloadable')
+
+    response = Faraday.get(transfer.url)
+    # it hits the short-url with redirect
+    expect(response.status).to eq(302)
+    # but check in the header for a wetransfer domain location
+    expect(response['location']).to start_with('https://wetransfer')
+    # transfer = client.get_transfer(transfer_id: transfer.id)
 
   end
 end

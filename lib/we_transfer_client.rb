@@ -53,7 +53,6 @@ class WeTransferClient
 
   def upload_file(object:, file:, io:)
     put_io_in_parts(object, file, io)
-    complete_file!(object, file.id)
   end
 
   def complete_transfer(transfer:)
@@ -66,6 +65,12 @@ class WeTransferClient
 
   def get_transfer(transfer_id:)
     request_transfer(transfer_id)
+  end
+
+  def complete_file!(object:, file:)
+    response = object.is_a?(RemoteTransfer) ? complete_transfer_file(object, file) : complete_board_file(object, file)
+    ensure_ok_status!(response)
+    JSON.parse(response.body, symbolize_names: true)
   end
 
   private
@@ -162,22 +167,21 @@ class WeTransferClient
     JSON.parse(response.body, symbolize_names: true)
   end
 
-  def complete_file!(object, item_id)
-    response = if object.is_a?(RemoteTransfer)
-      faraday.put(
-        "/v2/transfers/#{object.id}/files/#{item_id}/upload-complete",
-        '',
-        auth_headers.merge('Content-Type' => 'application/json')
-      )
-    else
-      faraday.put(
-        "/v2/boards/#{object.id}/files/#{item_id}/upload-complete",
-        '{}',
-        auth_headers.merge('Content-Type' => 'application/json')
-      )
-    end
-    ensure_ok_status!(response)
-    JSON.parse(response.body, symbolize_names: true)
+  def complete_transfer_file(object, file)
+    body = {part_numbers: file.multipart.part_numbers}
+    faraday.put(
+      "/v2/transfers/#{object.id}/files/#{file.id}/upload-complete",
+      JSON.pretty_generate(body),
+      auth_headers.merge('Content-Type' => 'application/json')
+    )
+  end
+
+  def complete_board_file(object, file)
+    faraday.put(
+      "/v2/boards/#{object.id}/files/#{file.id}/upload-complete",
+      '{}',
+      auth_headers.merge('Content-Type' => 'application/json')
+    )
   end
 
   def complete_transfer_call(object)
@@ -187,6 +191,7 @@ class WeTransferClient
       '',
       auth_headers.merge('Content-Type' => 'application/json')
     )
+    # binding.pry
     ensure_ok_status!(response)
     RemoteTransfer.new(JSON.parse(response.body, symbolize_names: true))
   end

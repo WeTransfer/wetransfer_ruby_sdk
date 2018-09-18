@@ -64,7 +64,7 @@ describe FutureBoard do
     end
 
     it 'items' do
-      subject.description
+      subject.items
     end
   end
 end

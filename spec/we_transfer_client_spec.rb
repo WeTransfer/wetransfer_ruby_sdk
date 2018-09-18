@@ -70,13 +70,11 @@ describe WeTransferClient do
 
     it 'Creates a RemoteBoard object' do
       board = client.create_board(name: 'test board', description: 'test description')
-      binding.pry
       expect(board).to be_kind_of(RemoteBoard)
     end
 
     it 'Creates a board with no items when no block is passed' do
       board = client.create_board(name: 'test board', description: 'test description')
-      binding.pry
       expect(board.items).to be_empty
     end
   end

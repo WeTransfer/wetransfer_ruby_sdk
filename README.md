@@ -103,6 +103,12 @@ If any violations can be handled by rubocop, you can run auto-fix and it'll hand
 
     $ bundle exec rubocop -a
 
+For more convenience you also can run Guard, this checks all the tests and runs rubocop
+
+```
+  $ bundle exec guard
+```
+
 Hooray!
 
 ## Contributing

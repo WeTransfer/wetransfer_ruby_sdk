@@ -5,7 +5,6 @@ describe BoardBuilder do
 
   describe '#initialize' do
     it 'initializes with an empty array' do
-      board = described_class.new
       expect(board.items.empty?).to be(true)
     end
   end

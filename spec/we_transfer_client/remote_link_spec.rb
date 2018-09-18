@@ -1,49 +1,33 @@
 require 'spec_helper'
 
 describe RemoteLink do
-  let (:params) {
+  let(:params) {
     {
-      id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
-      url: 'http://www.wetransfer.com',
-      meta: {title: 'wetransfer.com'},
-      type: 'web_content'
+      id:     SecureRandom.uuid,
+      url:    'http://www.wetransfer.com',
+      title:  'wetransfer.com',
+      type:   'web_content',
     }
-    }
+  }
 
   describe '#initialize' do
-    it 'raises an ArgumentError when id is missing' do
-      params.delete(:id)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /id/
-    end
+    attributes = %i[id url title type]
 
-    it 'raises an ArgumentError when url is missing' do
-      params.delete(:url)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /url/
-    end
-
-    it 'raises an ArgumentError when id is missing' do
-      params.delete(:meta)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /meta/
-    end
-
-    it 'raises an ArgumentError when id is missing' do
-      params.delete(:type)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /type/
+    attributes.each do |atttribute|
+      it "raises an ArgumentError when #{atttribute} is missing" do
+        params.delete(atttribute)
+        expect {
+          described_class.new(params)
+        }.to raise_error ArgumentError, %r{#{atttribute}}
+      end
     end
   end
-  describe 'getters' do
-    let (:object) { described_class.new(params) }
 
-    it '#type' do
-      object.type
+  describe 'getters' do
+    subject { described_class.new(params) }
+
+    it 'responds to #type' do
+      expect(subject.type).to eq 'web_content'
     end
   end
 end

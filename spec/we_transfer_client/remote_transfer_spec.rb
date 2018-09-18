@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe RemoteTransfer do
-  let (:params) {
+  let(:params) {
     {
       id: '2ae97886522f375c1c6696799a56f0d820180912075119',
       state: 'uploading',
@@ -23,7 +23,7 @@ describe RemoteTransfer do
           }
         ]
     }
-    }
+  }
 
   describe '#initialize' do
     it 'fails when id is missing' do
@@ -72,7 +72,7 @@ describe RemoteTransfer do
   end
 
   describe '#Getters' do
-    let (:object) { described_class.new(params) }
+    let(:object) { described_class.new(params) }
 
     it '#files' do
       object.files

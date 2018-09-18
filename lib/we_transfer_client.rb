@@ -129,6 +129,9 @@ class WeTransferClient
   end
 
   def put_io_in_parts(object, file, io)
+    # board_id could also be a transfer_id!
+    # check for board_upload_url or transfer_upload_url
+
     (1..file.multipart.part_numbers).each do |part_n_one_based|
       if object.is_a?(RemoteTransfer)
         upload_url = request_transfer_upload_url(transfer_id: object.id, file: file, part_number: part_n_one_based).fetch(:url)

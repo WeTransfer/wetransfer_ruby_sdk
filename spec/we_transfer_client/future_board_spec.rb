@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe FutureBoard do
-  let (:params) { { name: 'yes', description: 'A description about the board', items: [] } }
+  let(:params) { { name: 'yes', description: 'A description about the board', items: [] } }
 
   describe '#initializer' do
     it 'raises ArgumentError when no name is given' do

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe FutureLink do
-  let (:params) { { url: 'http://www.wetransfer.com', title: 'WeTransfer' } }
+  let(:params) { { url: 'http://www.wetransfer.com', title: 'WeTransfer' } }
 
   describe '#initializer' do
     it 'needs a :url keyword arg' do
@@ -26,7 +26,7 @@ describe FutureLink do
       as_params = described_class.new(params).to_request_params
 
       expect(as_params[:url]).to eq('http://www.wetransfer.com')
-      expect(as_params[:meta][:title]).to be_kind_of(String)
+      expect(as_params[:title]).to be_kind_of(String)
     end
   end
 

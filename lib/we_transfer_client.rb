@@ -34,6 +34,8 @@ class WeTransferClient
     yield(builder)
     future_transfer = FutureTransfer.new(message: message, files: builder.items)
     create_remote_transfer(future_transfer)
+  rescue LocalJumpError
+    raise ArgumentError, 'No items where added to transfer'
   end
 
   def create_board(name:, description:)
@@ -79,7 +81,7 @@ class WeTransferClient
     authorize_if_no_bearer_token!
     response = faraday.post(
       '/v2/transfers',
-      JSON.pretty_generate(xfer.to_create_transfer_params),
+      JSON.pretty_generate(xfer.to_request_params),
       auth_headers.merge('Content-Type' => 'application/json')
     )
     ensure_ok_status!(response)

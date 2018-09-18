@@ -16,6 +16,10 @@ module WeTransfer
       rescue LocalJumpError
         raise ArgumentError, 'No items where added to the board'
       end
+
+      def get_board(board_id:)
+        request_board(board_id)
+      end
     end
   end
 end

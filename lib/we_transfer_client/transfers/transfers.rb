@@ -10,6 +10,14 @@ module WeTransfer
       rescue LocalJumpError
         raise ArgumentError, 'No items where added to transfer'
       end
+
+      def complete_transfer(transfer:)
+        complete_transfer_call(transfer)
+      end
+
+      def get_transfer(transfer_id:)
+        request_transfer(transfer_id)
+      end
     end
   end
 end

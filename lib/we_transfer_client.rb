@@ -39,18 +39,6 @@ module WeTransfer
       put_io_in_parts(object, file, io)
     end
 
-    def complete_transfer(transfer:)
-      complete_transfer_call(transfer)
-    end
-
-    def get_board(board_id:)
-      request_board(board_id)
-    end
-
-    def get_transfer(transfer_id:)
-      request_transfer(transfer_id)
-    end
-
     def complete_file!(object:, file:)
       response = object.is_a?(RemoteTransfer) ? complete_transfer_file(object, file) : complete_board_file(object, file)
       ensure_ok_status!(response)

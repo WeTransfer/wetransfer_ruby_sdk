@@ -1,67 +1,60 @@
 require 'spec_helper'
 
 describe TransferBuilder do
-  it 'raises if given an item with a size of 0' do
-    skip
-    broken = StringIO.new('')
-    expect {
-      described_class.new.ensure_io_compliant!(broken)
-    }.to raise_error(/The IO object given to add_file has a size of 0/)
+  let (:transfer) { described_class.new }
+
+  describe '#initialze' do
+    it 'initializes with an empty items array' do
+      expect(transfer.items.empty?).to be(true)
+    end
   end
 
-  it 'raises if IO raises an error' do
-    skip
-    broken = []
 
-    expect {
-      described_class.new.ensure_io_compliant!(broken)
-    }.to raise_error(TransferBuilder::TransferIOError)
+  describe '#add_file' do
+    it 'returns an error when name is missing' do
+      expect {
+        transfer.add_file(io: File.open(__FILE__, 'rb'))
+      }.to raise_error ArgumentError, /name/
+    end
+
+    it 'returns an error when io is missing' do
+      expect {
+        transfer.add_file(name: 'file name')
+      }.to raise_error ArgumentError, /io/
+    end
+
+    it 'returns a error when file doesnt exists' do
+      expect {
+        transfer.add_file(name: 'file name', io: File.open('foo', 'rb'))
+      }.to raise_error Errno::ENOENT
+    end
+
+    it 'adds a file when name and io is given' do
+      transfer.add_file(name: 'file name', io: File.open(__FILE__, 'rb'))
+      expect(transfer.items.first).to be_kind_of(FutureFile)
+    end
   end
 
-  it 'adds a file' do
-    skip
-    transfer_builder = described_class.new
-    transfer_builder.add_file_at(path: __FILE__)
-    expect(transfer_builder.items.count).to eq(1)
+  describe '#add_file_at' do
+    it 'adds a file from a path' do
+      transfer.add_file_at(path: __FILE__)
+      expect(transfer.items.first).to be_kind_of(FutureFile)
+    end
 
-    item = transfer_builder.items.first
-    expect(item.name).to eq('transfer_builder_spec.rb')
-    expect(item.io).to be_kind_of(File)
-    expect(item.local_identifier).to be_kind_of(String)
-  end
+    it 'throws a Error when file doesnt exists' do
+      expect {
+        transfer.add_file_at(path: '/this/path/leads/to/nothing.exe')
+      }.to raise_error Errno::ENOENT
+    end
 
-  it 'should add a url' do
-    skip
-    transfer_builder = described_class.new
-    transfer_builder.add_web_url(url: 'https://www.wetransfer.com/')
-    expect(transfer_builder.items.count).to eq(1)
+    it 'should call #add_file' do
+      client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'))
+      client.create_transfer(message: 'A transfer message') do |t|
+        t.add_file(name: 'test file ', io: File.open(__FILE__, 'rb'))
 
-    item = transfer_builder.items.first
-    expect(item.url).to eq('https://www.wetransfer.com/')
-    expect(item.local_identifier).to be_kind_of(String)
-  end
-
-  it 'should user url for the title when none is given' do
-    skip
-    transfer_builder = described_class.new
-    transfer_builder.add_web_url(url: 'https://www.wetransfer.com/')
-    expect(transfer_builder.items.count).to eq(1)
-
-    item = transfer_builder.items.first
-
-    expect(item.title).to eq('https://www.wetransfer.com/')
-    expect(item.local_identifier).to be_kind_of(String)
-  end
-
-  it 'should pass title as webcontent title' do
-    skip
-    transfer_builder = described_class.new
-    transfer_builder.add_web_url(url: 'https://www.wetransfer.com/', title: 'awesome website for file transfering')
-    expect(transfer_builder.items.count).to eq(1)
-
-    item = transfer_builder.items.first
-    expect(item.url).to eq('https://www.wetransfer.com/')
-    expect(item.title).to eq('awesome website for file transfering')
-    expect(item.local_identifier).to be_kind_of(String)
+        expect(t).to receive(:add_file).with(name: anything, io: kind_of(::IO))
+        t.add_file_at(path: __FILE__)
+      end
+    end
   end
 end

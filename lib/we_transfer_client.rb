@@ -15,7 +15,7 @@ require_relative 'we_transfer_client/remote_board'
 require_relative 'we_transfer_client/remote_link'
 require_relative 'we_transfer_client/remote_file'
 require_relative 'we_transfer_client/transfers/transfers'
-require_relative 'we_transfer_client/transfers/boards'
+require_relative 'we_transfer_client/boards/boards'
 
 module WeTransfer
   class Client
@@ -79,7 +79,7 @@ module WeTransfer
       )
       ensure_ok_status!(response)
       remote_board = RemoteBoard.new(JSON.parse(response.body, symbolize_names: true))
-      add_items_to_remote_board(board.items, remote_board) if board.items.any?
+      board.items.any? ? add_items_to_remote_board(board.items, remote_board) : remote_board
     end
 
     def add_items_to_remote_board(items, board)
@@ -206,7 +206,7 @@ module WeTransfer
       Faraday.new(@api_url_base) do |c|
         c.response :logger, @logger
         c.adapter Faraday.default_adapter
-        c.headers = { 'User-Agent' => "WetransferRubySdk/#{WeTransferClient::VERSION} Ruby #{RUBY_VERSION}"}
+        c.headers = { 'User-Agent' => "WetransferRubySdk/#{WeTransfer::VERSION} Ruby #{RUBY_VERSION}"}
       end
     end
 

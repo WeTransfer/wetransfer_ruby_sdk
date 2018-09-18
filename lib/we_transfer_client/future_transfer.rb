@@ -6,7 +6,7 @@ class FutureTransfer
     @files = files
   end
 
-  def to_create_transfer_params
+  def to_request_params
     {
       message: message,
       files: files.map(&:to_request_params),

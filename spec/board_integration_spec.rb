@@ -2,7 +2,7 @@ require 'spec_helper'
 
 require_relative '../lib/we_transfer_client.rb'
 
-describe WeTransferClient do
+describe WeTransfer::Client do
   TWO_CHUNKS_FILE_NAME = 'spec/testdir/two_chunks'
 
   before(:all) do
@@ -22,7 +22,7 @@ describe WeTransferClient do
   end
 
   let(:client) do
-    WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
   end
 
   pending "this talks to production, and it doesn't know about the meta-change of web_content" do

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 require_relative '../lib/we_transfer_client.rb'
 
-describe WeTransferClient do
+describe WeTransfer::Client do
   TWO_CHUNKS_FILE_NAME = 'spec/testdir/two_chunks'
 
   before(:all) do

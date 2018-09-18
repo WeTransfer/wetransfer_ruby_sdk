@@ -5,7 +5,7 @@ require 'we_transfer_client/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'wetransfer'
-  spec.version       = WeTransferClient::VERSION
+  spec.version       = WeTransfer::VERSION
   spec.authors       = ['Noah Berman', 'David Bosveld']
   spec.email         = ['noah@wetransfer.com', 'david@wetransfer.com', 'developers@wetransfer.com']
 

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe FutureTransfer do
-  let (:transfer) { described_class }
+  let(:transfer) { described_class }
 
   describe '#initialize' do
     it 'creates an empty array when initialized' do

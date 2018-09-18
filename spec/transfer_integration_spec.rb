@@ -24,7 +24,7 @@ describe WeTransferClient do
   end
 
   let(:client) do
-    WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
   end
 
   it 'creates a transfer with 2 files ' do
@@ -40,8 +40,8 @@ describe WeTransferClient do
     client.upload_file(object: transfer, file: transfer.files[0], io: File.open(__FILE__, 'rb'))
     client.upload_file(object: transfer, file: transfer.files[1], io: two_chunks)
 
-    client.complete_file!(object: transfer, file: transfer.files[0] )
-    client.complete_file!(object: transfer, file: transfer.files[1] )
+    client.complete_file!(object: transfer, file: transfer.files[0])
+    client.complete_file!(object: transfer, file: transfer.files[1])
 
     transfer = client.complete_transfer(transfer: transfer)
     if transfer.state == 'processing'
@@ -57,6 +57,5 @@ describe WeTransferClient do
     # but check in the header for a wetransfer domain location
     expect(response['location']).to start_with('https://wetransfer')
     # transfer = client.get_transfer(transfer_id: transfer.id)
-
   end
 end

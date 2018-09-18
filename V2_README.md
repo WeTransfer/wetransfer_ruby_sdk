@@ -8,7 +8,7 @@ Boards excists next to the transfers and will be mutable, so you can add new fil
 To use the ruby sdk you have to Initailize a new client with your API-Key:
 
 ```
-client = WeTransferClient.new(api_key: 'your-special-api-key')
+client = WeTransfer::Client.new(api_key: 'your-special-api-key')
 ```
 
 ### Initailize a Board

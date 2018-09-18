@@ -1,14 +1,13 @@
 require 'spec_helper'
 
 describe TransferBuilder do
-  let (:transfer) { described_class.new }
+  let(:transfer) { described_class.new }
 
   describe '#initialze' do
     it 'initializes with an empty items array' do
       expect(transfer.items.empty?).to be(true)
     end
   end
-
 
   describe '#add_file' do
     it 'returns an error when name is missing' do
@@ -48,7 +47,7 @@ describe TransferBuilder do
     end
 
     it 'should call #add_file' do
-      client = WeTransferClient.new(api_key: ENV.fetch('WT_API_KEY'))
+      client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
       client.create_transfer(message: 'A transfer message') do |t|
         t.add_file(name: 'test file ', io: File.open(__FILE__, 'rb'))
 

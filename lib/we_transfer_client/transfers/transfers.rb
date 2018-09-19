@@ -6,7 +6,7 @@ module WeTransfer
         builder = TransferBuilder.new
         yield(builder)
         future_transfer = FutureTransfer.new(message: message, files: builder.items)
-        create_remote_transfer(future_transfer)
+        @remote_transfer = create_remote_transfer(future_transfer)
       rescue LocalJumpError
         raise ArgumentError, 'No items where added to transfer'
       end
@@ -17,6 +17,41 @@ module WeTransfer
 
       def get_transfer(transfer_id:)
         request_transfer(transfer_id)
+      end
+
+      # private
+
+      def create_remote_transfer(xfer)
+        authorize_if_no_bearer_token!
+        response = faraday.post(
+          '/v2/transfers',
+          JSON.pretty_generate(xfer.to_request_params),
+          auth_headers.merge('Content-Type' => 'application/json')
+        )
+        ensure_ok_status!(response)
+        RemoteTransfer.new(JSON.parse(response.body, symbolize_names: true))
+      end
+
+      def complete_transfer_call(object)
+        authorize_if_no_bearer_token!
+        response = faraday.put(
+          "/v2/transfers/#{object.id}/finalize",
+          '',
+          auth_headers.merge('Content-Type' => 'application/json')
+        )
+        ensure_ok_status!(response)
+        RemoteTransfer.new(JSON.parse(response.body, symbolize_names: true))
+      end
+
+      def request_transfer(transfer_id)
+        authorize_if_no_bearer_token!
+        response = faraday.get(
+          "/v2/transfers/#{transfer_id}",
+          {},
+          auth_headers.merge('Content-Type' => 'application/json')
+        )
+        ensure_ok_status!(response)
+        RemoteTransfer.new(JSON.parse(response.body, symbolize_names: true))
       end
     end
   end

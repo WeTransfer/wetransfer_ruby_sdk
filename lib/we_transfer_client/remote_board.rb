@@ -3,6 +3,8 @@ class RemoteBoard
 
   attr_reader :id, :items, :url, :state
 
+  CHUNK_SIZE = 6 * 1024 * 1024
+
   def initialize(id:, state:, url:, name:, description: '', items: [])
     @id = id
     @state = state
@@ -12,7 +14,14 @@ class RemoteBoard
     @items = to_instances(items)
   end
 
-  private
+  def prepare_file(client:, file:, part_number:)
+    url = file.request_board_upload_url(client: client, board_id: @id, part_number: part_number)
+    [url, CHUNK_SIZE]
+  end
+
+  def prepare_file_completion(client: self, file: file)
+    file.complete_board_file(client: client, board_id: @id)
+  end
 
   def to_instances(items)
     items.map do |item|

@@ -9,6 +9,17 @@ class RemoteTransfer
     @files = files_to_class(files)
   end
 
+  def prepare_file(client:, file:, part_number:)
+    url = file.request_transfer_upload_url(client: client, transfer_id: @id, part_number: part_number)
+    chunk_size = file.multipart.chunk_size
+    [url, chunk_size]
+  end
+
+  def prepare_file_completion(client: self, file: file)
+    resp = file.complete_transfer_file(client: client, transfer_id: @id)
+    binding.pry
+  end
+
   def files_to_class(files)
     files.map { |x| RemoteFile.new(x) }
   end

@@ -5,13 +5,13 @@ describe RemoteLink do
     {
       id:     SecureRandom.uuid,
       url:    'http://www.wetransfer.com',
-      title:  'wetransfer.com',
-      type:   'web_content',
+      meta:   {title:  'wetransfer.com'},
+      type:   'link',
     }
   }
 
   describe '#initialize' do
-    attributes = %i[id url title type]
+    attributes = %i[id url type meta]
 
     attributes.each do |atttribute|
       it "raises an ArgumentError when #{atttribute} is missing" do
@@ -27,7 +27,7 @@ describe RemoteLink do
     subject { described_class.new(params) }
 
     it 'responds to #type' do
-      expect(subject.type).to eq 'web_content'
+      expect(subject.type).to eq 'link'
     end
   end
 end

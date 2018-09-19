@@ -7,12 +7,12 @@ describe RemoteFile do
       name: 'Board name',
       size: Random.rand(9999999),
       url: nil,
-      type: 'file',
       multipart: {
         part_numbers: Random.rand(10),
         id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
         chunk_size:  6 * 1024 * 1024,
-      }
+      },
+      type: 'file',
     }}
 
   describe '#initializer' do
@@ -68,12 +68,6 @@ describe RemoteFile do
       params.delete(:type)
       remote_file = described_class.new(params)
       expect(remote_file.type).to eq('file')
-    end
-
-    it 'contains a type of link when passed' do
-      params[:type] = 'link'
-      remote_file = described_class.new(params)
-      expect(remote_file.type).to eq('link')
     end
   end
 

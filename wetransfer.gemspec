@@ -40,3 +40,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'guard-rspec', '~> 4.7'
   spec.add_development_dependency 'guard-rubocop', '~> 1.3'
 end
+
+#   spec.add_development_dependency 'guard-flay'
+#   spec.add_development_dependency 'guard-flog'
+#   spec.add_development_dependency 'flay', '~> 2.4'
+#   spec.add_development_dependency 'flog'

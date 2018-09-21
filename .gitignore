@@ -13,4 +13,3 @@
 # rspec failure tracking
 .rspec_status
 .env
-Guardfile

@@ -8,7 +8,6 @@ class FutureBoard
   end
 
   def to_initial_request_params
-    # the initial create_board endpoint doesn't accept items....
     {
       name: name,
       description: description,

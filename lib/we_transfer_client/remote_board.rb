@@ -11,19 +11,21 @@ class RemoteBoard
     @url = url
     @name = name
     @description = description
-    @items = to_instances(items)
+    @items = to_instances(items: items)
   end
 
-  def prepare_file(client:, file:, part_number:)
+  def prepare_file_upload(client:, file:, part_number:)
     url = file.request_board_upload_url(client: client, board_id: @id, part_number: part_number)
     [url, CHUNK_SIZE]
   end
 
-  def prepare_file_completion(client: self, file: file)
+  def prepare_file_completion(client:, file:)
     file.complete_board_file(client: client, board_id: @id)
   end
 
-  def to_instances(items)
+  private
+
+  def to_instances(items:)
     items.map do |item|
       begin
         remote_class = "Remote#{item[:type].capitalize}"

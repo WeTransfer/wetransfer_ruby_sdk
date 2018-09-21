@@ -63,12 +63,6 @@ describe RemoteFile do
       remote_file = described_class.new(params)
       expect(remote_file.multipart.members).to eq(params[:multipart].keys)
     end
-
-    it 'has a default type of file' do
-      params.delete(:type)
-      remote_file = described_class.new(params)
-      expect(remote_file.type).to eq('file')
-    end
   end
 
   describe 'Getters' do

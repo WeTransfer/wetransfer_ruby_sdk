@@ -35,16 +35,16 @@ module WeTransfer
     end
 
     def upload_file(object:, file:, io:)
-      put_io_in_parts(object, file, io)
+      put_io_in_parts(object: object, file: file, io: io)
     end
 
     def complete_file!(object:, file:)
       object.prepare_file_completion(client: self, file: file)
     end
 
-    def put_io_in_parts(object, file, io)
+    def put_io_in_parts(object:, file:, io:)
       (1..file.multipart.part_numbers).each do |part_n_one_based|
-        upload_url, chunk_size = object.prepare_file(client: self, file: file, part_number: part_n_one_based)
+        upload_url, chunk_size = object.prepare_file_upload(client: self, file: file, part_number: part_n_one_based)
         part_io = StringIO.new(io.read(chunk_size))
         part_io.rewind
         response = faraday.put(

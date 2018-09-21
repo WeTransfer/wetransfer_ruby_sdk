@@ -1,3 +1,4 @@
+
 require 'spec_helper'
 
 describe RemoteBoard do
@@ -24,7 +25,7 @@ describe RemoteBoard do
         {
           id: 'storr6ua2l1fsl8lt20180911093826',
           url: 'http://www.wetransfer.com',
-          title: 'WeTransfer Website',
+          meta: {title: 'WeTransfer Website'},
           type: 'link',
         }
       ]

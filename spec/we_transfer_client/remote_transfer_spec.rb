@@ -13,13 +13,15 @@ describe RemoteTransfer do
             id: '5e3823ea8ad54f259c85b776eaf7086e20180912075119',
             name: 'transfer_integration_spec.rb',
             size: 7361,
-            multipart: {part_numbers: 1, chunk_size: 7361}
+            multipart: {part_numbers: 1, chunk_size: 7361},
+            type: 'file',
           },
           {
             id: '43b5a6323102eced46f071f2db9ec2eb20180912075119',
             name: 'two_chunks',
             size: 6291460,
-            multipart: {part_numbers: 2, chunk_size: 5242880}
+            multipart: {part_numbers: 2, chunk_size: 5242880},
+            type: 'file',
           }
         ]
     }
@@ -71,23 +73,29 @@ describe RemoteTransfer do
     end
   end
 
+  describe '#prepare_file_upload' do
+    it 'it retreives the upload url ' do
+
+    end
+  end
+
   describe '#Getters' do
-    let(:object) { described_class.new(params) }
+    subject { described_class.new(params) }
 
     it '#files' do
-      object.files
+      subject.files
     end
 
     it '#url' do
-      object.url
+      subject.url
     end
 
     it '#state' do
-      object.state
+      subject.state
     end
 
     it '#id' do
-      object.id
+      subject.id
     end
   end
 end

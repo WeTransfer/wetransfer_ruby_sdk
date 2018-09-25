@@ -17,3 +17,5 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+TWO_CHUNKS_FILE_NAME = 'spec/testdir/two_chunks'

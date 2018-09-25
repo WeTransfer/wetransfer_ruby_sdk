@@ -2,8 +2,8 @@ module WeTransfer
   class Client
     module Boards
 
-      def create_board(name:, description:)
-        builder = BoardBuilder.new
+      def create_board(name:, description:, board_builder: BoardBuilder)
+        builder = board_builder.new
         yield(builder) if block_given?
         future_board = FutureBoard.new(name: name, description: description, items: builder.items)
         create_remote_board(future_board)
@@ -20,6 +20,8 @@ module WeTransfer
       def get_board(board_id:)
         request_board(board_id)
       end
+
+      private
 
       def create_remote_board(board)
         authorize_if_no_bearer_token!
@@ -39,7 +41,6 @@ module WeTransfer
             item.add_to_board(client: self, remote_board: remote_board)
           end
         end
-        binding.pry
         remote_board
       end
 

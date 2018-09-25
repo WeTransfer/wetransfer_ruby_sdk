@@ -19,6 +19,8 @@ class BoardBuilder
     @items << FutureLink.new(url: url, title: title)
   end
 
+  private
+
   def ensure_io_compliant!(io)
     io.seek(0)
     io.read(1) # Will cause things like Errno::EACCESS to happen early, before the upload begins

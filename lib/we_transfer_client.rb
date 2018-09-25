@@ -14,8 +14,8 @@ require_relative 'we_transfer_client/remote_transfer'
 require_relative 'we_transfer_client/remote_board'
 require_relative 'we_transfer_client/remote_link'
 require_relative 'we_transfer_client/remote_file'
-require_relative 'we_transfer_client/transfers/transfers'
-require_relative 'we_transfer_client/boards/boards'
+require_relative 'we_transfer_client/transfers'
+require_relative 'we_transfer_client/boards'
 
 module WeTransfer
   class Client

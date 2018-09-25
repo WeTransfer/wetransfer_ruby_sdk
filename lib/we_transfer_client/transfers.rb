@@ -19,7 +19,7 @@ module WeTransfer
         request_transfer(transfer_id)
       end
 
-      # private
+      private
 
       def create_remote_transfer(xfer)
         authorize_if_no_bearer_token!

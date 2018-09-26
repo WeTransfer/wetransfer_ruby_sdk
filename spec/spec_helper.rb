@@ -12,10 +12,10 @@ require 'tempfile'
 require 'dotenv'
 Dotenv.load
 
+TWO_CHUNKS_FILE_NAME = 'spec/testdir/two_chunks'
+
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
 end
-
-TWO_CHUNKS_FILE_NAME = 'spec/testdir/two_chunks'

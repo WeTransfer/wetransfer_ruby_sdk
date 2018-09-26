@@ -1,2 +1,5 @@
 inherit_gem:
   wetransfer_style: ruby/default.yml
+
+Lint/UnifiedInteger:
+  TargetRubyVersion: 2.1

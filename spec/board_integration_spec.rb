@@ -7,7 +7,7 @@ describe WeTransfer::Client do
     Dir.mkdir('spec/testdir') unless Dir.exist?('spec/testdir')
     unless File.exist?(TWO_CHUNKS_FILE_NAME)
       File.open(TWO_CHUNKS_FILE_NAME, 'w') do |f|
-        f.puts('-' * (described_class::MAGIC_PART_SIZE + 3))
+        f.puts('-' * (PART_SIZE + 3))
         puts File.absolute_path(f)
       end
     end

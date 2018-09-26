@@ -2,7 +2,7 @@ require 'spec_helper'
 
 require_relative '../../lib/we_transfer_client.rb'
 
-describe WeTransfer::Client::Boards do
+describe WeTransfer::Client do
   before(:all) do
     Dir.mkdir('spec/testdir') unless Dir.exist?('spec/testdir')
     unless File.exist?(TWO_CHUNKS_FILE_NAME)

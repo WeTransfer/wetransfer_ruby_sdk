@@ -10,7 +10,7 @@ class FutureFile
   def to_request_params
     {
       name: @name,
-      size: @io.size.to_i,
+      size: @io.size,
     }
   end
 

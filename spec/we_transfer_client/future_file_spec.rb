@@ -30,7 +30,7 @@ describe FutureFile do
       as_params = described_class.new(params).to_request_params
 
       expect(as_params[:name]).to eq('yes')
-      expect(as_params[:size].class).to eq(Fixnum)
+      expect(as_params[:size].class).to eq(Integer)
     end
   end
 

@@ -71,7 +71,7 @@ describe WeTransfer::Client do
 
     # Check for the Boards status to be downloadable
     resulting_board = loop do
-      res = client.get_board(board_id: board.id)
+      res = client.get_board(board: board)
       break res if res.state != 'processing'
       sleep 1
     end

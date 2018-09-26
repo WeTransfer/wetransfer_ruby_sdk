@@ -17,8 +17,8 @@ module WeTransfer
         raise ArgumentError, 'No items where added to the board'
       end
 
-      def get_board(board_id:)
-        request_board(board_id)
+      def get_board(board:)
+        request_board(board)
       end
 
       private
@@ -44,10 +44,10 @@ module WeTransfer
         remote_board
       end
 
-      def request_board(board_id)
+      def request_board(board)
         authorize_if_no_bearer_token!
         response = faraday.get(
-          "/v2/boards/#{board_id}",
+          "/v2/boards/#{board.id}",
           {},
           auth_headers.merge('Content-Type' => 'application/json')
         )

@@ -14,6 +14,7 @@ class FutureLink
   end
 
   def add_to_board(client:, remote_board:)
+    client.authorize_if_no_bearer_token!
     response = client.faraday.post(
       "/v2/boards/#{remote_board.id}/links",
       # this needs to be a array with hashes => [{name, filesize}]

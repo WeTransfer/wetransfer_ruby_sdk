@@ -74,8 +74,8 @@ describe RemoteTransfer do
   end
 
   describe '#prepare_file_upload' do
-    it 'it retreives the upload url ' do
-
+    pending 'it retreives the upload url' do
+      fail
     end
   end
 

@@ -2,6 +2,8 @@ module WeTransfer
   class Client
     module Boards
 
+      def create_board_and_upload_files(name: ,description:, board_builder: BoardBuilder, future_board: FutureB)
+
       def create_board(name:, description:, board_builder: BoardBuilder)
         builder = board_builder.new
         yield(builder) if block_given?

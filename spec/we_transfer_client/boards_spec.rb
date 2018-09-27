@@ -11,8 +11,6 @@ describe WeTransfer::Client::Boards do
       expect(board).to be_kind_of(RemoteBoard)
       expect(board.url).to start_with('https://we.tl/')
       expect(board.state).to eq('downloadable')
-
-
     end
   end
 

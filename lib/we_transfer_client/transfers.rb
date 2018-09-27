@@ -2,11 +2,24 @@ module WeTransfer
   class Client
     module Transfers
 
+      def create_transfer_and_upload_files(message:, transfer_builder_class: TransferBuilder, future_transfer_class: FutureTransfer)
+        builder = transfer_builder_class.new
+        yield(builder)
+        future_transfer = future_transfer_class.new(message: message, files: builder.items)
+        transfer = create_remote_transfer(future_transfer)
+        transfer.files.each do |item|
+          local_file = future_transfer.files.select { |x| x.name == item.name }.first
+          upload_file(object: transfer, file: item, io: local_file.io)
+          complete_file!(object: transfer, file: item)
+        end
+        complete_transfer(transfer: transfer)
+      end
+
       def create_transfer(message:)
         builder = TransferBuilder.new
         yield(builder)
         future_transfer = FutureTransfer.new(message: message, files: builder.items)
-        @remote_transfer = create_remote_transfer(future_transfer)
+        create_remote_transfer(future_transfer)
       rescue LocalJumpError
         raise ArgumentError, 'No items where added to transfer'
       end

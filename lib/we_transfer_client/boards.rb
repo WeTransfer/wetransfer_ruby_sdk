@@ -8,7 +8,7 @@ module WeTransfer
         future_board = future_board_class.new(name: name, description: description, items: builder.items)
         board = create_remote_board(future_board)
         board.file_items.each do |item|
-          file = future_board.file_items.select{ |x| x.name == item.name }.first
+          file = future_board.file_items.select { |x| x.name == item.name }.first
           upload_file(object: board, file: item, io: file.io)
           complete_file!(object: board, file: item)
         end

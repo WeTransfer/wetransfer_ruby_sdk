@@ -52,7 +52,7 @@ describe FutureBoard do
     end
   end
 
-  describe '#file_items' do
+  describe '#files' do
     it 'returns only file items' do
       file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
       link = FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
@@ -62,12 +62,12 @@ describe FutureBoard do
         future_board.items << link
       end
       expect(future_board.items.size).to eq(6)
-      expect(future_board.file_items.size).to eq(3)
+      expect(future_board.files.size).to eq(3)
     end
   end
 
-  describe '#link_items' do
-    it 'returns only file items' do
+  describe '#links' do
+    it 'returns only link items' do
       file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
       link = FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
       future_board = described_class.new(params)
@@ -76,7 +76,7 @@ describe FutureBoard do
         future_board.items << link
       end
       expect(future_board.items.size).to eq(6)
-      expect(future_board.link_items.size).to eq(3)
+      expect(future_board.links.size).to eq(3)
     end
   end
 

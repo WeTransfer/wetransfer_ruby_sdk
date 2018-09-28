@@ -2,23 +2,20 @@ module WeTransfer
   class Client
     module Boards
 
-      def create_board_and_upload_files(name:, description:, board_builder: BoardBuilder, future_board_class: FutureBoard)
-        builder = board_builder.new
-        yield(builder) if block_given?
-        future_board = future_board_class.new(name: name, description: description, items: builder.items)
-        board = create_remote_board(board: future_board)
-        board.file_items.each do |item|
-          file = future_board.file_items.select { |x| x.name == item.name }.first
-          upload_file(object: board, file: item, io: file.io)
-          complete_file!(object: board, file: item)
+      def create_board_and_upload_files(name:, description:, &block)
+        future_board = create_feature_board(name: name, description: description, &block)
+        remote_board = create_remote_board(board: future_board)
+        remote_board.files.each do |file|
+          check_for_file_duplicates(future_board, file)
+          local_file = future_board.files.select { |x| x.name == file.name }.first
+          upload_file(object: remote_board, file: file, io: local_file.io)
+          complete_file!(object: remote_board, file: file)
         end
-        board
+        remote_board
       end
 
-      def create_board(name:, description:, board_builder: BoardBuilder, future_board: FutureBoard)
-        builder = board_builder.new
-        yield(builder) if block_given?
-        future_board = future_board.new(name: name, description: description, items: builder.items)
+      def create_board(name:, description:, &block)
+        future_board = create_feature_board(name: name, description: description, &block)
         create_remote_board(board: future_board)
       end
 
@@ -35,6 +32,12 @@ module WeTransfer
       end
 
       private
+
+      def create_feature_board(name:, description:, future_board_class: FutureBoard, board_builder_class: BoardBuilder)
+        builder = board_builder_class.new
+        yield(builder) if block_given?
+        future_board_class.new(name: name, description: description, items: builder.items)
+      end
 
       def create_remote_board(board:, remote_board_class: RemoteBoard)
         authorize_if_no_bearer_token!

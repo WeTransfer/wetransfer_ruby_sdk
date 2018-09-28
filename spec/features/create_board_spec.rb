@@ -15,12 +15,8 @@ describe WeTransfer::Client::Boards do
 
   let(:two_chunks) { File.open("#{Dir.pwd}/#{TWO_CHUNKS_FILE_NAME}", 'r') }
 
-  let(:test_logger) do
-    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
-  end
-
   let(:client) do
-    WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
+    WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
   end
   describe '#create_board' do
     it 'creates a remote board' do

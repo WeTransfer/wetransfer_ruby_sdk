@@ -1,14 +1,14 @@
 class TransferBuilder
-  attr_reader :items
+  attr_reader :files
   class TransferIOError < StandardError; end
 
   def initialize
-    @items = []
+    @files = []
   end
 
   def add_file(name:, io:)
     ensure_io_compliant!(io)
-    @items << FutureFile.new(name: name, io: io)
+    @files << FutureFile.new(name: name, io: io)
   end
 
   def add_file_at(path:)

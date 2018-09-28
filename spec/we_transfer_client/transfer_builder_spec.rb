@@ -4,8 +4,8 @@ describe TransferBuilder do
   let(:transfer) { described_class.new }
 
   describe '#initialze' do
-    it 'initializes with an empty items array' do
-      expect(transfer.items.empty?).to be(true)
+    it 'initializes with an empty files array' do
+      expect(transfer.files.empty?).to be(true)
     end
   end
 
@@ -30,14 +30,14 @@ describe TransferBuilder do
 
     it 'adds a file when name and io is given' do
       transfer.add_file(name: 'file name', io: File.open(__FILE__, 'rb'))
-      expect(transfer.items.first).to be_kind_of(FutureFile)
+      expect(transfer.files.first).to be_kind_of(FutureFile)
     end
   end
 
   describe '#add_file_at' do
     it 'adds a file from a path' do
       transfer.add_file_at(path: __FILE__)
-      expect(transfer.items.first).to be_kind_of(FutureFile)
+      expect(transfer.files.first).to be_kind_of(FutureFile)
     end
 
     it 'throws a Error when file doesnt exists' do
@@ -46,8 +46,7 @@ describe TransferBuilder do
       }.to raise_error Errno::ENOENT
     end
 
-    it 'should call #add_file' do
-      pending
+    it 'calls #add_file' do
       client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
       client.create_transfer(message: 'A transfer message') do |t|
         t.add_file_at(path: __FILE__)

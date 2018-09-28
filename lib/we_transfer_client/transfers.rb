@@ -2,19 +2,20 @@ module WeTransfer
   class Client
     module Transfers
 
-      def create_transfer_and_upload_files(message:, transfer_builder_class: TransferBuilder)
-        future_transfer = create_future_transfer(message: message, files: yield(transfer_builder_class.new))
-        transfer = create_remote_transfer(future_transfer)
-        transfer.files.each do |file|
+      def create_transfer_and_upload_files(message:, &block)
+        future_transfer = create_future_transfer(message: message,  &block)
+        remote_transfer = create_remote_transfer(future_transfer)
+        remote_transfer.files.each do |file|
+          check_for_file_duplicates(future_transfer, file)
           local_file = future_transfer.files.select { |x| x.name == file.name }.first
-          upload_file(object: transfer, file: file, io: local_file.io)
-          complete_file!(object: transfer, file: file)
+          upload_file(object: remote_transfer, file: file, io: local_file.io)
+          complete_file!(object: remote_transfer, file: file)
         end
-        complete_transfer(transfer: transfer)
+        complete_transfer(transfer: remote_transfer)
       end
 
-      def create_transfer(message:, transfer_builder_class: TransferBuilder)
-        transfer = create_future_transfer(message: message, files: yield(transfer_builder_class.new))
+      def create_transfer(message:, &block)
+        transfer = create_future_transfer(message: message, &block)
         create_remote_transfer(transfer)
       end
 
@@ -28,8 +29,10 @@ module WeTransfer
 
       private
 
-      def create_future_transfer(message:, files:, future_transfer_class: FutureTransfer)
-        future_transfer_class.new(message: message, files: files)
+      def create_future_transfer(message:, future_transfer_class: FutureTransfer, transfer_builder_class: TransferBuilder)
+        builder = transfer_builder_class.new
+        yield(builder)
+        future_transfer_class.new(message: message, files: builder.files)
       rescue LocalJumpError
         raise ArgumentError, 'No items where added to transfer'
       end

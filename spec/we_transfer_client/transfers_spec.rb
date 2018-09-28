@@ -17,6 +17,23 @@ describe WeTransfer::Client::Transfers do
       end
       expect(transfer.state).to eq('downloadable')
     end
+
+    it 'fails when no items are added' do
+      client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
+      expect {
+        client.create_transfer_and_upload_files(message: 'test description')
+      }.to raise_error ArgumentError, /No items/
+    end
+
+    it 'fails when duplication in files' do
+      client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
+      expect {
+        client.create_transfer_and_upload_files(message: 'test description') do |b|
+          b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+          b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+        end
+      }.to raise_error ArgumentError, /Duplicate file entry/
+    end
   end
 
   pending '#create_transfers'

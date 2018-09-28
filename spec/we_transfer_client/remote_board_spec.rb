@@ -68,17 +68,17 @@ describe RemoteBoard do
     end
   end
 
-  describe '#link_items' do
+  describe '#files' do
     it 'returns only file items' do
       expect(subject.items.size).to eq(2)
-      expect(subject.file_items.size).to eq(1)
+      expect(subject.files.size).to eq(1)
     end
   end
 
-  describe '#link_items' do
-    it 'returns only file items' do
+  describe '#links' do
+    it 'returns only link items' do
       expect(subject.items.size).to eq(2)
-      expect(subject.link_items.size).to eq(1)
+      expect(subject.links.size).to eq(1)
     end
   end
 

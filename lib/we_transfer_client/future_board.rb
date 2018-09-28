@@ -7,11 +7,11 @@ class FutureBoard
     @items = items
   end
 
-  def file_items
+  def files
     @items.select { |item| item.class == FutureFile }
   end
 
-  def link_items
+  def links
     @items.select { |item| item.class == FutureLink }
   end
 

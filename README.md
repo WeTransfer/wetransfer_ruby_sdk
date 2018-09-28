@@ -1,6 +1,8 @@
 # WeTransfer Ruby SDK
 
-An open source Ruby SDK for the WeTransfer Public API
+The Ruby SDK that makes interacting with WeTransfer's Public API a breeze
+
+This gem can be used to create transfers (as seen on WeTransfer.com) and boards (as seen in our [iOS app](https://itunes.apple.com/app/apple-store/id765359021?pt=10422800&ct=wetransfer-developer-portal&mt=8) and [Android app](https://play.google.com/store/apps/details?id=com.wetransfer.app.live&referrer=utm_source%3Dwetransfer%26utm_medium%3Ddeveloper-portal) ) alike.
 
 For your API key and additional info please visit our [developer portal](https://developers.wetransfer.com).
 
@@ -9,12 +11,15 @@ For your API key and additional info please visit our [developer portal](https:/
 ## Table of Contents
 
 1. [Installation](#installation)
-2. [Usage](#usage)
-3. [Super simple transfers](#super-simple-transfers)
-4. [Development](#development)
-5. [Contributing](#contributing)
-6. [License](#license)
-7. [Code of Conduct](#code-of-conduct)
+1. [Getting started](#getting-started)
+1. [Transfers](#transfers)
+    * [Minimalist transfers](#minimalist-transfers)
+    * [Deep dive into transfers](#deep-dive-into-transfers)
+1. [Boards](#boards)
+1. [Development](#development)
+1. [Contributing](#contributing)
+1. [License](#license)
+1. [Code of Conduct](#code-of-conduct)
 
 ## Installation
 
@@ -26,87 +31,101 @@ gem 'wetransfer'
 
 And then execute:
 
-    $ bundle
+    bundle install
 
 Or install it yourself as:
 
-    $ gem install wetransfer
+    gem install wetransfer
 
-## Usage
-
-### Minimalist transfers
+## Getting started
 
 You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com).
 
-Be sure to not commit this key to Github! If you do though, no worries, you can always revoke & create a new key from within the portal.
+Be sure to not commit this key to Github! If you do though, you can always revoke it and create a new key from within the portal.
 
-For configuring and storing secrets - like this API key - there are a variety of solutions. The smoothest here is creating a .env file:
+For configuring and storing secrets - like this API key - there are a variety of solutions. The smoothest here is creating a `.env` file:
 
 Now that you've got a wonderful WeTransfer API key, create a .env file in your project folder:
 
-    $ touch .env
+    touch .env
 
-Check your `.gitignore` file and make sure it has `.env` listed!
+You don't want the contents of this file to leave your system. Ever.
 
-Now, open the file in your text editor and add this line:
+If the `.env` file is new, make sure to add it to your `.gitignore`, using the following command:
 
-`WT_API_KEY=<your api key>` (without the <> brackets!)
+    echo .env >> .gitignore
 
-Great! Now you can go to your project file and create the client:
+Open the file in your text editor and add this line:
+
+    WT_API_KEY=<your api key>
+
+Make sure to replace `<your api key>` by your actual api key. Don't include the pointy brackets!
+
+Great! Now you can go to your project file and use the client.
+
+## Transfers
+
+A transfer is a collection of files that can be created once, and downloaded many times. Once a transfer is created, it is closed for modifications.
+
+### Minimalist transfers
 
 ```ruby
 # In your project file:
 require 'we_transfer_client'
 
-@client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
+client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
 
 Now that you've got the client set up you can use  `create_transfer` to, well, create a transfer!
 
 ```ruby
-transfer = @client.create_transfer(name: "My wonderful transfer", description: "I'm so excited to share this") do |upload|
+transfer = client.create_transfer_and_upload_files(message: 'All the Things') do |upload|
   upload.add_file_at(path: '/path/to/local/file.jpg')
   upload.add_file_at(path: '/path/to/another/local/file.jpg')
-  upload.add_file(name: 'README.txt', io: StringIO.new("This is the contents of the file"))
+  upload.add_file(name: 'README.txt', io: StringIO.new("You should read me!"))
 end
 
-transfer.url => "https://we.tl/SSBsb3ZlIHJ1Ynk="
+transfer.url => "https://we.tl/t-123234="
 ```
 
-The upload will be performed at the end of the block.
+The upload will be performed at the end of the block. Depending on your file sizes and network connection speed, this might take some time.
+
+### Deep dive into transfers
+
+More control over your transfers
+TODO
+
+### Boards
+
+A board is a collection of files and links, but it is open for modifications. Like your portfolio: While working, you can make adjustments to it. A board is a fantastic place for showcasing your work in progress.
 
 ## Development
+
 You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com), and as described above, store it in a local `.env` file. As always, do not commit this file to github! :)
 
 After forking and cloning down the repo, run `bundle install` to install dependencies. Then, run `bundle exec rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-```
-$ git clone <your fork>
-$ cd wetransfer_ruby_sdk
-$ bundle install
-```
+    git clone <your fork> ./wetransfer_ruby_sdk
+    cd wetransfer_ruby_sdk
+    bundle install
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
 To execute to ruby specs, run:
 
-```
-$ bundle exec rspec
-```
+    bundle exec rspec
 
 Please note that we use rubocop to lint this gem -- be sure to run it prior to submitting a PR for maximum mergeability.
 
-    $ bundle exec rubocop
+    bundle exec rubocop
 
-If any violations can be handled by rubocop, you can run auto-fix and it'll handle them for you, though do run the tests again and make sure it hasn't done something ... unexpected.
+If any violations can be handled by rubocop, you can run auto-fix and it'll handle them for you, though do run the tests again and make sure it hasn't done something... unexpected.
 
-    $ bundle exec rubocop -a
+    bundle exec rubocop -a
 
-For more convenience you also can run Guard, this checks all the tests and runs rubocop
+For more convenience you also can run Guard, this checks all the tests and runs rubocop every time you save your files.
 
-```
-  $ bundle exec guard
-```
+    bundle exec guard
 
 Hooray!
 

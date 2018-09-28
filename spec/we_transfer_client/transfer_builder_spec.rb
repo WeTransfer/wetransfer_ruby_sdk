@@ -47,7 +47,7 @@ describe TransferBuilder do
     end
 
     it 'should call #add_file' do
-      skip
+      pending
       client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
       client.create_transfer(message: 'A transfer message') do |t|
         t.add_file_at(path: __FILE__)

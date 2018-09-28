@@ -69,7 +69,7 @@ describe RemoteBoard do
   end
 
   describe '#files' do
-    it 'returns only file items' do
+    it 'returns only file item' do
       expect(subject.items.size).to eq(2)
       expect(subject.files.size).to eq(1)
     end

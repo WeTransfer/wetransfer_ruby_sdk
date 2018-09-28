@@ -23,6 +23,14 @@ class RemoteBoard
     file.complete_board_file(client: client, board_id: @id)
   end
 
+  def file_items
+    @items.select { |item| item.class == RemoteFile }
+  end
+
+  def link_items
+    @items.select { |item| item.class == RemoteLink }
+  end
+
   private
 
   def to_instances(items:)

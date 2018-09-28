@@ -55,6 +55,7 @@ module WeTransfer
         )
         ensure_ok_status!(response)
       end
+      {success: true, message: 'File Uploaded'}
     end
 
     def faraday

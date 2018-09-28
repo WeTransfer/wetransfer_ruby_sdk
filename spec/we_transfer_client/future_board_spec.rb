@@ -52,6 +52,34 @@ describe FutureBoard do
     end
   end
 
+  describe '#file_items' do
+    it 'returns only file items' do
+      file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
+      link = FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
+      future_board = described_class.new(params)
+      3.times do
+        future_board.items << file
+        future_board.items << link
+      end
+      expect(future_board.items.size).to eq(6)
+      expect(future_board.file_items.size).to eq(3)
+    end
+  end
+
+  describe '#link_items' do
+    it 'returns only file items' do
+      file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
+      link = FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
+      future_board = described_class.new(params)
+      3.times do
+        future_board.items << file
+        future_board.items << link
+      end
+      expect(future_board.items.size).to eq(6)
+      expect(future_board.link_items.size).to eq(3)
+    end
+  end
+
   describe 'getters' do
     let(:subject) { described_class.new(params) }
 

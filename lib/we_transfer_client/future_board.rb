@@ -7,6 +7,14 @@ class FutureBoard
     @items = items
   end
 
+  def file_items
+    @items.select { |item| item.class == FutureFile }
+  end
+
+  def link_items
+    @items.select { |item| item.class == FutureLink }
+  end
+
   def to_initial_request_params
     {
       name: name,

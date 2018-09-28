@@ -19,8 +19,8 @@ module WeTransfer
         create_remote_board(board: future_board)
       end
 
-      def add_items(board:, board_builder: BoardBuilder)
-        builder = board_builder.new
+      def add_items(board:, board_builder_class: BoardBuilder)
+        builder = board_builder_class.new
         yield(builder)
         add_items_to_remote_board(items: builder.items, remote_board: board)
       rescue LocalJumpError
@@ -60,7 +60,7 @@ module WeTransfer
         remote_board
       end
 
-      def request_board(board:, remote_board: RemoteBoard)
+      def request_board(board:, remote_board_class: RemoteBoard)
         authorize_if_no_bearer_token!
         response = faraday.get(
           "/v2/boards/#{board.id}",
@@ -68,7 +68,7 @@ module WeTransfer
           auth_headers.merge('Content-Type' => 'application/json')
         )
         ensure_ok_status!(response)
-        remote_board.new(JSON.parse(response.body, symbolize_names: true))
+        remote_board_class.new(JSON.parse(response.body, symbolize_names: true))
       end
 
     end

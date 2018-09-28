@@ -1,4 +1,6 @@
 require 'simplecov'
+require 'securerandom'
+
 SimpleCov.start do
   add_filter '/spec/'
 end
@@ -12,11 +14,12 @@ require 'tempfile'
 require 'dotenv'
 Dotenv.load
 
-TWO_CHUNKS_FILE_NAME = 'spec/testdir/two_chunks'
-PART_SIZE = 6 * 1024 * 1024
-
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+  config.filter_run :focus
+  config.run_all_when_everything_filtered = true
+  config.default_formatter = 'doc'
+  config.order = :random
 end

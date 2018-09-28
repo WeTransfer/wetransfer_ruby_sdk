@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-require_relative '../lib/we_transfer_client.rb'
-
 describe WeTransfer::Client do
   subject { described_class.new(params) }
   let(:params) { { api_key: ENV.fetch('WT_API_KEY') } }

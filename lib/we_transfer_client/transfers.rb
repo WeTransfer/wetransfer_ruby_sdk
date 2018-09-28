@@ -1,14 +1,13 @@
 module WeTransfer
   class Client
     module Transfers
-
       def create_transfer(message:)
         builder = TransferBuilder.new
         yield(builder)
         future_transfer = FutureTransfer.new(message: message, files: builder.items)
-        @remote_transfer = create_remote_transfer(future_transfer)
+        create_remote_transfer(future_transfer)
       rescue LocalJumpError
-        raise ArgumentError, 'No items where added to transfer'
+        raise ArgumentError, 'No files were added to transfer'
       end
 
       def complete_transfer(transfer:)

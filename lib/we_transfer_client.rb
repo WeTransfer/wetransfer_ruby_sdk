@@ -1,6 +1,5 @@
 require 'faraday'
 require 'logger'
-require 'securerandom'
 require 'json'
 
 require_relative 'we_transfer_client/version'

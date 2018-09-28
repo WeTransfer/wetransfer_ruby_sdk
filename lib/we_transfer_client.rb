@@ -42,6 +42,12 @@ module WeTransfer
       object.prepare_file_completion(client: self, file: file)
     end
 
+    def check_for_file_duplicates(object, file)
+      if object.files.select { |x| x.name == file.name }.size != 1
+        raise ArgumentError, 'Duplicate file entry'
+      end
+    end
+
     def put_io_in_parts(object:, file:, io:)
       (1..file.multipart.part_numbers).each do |part_n_one_based|
         upload_url, chunk_size = object.prepare_file_upload(client: self, file: file, part_number: part_n_one_based)

@@ -15,7 +15,7 @@ describe WeTransfer::Client::Boards do
       expect(board.state).to eq('downloadable')
     end
   end
-  
+
   describe '#create_board' do
     it 'creates a board' do
       client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
@@ -46,5 +46,5 @@ describe WeTransfer::Client::Boards do
 
       expect(board_request).to be_kind_of(RemoteBoard)
     end
-  end  
+  end
 end

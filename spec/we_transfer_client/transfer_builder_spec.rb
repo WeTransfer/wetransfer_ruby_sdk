@@ -47,10 +47,11 @@ describe TransferBuilder do
     end
 
     it 'should call #add_file' do
+      skip
       client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
       client.create_transfer(message: 'A transfer message') do |t|
-        t.add_file(name: 'test file ', io: File.open(__FILE__, 'rb'))
-
+        t.add_file_at(path: __FILE__)
+        t.add_file(name: 'file name', io: File.open(__FILE__, 'rb'))
         expect(t).to receive(:add_file).with(name: anything, io: kind_of(::IO))
         t.add_file_at(path: __FILE__)
       end

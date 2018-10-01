@@ -13,7 +13,7 @@ describe WeTransfer::Client do
     end
   end
 
-  let(:two_chunks) { File.open("#{Dir.pwd}/#{TWO_CHUNKS_FILE_NAME}", 'r') }
+  let(:two_chunks) { File.open(File.dirname(__FILE__) + '/../' + TWO_CHUNKS_FILE_NAME, 'r') }
 
   let(:client) do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))

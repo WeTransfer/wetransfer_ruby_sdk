@@ -10,68 +10,46 @@ describe WeTransfer::Client do
     expect(WeTransfer::VERSION).to be_kind_of(String)
   end
 
-  describe '#initialize' do
-    it 'creates a new instance' do
-      subject
+  describe "#ensure_ok_status!" do
+    before(:all) { Response = Struct.new(:status) }
+
+    context "on success" do
+      it "returns true if the status code is in the 2xx range" do
+        (200..299).each do |status_code|
+          response = Response.new(status_code)
+          expect(subject.ensure_ok_status!(response)).to be_truthy
+        end
+      end
+    end
+
+    context "unsuccessful" do
+      it "raises with the status code the server returned" do
+        response = Response.new("Mehh")
+        expect { subject.ensure_ok_status!(response) }
+          .to raise_error(WeTransfer::Client::Error, %r/Response had a Mehh code/)
+      end
+
+      it "if there is a server error, it raises with information that we can retry" do
+        (500..504).each do |status_code|
+          response = Response.new(status_code)
+          expect { subject.ensure_ok_status!(response) }
+            .to raise_error(WeTransfer::Client::Error, /we could retry/)
+        end
+      end
+
+      it "on client error, it raises with information that the server cannot understand this" do
+        (400..499).each do |status_code|
+          response = Response.new(status_code)
+          expect { subject.ensure_ok_status!(response) }
+            .to raise_error(WeTransfer::Client::Error, /server will not accept this request even if retried/)
+        end
+      end
+
+      it "if the status code is unknown, it raises a generic error" do
+        response = Response.new("I aint a status code")
+        expect { subject.ensure_ok_status!(response) }
+          .to raise_error(WeTransfer::Client::Error, /no idea what to do/)
+      end
     end
   end
-
-  # describe '#create_transfer' do
-  #   it 'throws an argument error when no message is given' do
-  #     expect {
-  #       client.create_transfer
-  #     }.to raise_error ArgumentError
-  #   end
-
-  #   it 'creates a empty transfer when no block is given' do
-  #     expect {
-  #       client.create_transfer(message: 'test transfer')
-  #     }.to raise_error ArgumentError
-  #   end
-
-  #   it 'creates a RemoteTransfer object' do
-  #     transfer = client.create_transfer(message: 'Test Transfer') do |t|
-  #       t.add_file(name: 'test file ', io: File.open(__FILE__, 'rb'))
-  #     end
-  #     expect(transfer).to be_kind_of(RemoteTransfer)
-  #   end
-
-  #   it 'after created a transfer the url is nil' do
-  #     transfer = client.create_transfer(message: 'Test Transfer') do |t|
-  #       t.add_file(name: 'test file ', io: File.open(__FILE__, 'rb'))
-  #     end
-  #     expect(transfer.url).to be_nil
-  #   end
-
-  #   it 'after created a transfer the url is nil' do
-  #     transfer = client.create_transfer(message: 'Test Transfer') do |t|
-  #       t.add_file(name: 'test file ', io: File.open(__FILE__, 'rb'))
-  #     end
-  #     expect(transfer.state).to eq('uploading')
-  #   end
-  # end
-
-  # describe '#create_board' do
-  #   it 'throws an Argument error when no name is given' do
-  #     expect {
-  #       client.create_board(description: 'test description')
-  #     }.to raise_error ArgumentError
-  #   end
-
-  #   it 'throws an Argument error when no description is given' do
-  #     expect {
-  #       client.create_board(name: 'test name')
-  #     }.to raise_error ArgumentError
-  #   end
-
-  #   it 'Creates a RemoteBoard object' do
-  #     board = client.create_board(name: 'test board', description: 'test description')
-  #     expect(board).to be_kind_of(RemoteBoard)
-  #   end
-
-  #   it 'Creates a board with no items when no block is passed' do
-  #     board = client.create_board(name: 'test board', description: 'test description')
-  #     expect(board.items).to be_empty
-  #   end
-  # end
 end

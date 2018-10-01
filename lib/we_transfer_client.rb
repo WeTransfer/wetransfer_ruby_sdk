@@ -93,7 +93,7 @@ module WeTransfer
     def ensure_ok_status!(response)
       case response.status
       when 200..299
-        nil
+        true
       when 400..499
         @logger.error { response.body }
         raise Error, "Response had a #{response.status} code, the server will not accept this request even if retried"

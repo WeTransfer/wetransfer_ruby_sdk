@@ -48,7 +48,6 @@ describe BoardBuilder do
       client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
       client.create_board(name: 'Test board', description: 'A board description') do |b|
         expect(b).to receive(:add_file).with(name: anything, io: kind_of(::IO))
-
         b.add_file_at(path: __FILE__)
       end
     end

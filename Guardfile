@@ -10,4 +10,4 @@ group :red_green_refactor, halt_on_fail: true do
   end
 end
 
-clearing :on
+guard :rubocop

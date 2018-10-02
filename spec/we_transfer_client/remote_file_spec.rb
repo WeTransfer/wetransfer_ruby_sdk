@@ -10,7 +10,7 @@ describe RemoteFile do
       multipart: {
         part_numbers: Random.rand(10),
         id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
-        chunk_size:  6 * 1024 * 1024,
+        chunk_size: RemoteBoard::CHUNK_SIZE,
       },
       type: 'file',
     }}

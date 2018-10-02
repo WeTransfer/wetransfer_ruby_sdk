@@ -15,7 +15,7 @@ describe FutureTransfer do
     end
   end
 
-  describe 'Getters' do
+  describe 'getters' do
     it 'message' do
       transfer.new(message: 'test').message
     end

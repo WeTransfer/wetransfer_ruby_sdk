@@ -5,4 +5,4 @@ rvm:
 before_install: gem install bundler -v 1.16.1
 cache: bundler
 script:
-  - WT_API_KEY=QVlE1O5eeW8GGRsJYKoXt2XUBCuL7hOk7ipeHVFQ bundle exec rspec --seed=12428 --fail-fast
+  - bundle exec rspec --seed=12428 --fail-fast

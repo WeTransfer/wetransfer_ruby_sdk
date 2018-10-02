@@ -10,4 +10,6 @@ matrix:
   allow_failures:
     - rvm: jruby-9.0
 script:
-  - bundle exec rspec --seed=12428 --fail-fast
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bundle exec rspec --exclude-pattern "spec/integration_spec.rb"; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bundle exec rspec; fi'
+  - bundle exec rubocop -c .rubocop.yml --force-exclusion

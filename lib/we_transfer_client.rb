@@ -1,6 +1,5 @@
 require 'faraday'
 require 'logger'
-require 'securerandom'
 require 'json'
 
 require_relative 'we_transfer_client/version'
@@ -88,13 +87,13 @@ module WeTransfer
       when 200..299
         nil
       when 400..499
-        @logger.error { response.body }
+        @logger.error response
         raise Error, "Response had a #{response.status} code, the server will not accept this request even if retried"
       when 500..504
-        @logger.error { response.body }
+        @logger.error response
         raise Error, "Response had a #{response.status} code, we could retry"
       else
-        @logger.error { response.body }
+        @logger.error response
         raise Error, "Response had a #{response.status} code, no idea what to do with that"
       end
     end

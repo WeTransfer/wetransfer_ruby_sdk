@@ -1,15 +1,11 @@
 require 'spec_helper'
 
 describe WeTransfer::Client::Boards do
-  let(:big_file) { File.open('spec/files/Japan-01.jpg', 'r') }
-
-  let(:test_logger) do
-    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
-  end
-
+  let(:big_file) { File.open(fixtures_dir + 'Japan-01.jpg', 'r') }
   let(:client) do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
   end
+
   describe '#create_board' do
     it 'creates a remote board' do
       client.create_board(name: 'Test Board', description: 'Test Descritpion')
@@ -32,7 +28,7 @@ describe WeTransfer::Client::Boards do
     it 'fails when file path is wrong' do
       expect {
         client.create_board(name: 'Test Board', description: 'Test descrition') do |b|
-          b.add_file(name: 'file_not_found.rb', io: File.open('path/to/file.rb', 'r'))
+          b.add_file(name: 'file_not_found.rb', io: File.open('path/to/non-existing-file.rb', 'r'))
         end
       }.to raise_error Errno::ENOENT, /No such file/
     end

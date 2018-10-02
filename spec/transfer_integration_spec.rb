@@ -3,25 +3,22 @@
 require 'spec_helper'
 
 describe WeTransfer::Client do
-  let(:test_logger) do
-    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
-  end
-
   let(:client) do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
   end
 
   let(:file_locations) do
-    %w[spec/files/Japan-01.jpg spec/files/Japan-02.jpg]
+    %w[Japan-01.jpg Japan-02.jpg]
   end
 
   describe described_class::Transfers do
     it 'creates a transfer with multiple files' do
       transfer = client.create_transfer(message: 'Japan: 🏯 & 🎎') do |builder|
         file_locations.each do |file_location|
-          builder.add_file(name: File.basename(file_location), io: File.open(file_location, 'rb'))
+          builder.add_file(name: File.basename(file_location), io: File.open(fixtures_dir + file_location, 'rb'))
         end
       end
+
       expect(transfer).to be_kind_of(RemoteTransfer)
 
       # it has an url that is not available (yet)
@@ -31,12 +28,12 @@ describe WeTransfer::Client do
       # it is in an uploading state
       expect(transfer.state).to eq('uploading')
 
-      # TODO: the file_locations and transfer.files are too coupled
+      # TODO: uncouple file_locations and transfer.files
       file_locations.each_with_index do |location, index|
         client.upload_file(
           object: transfer,
           file: transfer.files[index],
-          io: File.open(location, 'rb')
+          io: File.open(fixtures_dir + location, 'rb')
         )
         client.complete_file!(
           object: transfer,

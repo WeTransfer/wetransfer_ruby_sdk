@@ -1,13 +1,8 @@
 require 'spec_helper'
 
 describe WeTransfer::Client do
-  let(:small_file_path) { 'spec/files/Japan-02.jpg' }
-  let(:big_file) { File.open('spec/files/Japan-01.jpg', 'rb') }
-
-  let(:test_logger) do
-    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
-  end
-
+  let(:small_file_name) { 'Japan-02.jpg' }
+  let(:big_file) { File.open(fixtures_dir + 'Japan-01.jpg', 'rb') }
   let(:client) do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
   end
@@ -17,7 +12,7 @@ describe WeTransfer::Client do
     board = client.create_board(name: 'Test Board', description: 'Test description') do |b|
       b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
       b.add_file(name: 'big file', io: big_file)
-      b.add_file_at(path: small_file_path)
+      b.add_file_at(path: fixtures_dir + small_file_name)
       b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
     end
 
@@ -43,7 +38,7 @@ describe WeTransfer::Client do
     file_items = board.items.select { |i| i.type == 'file' }
     client.upload_file(object: board, file: file_items[0], io: File.open(__FILE__, 'rb'))
     client.upload_file(object: board, file: file_items[1], io: big_file)
-    client.upload_file(object: board, file: file_items[2], io: File.open(small_file_path, 'rb'))
+    client.upload_file(object: board, file: file_items[2], io: File.open(fixtures_dir + small_file_name, 'rb'))
     client.upload_file(object: board, file: file_items[3], io: File.open(__FILE__, 'rb'))
 
     # Complete all the files of the board

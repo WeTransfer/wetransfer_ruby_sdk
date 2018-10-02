@@ -82,7 +82,7 @@ Now that you've got the client set up you can use  `create_transfer` to, well, c
 transfer = client.create_transfer_and_upload_files(message: 'All the Things') do |upload|
   upload.add_file_at(path: '/path/to/local/file.jpg')
   upload.add_file_at(path: '/path/to/another/local/file.jpg')
-  upload.add_file(name: 'README.txt', io: StringIO.new("You should read me!"))
+  upload.add_file(name: 'README.txt', io: StringIO.new("You should read All the Things!"))
 end
 
 transfer.url => "https://we.tl/t-123234="
@@ -90,10 +90,15 @@ transfer.url => "https://we.tl/t-123234="
 
 The upload will be performed at the end of the block. Depending on your file sizes and network connection speed, this might take some time.
 
+What are you waiting for? Open that link in your browser! Chop chop.
+
 ### Deep dive into transfers
 
-More control over your transfers
-TODO
+More control over your transfers? We've got you covered!
+
+1. do this
+2. do that
+
 
 ### Boards
 

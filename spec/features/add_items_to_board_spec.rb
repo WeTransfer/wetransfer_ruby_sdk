@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe WeTransfer::Client::Boards do
-  let(:test_logger) do
-    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
-  end
-
   let(:client) do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
   end
@@ -17,7 +13,7 @@ describe WeTransfer::Client::Boards do
     it 'adds items to a board' do
       client.add_items(board: board) do |b|
         b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-        b.add_file_at(path: 'spec/files/Japan-01.jpg')
+        b.add_file_at(path: fixtures_dir + 'Japan-02.jpg')
         b.add_web_url(url: 'http://www.google.com', title: 'google')
       end
     end
@@ -39,7 +35,7 @@ describe WeTransfer::Client::Boards do
     it 'fails when file is not found' do
       expect {
         client.add_items(board: board) do |b|
-          b.add_file(name: 'file_not_found.rb', io: File.open('path/to/file.rb', 'r'))
+          b.add_file(name: 'file_not_found.rb', io: File.open('/path/to/non-existent-file.rb', 'r'))
         end
       }.to raise_error Errno::ENOENT, /No such file/
     end
@@ -49,7 +45,7 @@ describe WeTransfer::Client::Boards do
       expect {
         client.add_items(board: new_board) do |b|
           b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-          b.add_file_at(path: 'spec/files/Japan-01.jpg')
+          b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
           b.add_web_url(url: 'http://www.google.com', title: 'google')
         end
       }.to raise_error WeTransfer::Client::Error, /404 code/

@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe WeTransfer::Client::Boards do
-  let(:test_logger) do
-    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
-  end
-
   let(:client) do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
   end

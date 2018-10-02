@@ -1,6 +1,7 @@
 module WeTransfer
   class Client
     module Transfers
+      # TODO: Make message optional, spec it
       def create_transfer(message:)
         builder = TransferBuilder.new
         yield(builder)

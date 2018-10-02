@@ -1,8 +1,13 @@
 sudo: false
 language: ruby
 rvm:
+- 2.1.0
 - 2.5.1
+- jruby-9.0
 before_install: gem install bundler -v 1.16.1
 cache: bundler
+matrix:
+  allow_failures:
+    - rvm: jruby-9.0
 script:
   - bundle exec rspec --seed=12428 --fail-fast

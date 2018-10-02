@@ -6,7 +6,7 @@ module WeTransfer
         future_board = create_feature_board(name: name, description: description, &block)
         remote_board = create_remote_board(board: future_board)
         remote_board.files.each do |file|
-          check_for_file_duplicates(future_board, file)
+          check_for_file_duplicates(future_board.files, file)
           local_file = future_board.files.select { |x| x.name == file.name }.first
           upload_file(object: remote_board, file: file, io: local_file.io)
           complete_file!(object: remote_board, file: file)

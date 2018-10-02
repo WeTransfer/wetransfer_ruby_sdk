@@ -42,8 +42,8 @@ module WeTransfer
       object.prepare_file_completion(client: self, file: file)
     end
 
-    def check_for_file_duplicates(object, file)
-      if object.files.select { |x| x.name == file.name }.size != 1
+    def check_for_file_duplicates(files, new_file)
+      if files.select { |file| file.name == new_file.name }.size != 1
         raise ArgumentError, 'Duplicate file entry'
       end
     end

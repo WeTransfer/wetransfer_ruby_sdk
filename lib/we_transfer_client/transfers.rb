@@ -3,10 +3,10 @@ module WeTransfer
     module Transfers
 
       def create_transfer_and_upload_files(message:, &block)
-        future_transfer = create_future_transfer(message: message,  &block)
+        future_transfer = create_future_transfer(message: message, &block)
         remote_transfer = create_remote_transfer(future_transfer)
         remote_transfer.files.each do |file|
-          check_for_file_duplicates(future_transfer, file)
+          check_for_file_duplicates(future_transfer.files, file)
           local_file = future_transfer.files.select { |x| x.name == file.name }.first
           upload_file(object: remote_transfer, file: file, io: local_file.io)
           complete_file!(object: remote_transfer, file: file)

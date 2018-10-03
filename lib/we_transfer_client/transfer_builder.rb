@@ -1,25 +1,18 @@
 class TransferBuilder
-  attr_reader :items
+  attr_reader :files
   class TransferIOError < StandardError; end
 
   def initialize
-    @items = []
+    @files = []
   end
 
   def add_file(name:, io:)
     ensure_io_compliant!(io)
-    @items << FutureFileItem.new(name: name, io: io)
-    true
+    @files << FutureFile.new(name: name, io: io)
   end
 
   def add_file_at(path:)
     add_file(name: File.basename(path), io: File.open(path, 'rb'))
-  end
-
-  def add_web_url(url:, title: nil)
-    title ||= url
-    @items << FutureWebItem.new(url: url, title: title)
-    true
   end
 
   def ensure_io_compliant!(io)

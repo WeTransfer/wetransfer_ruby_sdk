@@ -1,3 +1,3 @@
-class WeTransferClient
-  VERSION = '0.4.4'
+module WeTransfer
+  VERSION = '0.9.0.beta'
 end

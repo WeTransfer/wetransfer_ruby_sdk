@@ -13,8 +13,6 @@ For your API key and additional info please visit our [developer portal](https:/
 1. [Installation](#installation)
 1. [Getting started](#getting-started)
 1. [Transfers](#transfers)
-    * [Minimalist transfers](#minimalist-transfers)
-    * [Deep dive into transfers](#deep-dive-into-transfers)
 1. [Boards](#boards)
 1. [Development](#development)
 1. [Contributing](#contributing)
@@ -43,7 +41,7 @@ You'll need to retrieve an API key from [our developer portal](https://developer
 
 Be sure to not commit this key to Github! If you do though, you can always revoke it and create a new key from within the portal.
 
-For configuring and storing secrets - like this API key - there are a variety of solutions. The smoothest here is creating a `.env` file:
+For configuring and storing secrets - like this API key - there are a variety of solutions. The smoothest here is creating a `.env` file, and use a gem like [dotenv](https://github.com/bkeepers/dotenv).
 
 Now that you've got a wonderful WeTransfer API key, create a .env file in your project folder:
 
@@ -65,9 +63,7 @@ Great! Now you can go to your project file and use the client.
 
 ## Transfers
 
-A transfer is a collection of files that can be created once, and downloaded many times. Once a transfer is created, it is closed for modifications.
-
-### Minimalist transfers
+A transfer is a collection of files that can be created once, and downloaded until it expires. Once a transfer is ready for sharing, it is closed for modifications.
 
 ```ruby
 # In your project file:
@@ -76,7 +72,7 @@ require 'we_transfer_client'
 client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
 
-Now that you've got the client set up you can use  `create_transfer` to, well, create a transfer!
+Now that you've got the client set up you can use  `create_transfer_and_upload_files` to, well, create a transfer, and upload all files!
 
 ```ruby
 transfer = client.create_transfer_and_upload_files(message: 'All the Things') do |upload|
@@ -85,6 +81,7 @@ transfer = client.create_transfer_and_upload_files(message: 'All the Things') do
   upload.add_file(name: 'README.txt', io: StringIO.new("You should read All the Things!"))
 end
 
+# To get a link to your transfer, call `url` on your transfer object:
 transfer.url => "https://we.tl/t-123234="
 ```
 
@@ -92,15 +89,7 @@ The upload will be performed at the end of the block. Depending on your file siz
 
 What are you waiting for? Open that link in your browser! Chop chop.
 
-### Deep dive into transfers
-
-More control over your transfers? We've got you covered!
-
-1. do this
-2. do that
-
-
-### Boards
+## Boards
 
 A board is a collection of files and links, but it is open for modifications. Like your portfolio: While working, you can make adjustments to it. A board is a fantastic place for showcasing your work in progress.
 

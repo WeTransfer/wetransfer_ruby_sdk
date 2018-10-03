@@ -3,13 +3,13 @@ require 'spec_helper'
 describe RemoteFile do
   let(:params) {
     {
-      id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
+      id: SecureRandom.uuid,
       name: 'Board name',
       size: Random.rand(9999999),
       url: nil,
       multipart: {
         part_numbers: Random.rand(10),
-        id: [*('a'..'z'), *('0'..'9')].shuffle[0, 36].join,
+        id: SecureRandom.uuid,
         chunk_size: RemoteBoard::CHUNK_SIZE,
       },
       type: 'file',

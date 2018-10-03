@@ -1,7 +1,6 @@
 module WeTransfer
   class Client
     module Boards
-
       def create_board_and_upload_items(name:, description:, &block)
         future_board = create_feature_board(name: name, description: description, &block)
         remote_board = create_remote_board(board: future_board)
@@ -68,7 +67,6 @@ module WeTransfer
         ensure_ok_status!(response)
         remote_board_class.new(JSON.parse(response.body, symbolize_names: true))
       end
-
     end
   end
 end

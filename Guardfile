@@ -9,5 +9,3 @@ group :red_green_refactor, halt_on_fail: true do
     watch(%r{^spec/(.+)\.rb$})
   end
 end
-
-guard :rubocop

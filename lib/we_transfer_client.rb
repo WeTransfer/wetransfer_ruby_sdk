@@ -26,8 +26,10 @@ module WeTransfer
     end
 
     NULL_LOGGER = Logger.new(nil)
+    DEBUG_LOGGER = Logger.new(STDOUT)
+    DEBUG_LOGGER.level = Logger::DEBUG
 
-    def initialize(api_key:, logger: NULL_LOGGER)
+    def initialize(api_key:, logger: DEBUG_LOGGER)
       @api_url_base = 'https://dev.wetransfer.com'
       @api_key = api_key.to_str
       @bearer_token = nil

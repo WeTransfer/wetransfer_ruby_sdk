@@ -22,6 +22,7 @@ module WeTransfer
       private
 
       def create_remote_transfer(xfer)
+        @logger.warn("!!!!!!!!!THIS IS THE REQUEST!!!!!!!!!")
         authorize_if_no_bearer_token!
         response = faraday.post(
           '/v2/transfers',

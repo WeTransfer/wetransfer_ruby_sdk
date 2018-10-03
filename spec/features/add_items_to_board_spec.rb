@@ -1,28 +1,7 @@
 require 'spec_helper'
 
-require_relative '../../lib/we_transfer_client.rb'
-
 describe WeTransfer::Client::Boards do
-  before(:all) do
-    Dir.mkdir('spec/testdir') unless Dir.exist?('spec/testdir')
-    unless File.exist?(TWO_CHUNKS_FILE_NAME)
-      File.open(TWO_CHUNKS_FILE_NAME, 'w') do |f|
-        f.puts('-' * (PART_SIZE + 3))
-        puts File.absolute_path(f)
-      end
-    end
-  end
-
-  let(:two_chunks) { File.open("#{Dir.pwd}/#{TWO_CHUNKS_FILE_NAME}", 'r') }
-
-  let(:test_logger) do
-    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
-  end
-
-  let(:client) do
-    WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-  end
-
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
   let(:board) do
     client.create_board(name: 'Test Board', description: 'Test Descritpion')
   end
@@ -31,7 +10,7 @@ describe WeTransfer::Client::Boards do
     it 'adds items to a board' do
       client.add_items(board: board) do |b|
         b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-        b.add_file_at(path: "#{Dir.pwd}/#{TWO_CHUNKS_FILE_NAME}")
+        b.add_file_at(path: fixtures_dir + 'Japan-02.jpg')
         b.add_web_url(url: 'http://www.google.com', title: 'google')
       end
     end
@@ -45,7 +24,7 @@ describe WeTransfer::Client::Boards do
     it 'fails when no board is passed as keyword argument' do
       expect {
         client.add_items do |b|
-          b.add_file_at(path: "#{Dir.pwd}/#{TWO_CHUNKS_FILE_NAME}")
+          b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
         end
       }.to raise_error ArgumentError, /board/
     end
@@ -53,7 +32,7 @@ describe WeTransfer::Client::Boards do
     it 'fails when file is not found' do
       expect {
         client.add_items(board: board) do |b|
-          b.add_file(name: 'file_not_found.rb', io: File.open('path/to/file.rb', 'r'))
+          b.add_file(name: 'file_not_found.rb', io: File.open('/path/to/non-existent-file.rb', 'r'))
         end
       }.to raise_error Errno::ENOENT, /No such file/
     end
@@ -63,7 +42,7 @@ describe WeTransfer::Client::Boards do
       expect {
         client.add_items(board: new_board) do |b|
           b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-          b.add_file_at(path: "#{Dir.pwd}/#{TWO_CHUNKS_FILE_NAME}")
+          b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
           b.add_web_url(url: 'http://www.google.com', title: 'google')
         end
       }.to raise_error WeTransfer::Client::Error, /404 code/

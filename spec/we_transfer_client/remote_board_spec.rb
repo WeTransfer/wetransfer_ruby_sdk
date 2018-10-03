@@ -68,6 +68,20 @@ describe RemoteBoard do
     end
   end
 
+  describe '#files' do
+    it 'returns only file item' do
+      expect(subject.items.size).to eq(2)
+      expect(subject.files.size).to eq(1)
+    end
+  end
+
+  describe '#links' do
+    it 'returns only link item' do
+      expect(subject.items.size).to eq(2)
+      expect(subject.links.size).to eq(1)
+    end
+  end
+
   describe 'getters' do
     %i[id items url state].each do |getter|
       it "responds to ##{getter}" do

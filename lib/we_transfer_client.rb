@@ -1,6 +1,5 @@
 require 'faraday'
 require 'logger'
-require 'securerandom'
 require 'json'
 
 require_relative 'we_transfer_client/version'
@@ -42,6 +41,12 @@ module WeTransfer
       object.prepare_file_completion(client: self, file: file)
     end
 
+    def check_for_file_duplicates(files, new_file)
+      if files.select { |file| file.name == new_file.name }.size != 1
+        raise ArgumentError, 'Duplicate file entry'
+      end
+    end
+
     def put_io_in_parts(object:, file:, io:)
       (1..file.multipart.part_numbers).each do |part_n_one_based|
         upload_url, chunk_size = object.prepare_file_upload(client: self, file: file, part_number: part_n_one_based)
@@ -55,6 +60,7 @@ module WeTransfer
         )
         ensure_ok_status!(response)
       end
+      {success: true, message: 'File Uploaded'}
     end
 
     def faraday
@@ -86,15 +92,15 @@ module WeTransfer
     def ensure_ok_status!(response)
       case response.status
       when 200..299
-        nil
+        true
       when 400..499
-        @logger.error { response.body }
+        @logger.error response
         raise Error, "Response had a #{response.status} code, the server will not accept this request even if retried"
       when 500..504
-        @logger.error { response.body }
+        @logger.error response
         raise Error, "Response had a #{response.status} code, we could retry"
       else
-        @logger.error { response.body }
+        @logger.error response
         raise Error, "Response had a #{response.status} code, no idea what to do with that"
       end
     end

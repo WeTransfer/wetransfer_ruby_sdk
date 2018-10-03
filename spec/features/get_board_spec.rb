@@ -10,6 +10,10 @@ describe WeTransfer::Client::Boards do
   end
 
   describe '#get_board' do
+    before do
+      skip "this interface is still experimental"
+    end
+
     it 'it gets a exisiting board' do
       client.get_board(board: board)
     end

@@ -33,6 +33,10 @@ describe BoardBuilder do
   end
 
   describe '#add_file_at' do
+    before do
+      skip "this interface is still experimental"
+    end
+
     it 'adds a file from a path' do
       subject.add_file_at(path: __FILE__)
       expect(subject.items.first).to be_kind_of(FutureFile)

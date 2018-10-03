@@ -93,6 +93,31 @@ What are you waiting for? Open that link in your browser! Chop chop.
 
 A board is a collection of files and links, but it is open for modifications. Like your portfolio: While working, you can make adjustments to it. A board is a fantastic place for showcasing your work in progress.
 
+Boards need a WeTransfer Client to be present, just like transfers.
+
+```ruby
+# In your project file:
+require 'we_transfer_client'
+
+client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
+```
+
+After you create your client, you can
+
+### Create a board and upload items
+
+
+```ruby
+board = client.create_board(name: 'Meow', description: 'On Cats') do |items|
+  items.add_file(name: 'big file.jpg', io: File.open('/path/to/huge_file.jpg', 'rb')items.add_file_at(path: '/path/to/another/file.txt')
+  items.add_web_url(url: 'http://wepresent.wetransfer.com', title: 'Time well spent')
+end
+
+puts board.url # => "https://we.tl/b-923478"
+```
+
+You've just created a board. It is visible on the internet, to share it with anyone.
+
 ## Development
 
 You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com), and as described above, store it in a local `.env` file. As always, do not commit this file to github! :)

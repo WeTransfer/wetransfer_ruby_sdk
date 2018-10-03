@@ -5,6 +5,10 @@ describe WeTransfer::Client::Boards do
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
 
   describe '#create_board' do
+    before {
+      skip "this interface is still experimental"
+    }
+
     it 'creates a remote board' do
       client.create_board(name: 'Test Board', description: 'Test Descritpion')
     end

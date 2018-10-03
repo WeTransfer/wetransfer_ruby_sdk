@@ -7,6 +7,10 @@ describe WeTransfer::Client::Boards do
   end
 
   describe '#add_items' do
+    before do
+      skip "this interface is still experimental"
+    end
+
     it 'adds items to a board' do
       client.add_items(board: board) do |b|
         b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))

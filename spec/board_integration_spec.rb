@@ -9,7 +9,7 @@ describe WeTransfer::Client do
 
   it 'creates a board with files and web items as a block' do
     # Create a board with three items, one small file, one multipart file, and one web url
-    board = client.create_board(name: 'Test Board', description: 'Test description') do |b|
+    board = client.create_board_and_upload_items(name: 'Test Board', description: 'Test description') do |b|
       b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
       b.add_file(name: 'big file', io: big_file)
       b.add_file_at(path: fixtures_dir + small_file_name)
@@ -23,28 +23,29 @@ describe WeTransfer::Client do
     expect(board.items[1].multipart.part_numbers).to be > 1
     expect(board.items.count).to be(4)
 
-    # Add two new items to the board, one small file and one web url
-    client.add_items(board: board) do |b|
-      b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-      b.add_web_url(url: 'http://www.google.com', title: 'google')
-    end
-    expect(board.items.count).to be(6)
+    # TODO: make these experimental steps public
+    # # Add two new items to the board, one small file and one web url
+    # client.add_items(board: board) do |b|
+    #   b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+    #   b.add_web_url(url: 'http://www.google.com', title: 'google')
+    # end
+    # expect(board.items.count).to be(6)
 
-    # Check if the board includes 3 File items and 2 Link items
-    expect(board.items.select { |i| i.type == 'file' }.count).to be(4)
-    expect(board.items.select { |i| i.type == 'link' }.count).to be(2)
+    # # Check if the board includes 3 File items and 2 Link items
+    # expect(board.items.select { |i| i.type == 'file' }.count).to be(4)
+    # expect(board.items.select { |i| i.type == 'link' }.count).to be(2)
 
-    # Upload the Files to the Board
-    file_items = board.items.select { |i| i.type == 'file' }
-    client.upload_file(object: board, file: file_items[0], io: File.open(__FILE__, 'rb'))
-    client.upload_file(object: board, file: file_items[1], io: big_file)
-    client.upload_file(object: board, file: file_items[2], io: File.open(fixtures_dir + small_file_name, 'rb'))
-    client.upload_file(object: board, file: file_items[3], io: File.open(__FILE__, 'rb'))
+    # # Upload the Files to the Board
+    # file_items = board.items.select { |i| i.type == 'file' }
+    # client.upload_file(object: board, file: file_items[0], io: File.open(__FILE__, 'rb'))
+    # client.upload_file(object: board, file: file_items[1], io: big_file)
+    # client.upload_file(object: board, file: file_items[2], io: File.open(fixtures_dir + small_file_name, 'rb'))
+    # client.upload_file(object: board, file: file_items[3], io: File.open(__FILE__, 'rb'))
 
-    # Complete all the files of the board
-    file_items.each do |item|
-      client.complete_file!(object: board, file: item)
-    end
+    # # Complete all the files of the board
+    # file_items.each do |item|
+    #   client.complete_file!(object: board, file: item)
+    # end
 
     # Do a get request to see if url is available
     response = Faraday.get(board.url)
@@ -62,6 +63,6 @@ describe WeTransfer::Client do
     end
 
     expect(resulting_board.state).to eq('downloadable')
-    expect(resulting_board.items.count).to be(6)
+    expect(resulting_board.items.count).to be(4)
   end
 end

@@ -13,6 +13,12 @@ module WeTransfer
         remote_board
       end
 
+      def get_board(board:)
+        request_board(board: board)
+      end
+
+      private
+
       def create_board(name:, description:, &block)
         future_board = create_feature_board(name: name, description: description, &block)
         create_remote_board(board: future_board)
@@ -24,10 +30,6 @@ module WeTransfer
         add_items_to_remote_board(items: builder.items, remote_board: board)
       rescue LocalJumpError
         raise ArgumentError, 'No items where added to the board'
-      end
-
-      def get_board(board:)
-        request_board(board: board)
       end
 
       def create_feature_board(name:, description:, future_board_class: FutureBoard, board_builder_class: BoardBuilder)

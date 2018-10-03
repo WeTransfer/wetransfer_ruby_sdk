@@ -31,9 +31,9 @@ describe WeTransfer::Client::Transfers do
     it 'fails with duplicate file names' do
       client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY', logger: test_logger))
       expect {
-        client.create_transfer_and_upload_files(message: 'test description') do |b|
-          b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-          b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+        client.create_transfer_and_upload_files(message: 'All the (same) Things') do |builder|
+          builder.add_file(name: 'README.txt', io: StringIO.new("A thing"))
+          builder.add_file(name: 'README.txt', io: StringIO.new("another thing"))
         end
       }.to raise_error ArgumentError, /Duplicate file entry/
     end

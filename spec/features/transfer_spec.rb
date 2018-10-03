@@ -14,6 +14,10 @@ describe WeTransfer::Client::Transfers do
   end
 
   describe "#create_transfer" do
+    before do
+      skip "this interface is still experimental"
+    end
+
     it "is needed to add a file" do
       expect { client.create_transfer(message: "Transfer name") }
         .to raise_error(ArgumentError, /^No files were added/)

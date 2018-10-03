@@ -13,6 +13,12 @@ module WeTransfer
         complete_transfer(transfer: remote_transfer)
       end
 
+      def get_transfer(transfer_id:)
+        request_transfer(transfer_id)
+      end
+
+      private
+
       def create_transfer(message:, &block)
         transfer = create_future_transfer(message: message, &block)
         create_remote_transfer(transfer)
@@ -21,12 +27,6 @@ module WeTransfer
       def complete_transfer(transfer:)
         complete_transfer_call(transfer)
       end
-
-      def get_transfer(transfer_id:)
-        request_transfer(transfer_id)
-      end
-
-      private
 
       def create_future_transfer(message:, future_transfer_class: FutureTransfer, transfer_builder_class: TransferBuilder)
         builder = transfer_builder_class.new

@@ -7,7 +7,8 @@ describe WeTransfer::Client do
   let(:file_locations) { %w[Japan-01.jpg Japan-02.jpg] }
 
   describe described_class::Transfers do
-    it 'creates a transfer with multiple files' do
+    pending 'creates a transfer with multiple files' do
+      skip "this interface is still experimental"
       transfer = client.create_transfer(message: 'Japan: 🏯 & 🎎') do |builder|
         file_locations.each do |file_location|
           builder.add_file(name: File.basename(file_location), io: File.open(fixtures_dir + file_location, 'rb'))

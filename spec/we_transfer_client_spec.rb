@@ -21,7 +21,11 @@ describe WeTransfer::Client do
     end
 
     context "unsuccessful" do
-      it "raises with the status code the server returned" do
+      it "raises with a message including the status code the server returned" do
+        response = Response.new("404")
+        expect { subject.ensure_ok_status!(response) }
+          .to raise_error(WeTransfer::Client::Error, %r/Response had a 404 code/)
+
         response = Response.new("Mehh")
         expect { subject.ensure_ok_status!(response) }
           .to raise_error(WeTransfer::Client::Error, %r/Response had a Mehh code/)

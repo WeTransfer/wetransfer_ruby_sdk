@@ -2,7 +2,7 @@ module WeTransfer
   class Client
     module Boards
 
-      def create_board_and_upload_files(name:, description:, &block)
+      def create_board_and_upload_items(name:, description:, &block)
         future_board = create_feature_board(name: name, description: description, &block)
         remote_board = create_remote_board(board: future_board)
         remote_board.files.each do |file|
@@ -30,8 +30,6 @@ module WeTransfer
       def get_board(board:)
         request_board(board: board)
       end
-
-      private
 
       def create_feature_board(name:, description:, future_board_class: FutureBoard, board_builder_class: BoardBuilder)
         builder = board_builder_class.new

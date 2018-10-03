@@ -12,6 +12,9 @@ require 'tempfile'
 require 'dotenv'
 Dotenv.load
 
+TWO_CHUNKS_FILE_NAME = 'spec/testdir/two_chunks'
+PART_SIZE = 6 * 1024 * 1024
+
 RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect

@@ -1,22 +1,39 @@
 require 'spec_helper'
 
 describe FutureTransfer do
-  it 'errors if not given all required arguments' do
-    expect {
-      described_class.new(name: 'nope', description: 'sorry')
-    }.to raise_error(/missing keyword: items/)
+  let(:transfer) { described_class }
 
-    expect {
-      described_class.new(description: 'lol', items: [])
-    }.to raise_error(/missing keyword: name/)
+  describe '#initialize' do
+    it 'creates an empty array when initialized' do
+      expect(transfer.new(message: 'transfer').files).to be_kind_of(Array)
+    end
 
-    expect {
-      described_class.new(name: 'lol', items: [])
-    }.to raise_error(/missing keyword: description/)
+    it 'throws a error when message is not given' do
+      expect {
+        transfer.new
+      }.to raise_error ArgumentError
+    end
   end
 
-  it 'succeeds if given all required arguments' do
-    future_transfer = described_class.new(name: 'frank', description: 'a decent bloke', items: [])
-    expect(future_transfer).to be_kind_of(FutureTransfer)
+  describe 'Getters' do
+    it 'message' do
+      transfer.new(message: 'test').message
+    end
+
+    it 'files' do
+      transfer.new(message: 'test').files
+    end
+  end
+
+  describe 'to_request_params' do
+    it 'includes the message' do
+      new_transfer = transfer.new(message: 'test')
+      expect(new_transfer.to_request_params[:message]).to be(new_transfer.message)
+    end
+
+    it 'includes the files as an array' do
+      new_transfer = transfer.new(message: 'test')
+      expect(new_transfer.to_request_params[:files]).to eq([])
+    end
   end
 end

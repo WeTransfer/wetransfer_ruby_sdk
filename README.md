@@ -24,7 +24,7 @@ For your API key and additional info please visit our [developer portal](https:/
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'wetransfer'
+gem 'wetransfer', version: '0.9.0.beta1'
 ```
 
 And then execute:

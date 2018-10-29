@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RemoteFile do
+describe WeTransfer::RemoteFile do
   let(:params) {
     {
       id: SecureRandom.uuid,

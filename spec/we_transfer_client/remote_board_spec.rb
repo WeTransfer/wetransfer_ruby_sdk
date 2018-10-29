@@ -1,7 +1,7 @@
 
 require 'spec_helper'
 
-describe RemoteBoard do
+describe WeTransfer::RemoteBoard do
   subject { described_class.new(params) }
 
   let(:params) {
@@ -63,7 +63,7 @@ describe RemoteBoard do
 
       it 'raises ItemTypeError if the item has a wrong type' do
         params[:items] = [{ type: 'foo' }]
-        expect { subject }.to raise_error(RemoteBoard::ItemTypeError)
+        expect { subject }.to raise_error(WeTransfer::RemoteBoard::ItemTypeError)
       end
     end
   end

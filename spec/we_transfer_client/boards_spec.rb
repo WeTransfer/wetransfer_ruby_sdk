@@ -3,17 +3,8 @@ require 'spec_helper'
 require_relative '../../lib/we_transfer_client.rb'
 
 describe WeTransfer::Client::Boards do
-  describe '#create_board_and_upload_items' do
-    it 'creates a board and uploads the files' do
-      client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
-      board = client.create_board_and_upload_items(name: 'test', description: 'test description') do |b|
-        b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-        b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
-      end
-      expect(board).to be_kind_of(RemoteBoard)
-      expect(board.url).to start_with('https://we.tl/')
-      expect(board.state).to eq('downloadable')
-    end
+  before do
+    skip 'new implementation'
   end
 
   describe "experimental features" do
@@ -51,6 +42,31 @@ describe WeTransfer::Client::Boards do
 
         expect(board_request).to be_kind_of(RemoteBoard)
       end
+    end
+  end
+end
+
+describe WeTransfer::Boards do
+  let (:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+
+  describe 'Initialize' do
+    it 'creates a empty board ' do
+      expect(described_class.new(client: client, name: 'New Board', description: 'This is the description')).to be_kind_of(WeTransfer::Boards)
+    end
+
+    it 'has client, future and remote board as instance_variable' do
+      expect(described_class.new(client: client, name: 'New Board', description: 'This is the description').instance_variables).to include(:@client, :@future_board, :@remote_board)
+    end
+
+    it 'creates a board and uploads the files' do
+      board = described_class.new(client: client, name: 'test', description: 'test description') do |b|
+        b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+        b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
+      end
+      expect(board.remote_board).to be_kind_of(WeTransfer::RemoteBoard)
+      expect(board.future_board).to be_kind_of(WeTransfer::FutureBoard)
+      expect(board.url).to start_with('https://we.tl/')
+      expect(board.remote_board.state).to eq('downloadable')
     end
   end
 end

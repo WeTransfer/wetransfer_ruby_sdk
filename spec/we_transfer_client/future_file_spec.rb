@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FutureFile do
+describe WeTransfer::FutureFile do
   let(:params) { { name: 'yes', io: File.open(__FILE__, 'rb') } }
 
   describe '#initilizer' do

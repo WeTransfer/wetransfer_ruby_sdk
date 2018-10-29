@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FutureBoard do
+describe WeTransfer::FutureBoard do
   let(:params) { { name: 'yes', description: 'A description about the board', items: [] } }
 
   describe '#initializer' do
@@ -45,7 +45,7 @@ describe FutureBoard do
     end
 
     it 'has items' do
-      file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
+      file = WeTransfer::FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
       params[:items] << file
       as_params = described_class.new(params).to_request_params
       expect(as_params[:items].count).to be(1)
@@ -54,8 +54,8 @@ describe FutureBoard do
 
   describe '#files' do
     it 'returns only file items' do
-      file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
-      link = FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
+      file = WeTransfer::FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
+      link = WeTransfer::FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
       future_board = described_class.new(params)
       3.times do
         future_board.items << file
@@ -68,8 +68,8 @@ describe FutureBoard do
 
   describe '#links' do
     it 'returns only link items' do
-      file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
-      link = FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
+      file = WeTransfer::FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
+      link = WeTransfer::FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
       future_board = described_class.new(params)
       3.times do
         future_board.items << file

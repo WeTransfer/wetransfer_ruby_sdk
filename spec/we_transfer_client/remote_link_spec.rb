@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RemoteLink do
+describe WeTransfer::RemoteLink do
   let(:params) {
     {
       id:     SecureRandom.uuid,

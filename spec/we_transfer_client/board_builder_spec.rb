@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe BoardBuilder do
+describe WeTransfer::BoardBuilder do
   describe '#initialize' do
     it 'initializes with an empty array' do
       expect(subject.items.empty?).to be(true)
@@ -60,7 +60,7 @@ describe BoardBuilder do
   describe '#add_web_url' do
     it 'adds a item to board when url and title are given' do
       subject.add_web_url(url: 'http://www.wetransfer.com', title: 'wetransfer')
-      expect(subject.items.first).to be_kind_of(FutureLink)
+      expect(subject.items.first).to be_kind_of(WeTransfer::FutureLink)
     end
   end
 end

@@ -18,8 +18,6 @@ require_relative 'we_transfer_client/boards'
 
 module WeTransfer
   class Client
-    include WeTransfer::Client::Transfers
-    include WeTransfer::Client::Boards
 
     class Error < StandardError
     end
@@ -33,19 +31,7 @@ module WeTransfer
       @logger = logger
     end
 
-    def upload_file(object:, file:, io:)
-      put_io_in_parts(object: object, file: file, io: io)
-    end
 
-    def complete_file!(object:, file:)
-      object.prepare_file_completion(client: self, file: file)
-    end
-
-    def check_for_file_duplicates(files, new_file)
-      if files.select { |file| file.name == new_file.name }.size != 1
-        raise ArgumentError, 'Duplicate file entry'
-      end
-    end
 
     def put_io_in_parts(object:, file:, io:)
       (1..file.multipart.part_numbers).each do |part_n_one_based|

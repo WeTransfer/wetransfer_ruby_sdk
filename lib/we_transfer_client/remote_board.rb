@@ -37,7 +37,7 @@ module WeTransfer
     def to_instances(items:)
       items.map do |item|
         begin
-          remote_class = "Remote#{item[:type].capitalize}"
+          remote_class = "WeTransfer::Remote#{item[:type].capitalize}"
           Module.const_get(remote_class)
             .new(item)
         rescue NameError

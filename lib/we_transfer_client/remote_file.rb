@@ -1,6 +1,6 @@
 module WeTransfer
   class RemoteFile
-    attr_reader :multipart, :name, :id, :url, :type
+    attr_reader :multipart, :name, :id, :url, :type, :size
 
     def initialize(id:, name:, size:, url: nil, type: 'file', multipart:)
       @id = id
@@ -11,20 +11,6 @@ module WeTransfer
       @size = size
       multi = Struct.new(*multipart.keys)
       @multipart = multi.new(*multipart.values)
-    end
-
-    def upload_file(object:, file:, io:)
-      put_io_in_parts(object: object, file: file, io: io)
-    end
-
-    def complete_file!(object:, file:)
-      object.prepare_file_completion(client: self, file: file)
-    end
-
-    def check_for_duplicates(file_list)
-      if file_list.select { |file| file.name == name }.size != 1
-        raise ArgumentError, 'Duplicate file entry'
-      end
     end
 
     def request_transfer_upload_url(client:, transfer_id:, part_number:)

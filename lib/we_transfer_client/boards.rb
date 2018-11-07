@@ -1,99 +1,64 @@
 module WeTransfer
-  class Client
-    module Boards
-      def create_board_and_upload_items(name:, description:, &block)
-        future_board = create_feature_board(name: name, description: description, &block)
-        remote_board = create_remote_board(board: future_board)
-        remote_board.files.each do |file|
-          check_for_file_duplicates(future_board.files, file)
-          local_file = future_board.files.select { |x| x.name == file.name }.first
-          upload_file(object: remote_board, file: file, io: local_file.io)
-          complete_file!(object: remote_board, file: file)
-        end
-        remote_board
-      end
-
-      def get_board(board:)
-        request_board(board: board)
-      end
-
-      private
-
-      def create_board(name:, description:, &block)
-        future_board = create_feature_board(name: name, description: description, &block)
-        create_remote_board(board: future_board)
-      end
-
-      def add_items(board:, board_builder_class: BoardBuilder)
-        builder = board_builder_class.new
-        yield(builder)
-        add_items_to_remote_board(items: builder.items, remote_board: board)
-      rescue LocalJumpError
-        raise ArgumentError, 'No items where added to the board'
-      end
-
-
-      def request_board(board:, remote_board_class: RemoteBoard)
-        authorize_if_no_bearer_token!
-        response = faraday.get(
-          "/v2/boards/#{board.id}",
-          {},
-          auth_headers.merge('Content-Type' => 'application/json')
-        )
-        ensure_ok_status!(response)
-        remote_board_class.new(JSON.parse(response.body, symbolize_names: true))
-      end
-    end
-  end
-end
-
-module WeTransfer
   class Boards
-    attr_reader :remote_board, :future_board, :url
-    def initialize(client:, name:, description:, &block)
+    attr_reader :remote_board
+
+    def initialize(client:, name:, description:)
       @client = client
-      @future_board = create_feature_board(name: name, description: description, &block)
-      @remote_board = create_remote_board(board: @future_board)
-      @url = @remote_board.url
+      @remote_board = create_remote_board(name: name, description: description)
     end
 
+    def add_items(board_builder_class: WeTransfer::BoardBuilder)
+      builder = board_builder_class.new
+      yield(builder)
+      add_items_to_remote_board(future_items: builder.items)
+    rescue LocalJumpError
+      raise ArgumentError, 'No items where added to the board'
+    end
+
+    def upload_file!(name: nil, io: nil, path: nil)
+      set_future_file(name: name, io: io, path: path)
+      set_remote_file
+      @file.upload_file(client: @client, remote_object: @remote_board, remote_file: @remote_file)
+    end
+
+    def complete_file!(name: nil, io: nil, path: nil)
+      set_future_file(name: name, io: io, path: path)
+      set_remote_file
+      @file.complete_file(client: @client, remote_object: @remote_board, remote_file: @remote_file)
+    end
 
     private
-      def create_feature_board(name:, description:, future_board_class: FutureBoard, board_builder_class: BoardBuilder)
-        builder = board_builder_class.new
-        yield(builder) if block_given?
-        future_board_class.new(name: name, description: description, items: builder.items)
-      end
 
-      def create_remote_board(board:, remote_board_class: RemoteBoard)
-        @client.authorize_if_no_bearer_token!
-        response = @client.faraday.post(
-          '/v2/boards',
-          JSON.pretty_generate(board.to_initial_request_params),
-          @client.auth_headers.merge('Content-Type' => 'application/json')
-        )
-        @client.ensure_ok_status!(response)
-        remote_board = remote_board_class.new(JSON.parse(response.body, symbolize_names: true))
-        board.items.any? ? add_items_to_remote_board(items: board.items, remote_board: remote_board) : remote_board
-      end
+    def set_remote_file
+      @remote_file = @remote_board.files.select{|f| f.name == @file.name}.first
+    end
 
-      def create_board_and_upload_items(name:, description:, &block)
-        @remote_board.files.each do |file|
-          file.check_for_duplicates(@future_board.files)
-          local_file = @future_board.files.select { |x| x.name == file.name }.first
-          file.upload_file(object: @remote_board, file: file, io: local_file.io)
-          file.complete_file(object: @remote_board, file: file)
+    def set_future_file(name: nil, io: nil, path: nil)
+      name ||= File.basename(path)
+      io ||= File.open(path, 'rb')
+      @file = FutureFile.new(name: name, io: io)
+    end
+
+    def create_remote_board(name:, description:, future_board_class: FutureBoard)
+      future_board = future_board_class.new(name: name, description: description)
+      @client.authorize_if_no_bearer_token!
+      response = @client.faraday.post(
+        '/v2/boards',
+        JSON.pretty_generate(future_board.to_initial_request_params),
+        @client.auth_headers.merge('Content-Type' => 'application/json')
+      )
+      @client.ensure_ok_status!(response)
+      WeTransfer::RemoteBoard.new(JSON.parse(response.body, symbolize_names: true))
+    end
+
+    def add_items_to_remote_board(future_items:)
+      future_items.group_by(&:class).each do |group, grouped_items|
+        grouped_items.each do |item|
+          item.check_for_duplicates(grouped_items)
+          item_response = item.add_to_board(client: @client, remote_board: @remote_board)
         end
-        @remote_board
       end
-
-      def add_items_to_remote_board(items:, remote_board:)
-        items.group_by(&:class).each do |_, grouped_items|
-          grouped_items.each do |item|
-            item.add_to_board(client: @client, remote_board: remote_board)
-          end
-        end
-        remote_board
-      end
+      @remote_board
+    end
   end
 end

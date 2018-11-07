@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FutureLink do
+describe WeTransfer::FutureLink do
   let(:params) { { url: 'http://www.wetransfer.com', title: 'WeTransfer' } }
 
   describe '#initializer' do

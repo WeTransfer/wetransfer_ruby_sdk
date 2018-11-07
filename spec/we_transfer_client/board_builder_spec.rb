@@ -28,7 +28,7 @@ describe WeTransfer::BoardBuilder do
 
     it 'adds a file when name and io is given' do
       subject.add_file(name: 'file name', io: File.open(__FILE__, 'rb'))
-      expect(subject.items.first).to be_kind_of(FutureFile)
+      expect(subject.items.first).to be_kind_of(WeTransfer::FutureFile)
     end
   end
 
@@ -39,7 +39,7 @@ describe WeTransfer::BoardBuilder do
 
     it 'adds a file from a path' do
       subject.add_file_at(path: __FILE__)
-      expect(subject.items.first).to be_kind_of(FutureFile)
+      expect(subject.items.first).to be_kind_of(WeTransfer::FutureFile)
     end
 
     it 'throws a Error when file doesnt exists' do

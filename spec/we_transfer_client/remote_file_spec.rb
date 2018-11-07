@@ -10,7 +10,7 @@ describe WeTransfer::RemoteFile do
       multipart: {
         part_numbers: Random.rand(10),
         id: SecureRandom.uuid,
-        chunk_size: RemoteBoard::CHUNK_SIZE,
+        chunk_size: WeTransfer::RemoteBoard::CHUNK_SIZE,
       },
       type: 'file',
     }}

@@ -31,24 +31,6 @@ module WeTransfer
       @logger = logger
     end
 
-
-
-    def put_io_in_parts(object:, file:, io:)
-      (1..file.multipart.part_numbers).each do |part_n_one_based|
-        upload_url, chunk_size = object.prepare_file_upload(client: self, file: file, part_number: part_n_one_based)
-        part_io = StringIO.new(io.read(chunk_size))
-        part_io.rewind
-        response = faraday.put(
-          upload_url,
-          part_io,
-          'Content-Type' => 'binary/octet-stream',
-          'Content-Length' => part_io.size.to_s
-        )
-        ensure_ok_status!(response)
-      end
-      {success: true, message: 'File Uploaded'}
-    end
-
     def faraday
       Faraday.new(@api_url_base) do |c|
         c.response :logger, @logger

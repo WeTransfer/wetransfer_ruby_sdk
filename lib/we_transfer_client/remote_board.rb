@@ -32,6 +32,10 @@ module WeTransfer
       @items.select { |item| item.class == RemoteLink }
     end
 
+    def select_file_on_name(name: )
+      files.select{|f| f.name == name}.first
+    end
+
     private
 
     def to_instances(items:)

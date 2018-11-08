@@ -9,11 +9,12 @@ module WeTransfer
     end
 
     def files
-      @items.select { |item| item.class == WeTransfer::FutureFile }
+      binding.pry
+      @items.select { |item| item.is_a?(WeTransfer::FutureFile) }
     end
 
     def links
-      @items.select { |item| item.class == WeTransfer::FutureLink }
+      @items.select { |item| item.is_a?(WeTransfer::FutureLink) }
     end
 
     def to_initial_request_params

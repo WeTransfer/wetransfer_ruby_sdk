@@ -1,43 +1,36 @@
 module WeTransfer
+  class TransferIOError < StandardError; end
   class Boards
     attr_reader :remote_board
 
     def initialize(client:, name:, description:)
       @client = client
       @remote_board = create_remote_board(name: name, description: description)
+      @builder ||= WeTransfer::BoardBuilder.new
     end
 
-    def add_items(board_builder_class: WeTransfer::BoardBuilder)
-      builder = board_builder_class.new
-      yield(builder)
-      add_items_to_remote_board(future_items: builder.items)
+    def add_items
+      yield(@builder)
+      add_items_to_remote_board(future_items: @builder.items)
     rescue LocalJumpError
       raise ArgumentError, 'No items where added to the board'
     end
 
-    def upload_file!(name: nil, io: nil, path: nil)
-      set_future_file(name: name, io: io, path: path)
-      set_remote_file
-      @file.upload_file(client: @client, remote_object: @remote_board, remote_file: @remote_file)
+    def upload_file!(io:, name: File.basename(io.to_path))
+      local_file = @builder.select_file_on_name(name: name)
+      raise TransferIOError, 'File not in collection' if local_file.nil?
+      remote_file = @remote_board.select_file_on_name(name: local_file.name)
+      local_file.upload_file(client: @client, remote_object: @remote_board, remote_file: remote_file, io: io)
     end
 
-    def complete_file!(name: nil, io: nil, path: nil)
-      set_future_file(name: name, io: io, path: path)
-      set_remote_file
-      @file.complete_file(client: @client, remote_object: @remote_board, remote_file: @remote_file)
+    def complete_file!(name: )
+      local_file = @builder.select_file_on_name(name: name)
+      raise TransferIOError, 'File not in collection' if local_file.nil?
+      remote_file = @remote_board.select_file_on_name(name: local_file.name)
+      local_file.complete_file(client: @client, remote_object: @remote_board, remote_file: remote_file)
     end
 
     private
-
-    def set_remote_file
-      @remote_file = @remote_board.files.select{|f| f.name == @file.name}.first
-    end
-
-    def set_future_file(name: nil, io: nil, path: nil)
-      name ||= File.basename(path)
-      io ||= File.open(path, 'rb')
-      @file = FutureFile.new(name: name, io: io)
-    end
 
     def create_remote_board(name:, description:, future_board_class: FutureBoard)
       future_board = future_board_class.new(name: name, description: description)

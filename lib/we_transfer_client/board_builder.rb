@@ -7,6 +7,10 @@ module WeTransfer
       @links = []
     end
 
+    def items
+      (@files + @links).flatten
+    end
+
     def add_file(name:, size:)
       @files << FutureFile.new(name: name, size: size)
     end
@@ -19,12 +23,10 @@ module WeTransfer
       @links << FutureLink.new(url: url, title: title)
     end
 
-    def items
-      (@files + @links).flatten
-    end
-
     def select_file_on_name(name: )
       file = files.select{|f| f.name == name}.first
+      return file if file #Todo: this could be done different
+      raise WeTransfer::TransferIOError, 'File not found'
     end
   end
 end

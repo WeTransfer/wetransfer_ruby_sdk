@@ -18,14 +18,12 @@ module WeTransfer
 
     def upload_file!(io:, name: File.basename(io.to_path))
       local_file = @builder.select_file_on_name(name: name)
-      raise TransferIOError, 'File not in collection' if local_file.nil?
       remote_file = @remote_board.select_file_on_name(name: local_file.name)
       local_file.upload_file(client: @client, remote_object: @remote_board, remote_file: remote_file, io: io)
     end
 
     def complete_file!(name: )
       local_file = @builder.select_file_on_name(name: name)
-      raise TransferIOError, 'File not in collection' if local_file.nil?
       remote_file = @remote_board.select_file_on_name(name: local_file.name)
       local_file.complete_file(client: @client, remote_object: @remote_board, remote_file: remote_file)
     end

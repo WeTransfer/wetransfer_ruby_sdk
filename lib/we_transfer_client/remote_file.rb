@@ -14,6 +14,7 @@ module WeTransfer
     end
 
     def request_transfer_upload_url(client:, transfer_id:, part_number:)
+      client.authorize_if_no_bearer_token!
       response = client.faraday.get(
         "/v2/transfers/#{transfer_id}/files/#{@id}/upload-url/#{part_number}",
         {},
@@ -24,6 +25,7 @@ module WeTransfer
     end
 
     def request_board_upload_url(client:, board_id:, part_number:)
+      client.authorize_if_no_bearer_token!
       response = client.faraday.get(
         "/v2/boards/#{board_id}/files/#{@id}/upload-url/#{part_number}/#{@multipart.id}",
         {},
@@ -34,6 +36,7 @@ module WeTransfer
     end
 
     def complete_transfer_file(client:, transfer_id:)
+      client.authorize_if_no_bearer_token!
       body = {part_numbers: @multipart.part_numbers}
       response = client.faraday.put(
         "/v2/transfers/#{transfer_id}/files/#{@id}/upload-complete",
@@ -45,6 +48,7 @@ module WeTransfer
     end
 
     def complete_board_file(client:, board_id:)
+      client.authorize_if_no_bearer_token!
       response = client.faraday.put(
         "/v2/boards/#{board_id}/files/#{@id}/upload-complete",
         '{}',

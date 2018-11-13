@@ -3,8 +3,8 @@ module WeTransfer
     attr_reader :url, :title
 
     def initialize(url:, title: url)
-      @url = url
-      @title = title
+      @url = url.to_str
+      @title = title.to_str
     end
 
     def to_request_params
@@ -16,7 +16,7 @@ module WeTransfer
 
     def check_for_duplicates(link_list)
       if link_list.select { |link| link.url == url }.size != 1
-        raise ArgumentError, 'Duplicate link entry'
+        raise WeTransfer::TransferIOError, 'Duplicate link entry'
       end
     end
 
@@ -29,7 +29,9 @@ module WeTransfer
       )
       client.ensure_ok_status!(response)
       file_item = JSON.parse(response.body, symbolize_names: true).first
-      remote_board.items << WeTransfer::RemoteLink.new(file_item)
+      remote_link = WeTransfer::RemoteLink.new(file_item)
+      remote_board.items << remote_link
+      remote_link
     end
   end
 end

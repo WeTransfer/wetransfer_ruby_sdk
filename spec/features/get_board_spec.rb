@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe WeTransfer::Client::Boards do
+describe WeTransfer::Boards do
   let(:client) do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
   end

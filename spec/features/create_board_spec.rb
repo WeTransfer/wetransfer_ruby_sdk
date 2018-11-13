@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe WeTransfer::Client::Boards do
+describe WeTransfer::Boards do
   let(:big_file) { File.open(fixtures_dir + 'Japan-01.jpg', 'r') }
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
 
@@ -17,7 +17,7 @@ describe WeTransfer::Client::Boards do
       client.create_board(name: 'Test Board', description: 'Test descrition') do |b|
         b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
         b.add_file(name: 'big file', io: big_file)
-        b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
+        b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
       end
     end
 

@@ -5,7 +5,6 @@ describe WeTransfer::Client do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
   end
 
-
   it 'creates a board, let you add items to it, upload files and complete them' do
     # Initiate a new board
     board = WeTransfer::Boards.new(client: client, name: 'Integration Test', description: 'Test the functionality of this SDK')
@@ -27,7 +26,7 @@ describe WeTransfer::Client do
     board.upload_file!(io: File.open(fixtures_dir + 'Japan-02.jpg', 'rb'))
 
     # it raises an error when file doens't exists or isn't in the collection
-    expect{
+    expect {
       board.upload_file!(io: File.open(fixtures_dir + 'Japan-03.jpg', 'rb'))
     }.to raise_error Errno::ENOENT
 
@@ -43,7 +42,6 @@ describe WeTransfer::Client do
     expect(response.status).to eq(302)
     # ... to a board in the wetransfer domain
     expect(response['location']).to start_with('https://boards.wetransfer')
-
 
     expect(board.remote_board.state).to eq('downloadable')
     expect(board.remote_board.items.count).to be(6)

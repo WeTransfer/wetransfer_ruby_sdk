@@ -6,7 +6,7 @@ module WeTransfer
 
     CHUNK_SIZE = 6 * 1024 * 1024
 
-    def initialize(id:, state:, url:, name:, description: '', items: [])
+    def initialize(id:, state:, url:, name:, description: '', items: [], **_omitted)
       @id = id
       @state = state
       @url = url
@@ -33,7 +33,9 @@ module WeTransfer
     end
 
     def select_file_on_name(name: )
-      files.select{|f| f.name == name}.first
+      file = files.select{|f| f.name == name}.first
+      return file if file #Todo: this could be done different
+      raise WeTransfer::TransferIOError, 'File not found'
     end
 
     private

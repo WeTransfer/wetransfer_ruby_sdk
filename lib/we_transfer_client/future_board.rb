@@ -2,7 +2,7 @@ module WeTransfer
   class FutureBoard
     attr_reader :name, :description
 
-    def initialize(name:, description: nil)
+    def initialize(name: ,description: nil)
       @name = name
       @description = description
     end

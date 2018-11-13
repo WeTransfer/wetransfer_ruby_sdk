@@ -63,7 +63,7 @@ module WeTransfer
         true
       when 400..499
         @logger.error response
-        raise Error, "Response had a #{response.status} code, the server will not accept this request even if retried"
+        raise Error, JSON.parse(response.body, symbolize_names: true)[:message]
       when 500..504
         @logger.error response
         raise Error, "Response had a #{response.status} code, we could retry"

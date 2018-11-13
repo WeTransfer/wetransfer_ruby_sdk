@@ -1,6 +1,6 @@
 module WeTransfer
   class BoardBuilder
-    attr_reader :items, :files, :links
+    attr_reader :files, :links
 
     def initialize
       @files = []

@@ -1,12 +1,11 @@
 module WeTransfer
   class TransferIOError < StandardError; end
   class FutureFile
-
     attr_reader :name, :size
 
     def initialize(name:, size:)
-      @name = name
-      @size = size
+      @name = name.to_s
+      @size = size.to_i
     end
 
     def to_request_params
@@ -20,13 +19,12 @@ module WeTransfer
       client.authorize_if_no_bearer_token!
       response = client.faraday.post(
         "/v2/boards/#{remote_board.id}/files",
-        # this needs to be a array with hashes => [{name, filesize}]
         JSON.pretty_generate([to_request_params]),
         client.auth_headers.merge('Content-Type' => 'application/json')
       )
       client.ensure_ok_status!(response)
       file_item = JSON.parse(response.body, symbolize_names: true).first
-      remote_file =  WeTransfer::RemoteFile.new(file_item)
+      remote_file = WeTransfer::RemoteFile.new(file_item)
       remote_board.items << remote_file
       remote_file
     end
@@ -43,7 +41,7 @@ module WeTransfer
 
     def check_for_duplicates(file_list)
       if file_list.select { |file| file.name == name }.size != 1
-        raise ArgumentError, 'Duplicate file entry'
+        raise TransferIOError, 'Duplicate file entry'
       end
     end
 
@@ -62,6 +60,7 @@ module WeTransfer
         )
         client.ensure_ok_status!(response)
       end
+      remote_file
     end
 
     def ensure_right_file!(remote_file, io)
@@ -76,7 +75,7 @@ module WeTransfer
       io.seek(0) # Also rewinds the IO for later uploading action
       size = io.size # Will cause a NoMethodError
       raise TransferIOError, "#{File.basename(io)}, given to add_file has a size of 0" if size <= 0
-    rescue NoMethodError
+    rescue NoMethodError, IOError
       raise TransferIOError, "#{File.basename(io)}, given to add_file must respond to seek(), read() and size(), but #{io.inspect} did not"
     end
   end

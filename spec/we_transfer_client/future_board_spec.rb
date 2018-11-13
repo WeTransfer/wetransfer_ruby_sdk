@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe WeTransfer::FutureBoard do
-  let(:params) { { name: 'yes', description: 'A description about the board', items: [] } }
+  let(:params) { { name: 'yes', description: 'A description about the board' } }
 
   describe '#initializer' do
     it 'raises ArgumentError when no name is given' do
@@ -15,84 +15,33 @@ describe WeTransfer::FutureBoard do
       params.delete(:description)
       described_class.new(params)
     end
-
-    it 'accepts a empty array as item argument' do
-      expect(described_class.new(params).items).to be_kind_of(Array)
-    end
   end
 
   describe '#to_initial_request_params' do
     it 'has a name' do
-      as_params = described_class.new(params).to_initial_request_params
-      expect(as_params[:name]).to be_kind_of(String)
+      as_request_params = described_class.new(params).to_initial_request_params
+      expect(as_request_params[:name]).to be(params[:name])
     end
 
     it 'has a description' do
-      as_params = described_class.new(params).to_initial_request_params
-      expect(as_params[:description]).to be(params[:description])
-    end
-  end
-
-  describe '#to_request_params' do
-    it 'has a name' do
-      as_params = described_class.new(params).to_request_params
-      expect(as_params[:name]).to be_kind_of(String)
+      as_request_params = described_class.new(params).to_initial_request_params
+      expect(as_request_params[:description]).to be(params[:description])
     end
 
-    it 'has a description' do
-      as_params = described_class.new(params).to_request_params
-      expect(as_params[:description]).to be(params[:description])
-    end
-
-    it 'has items' do
-      file = WeTransfer::FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
-      params[:items] << file
-      as_params = described_class.new(params).to_request_params
-      expect(as_params[:items].count).to be(1)
-    end
-  end
-
-  describe '#files' do
-    it 'returns only file items' do
-      file = WeTransfer::FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
-      link = WeTransfer::FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
-      future_board = described_class.new(params)
-      3.times do
-        future_board.items << file
-        future_board.items << link
-      end
-      expect(future_board.items.size).to eq(6)
-      expect(future_board.files.size).to eq(3)
-    end
-  end
-
-  describe '#links' do
-    it 'returns only link items' do
-      file = WeTransfer::FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
-      link = WeTransfer::FutureLink.new(url: 'https://www.wetransfer.com', title: 'WeTransfer')
-      future_board = described_class.new(params)
-      3.times do
-        future_board.items << file
-        future_board.items << link
-      end
-      expect(future_board.items.size).to eq(6)
-      expect(future_board.links.size).to eq(3)
+    it 'when no description is given, the value of the key is empty' do
+      params.delete(:description)
+      as_request_params = described_class.new(params).to_initial_request_params
+      expect(as_request_params[:description]).to be_nil
     end
   end
 
   describe 'getters' do
-    let(:subject) { described_class.new(params) }
+    let (:subject) { described_class.new(params)}
 
-    it '#name' do
-      subject.name
-    end
-
-    it '#description' do
-      subject.description
-    end
-
-    it 'items' do
-      subject.items
+    %i(name description).each do |getter|
+      it "responds to ##{getter}" do
+        subject.send getter
+      end
     end
   end
 end

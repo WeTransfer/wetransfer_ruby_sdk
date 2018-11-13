@@ -18,7 +18,7 @@ describe WeTransfer::Boards do
       board = described_class.new(client: client, name: 'test', description: 'test description')
       board.add_items do |b|
         b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
-        b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
+        b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
       end
       expect(board.remote_board).to be_kind_of(WeTransfer::RemoteBoard)
       expect(board.remote_board.url).to start_with('https://we.tl/')
@@ -34,7 +34,7 @@ describe WeTransfer::Boards do
     it 'adds items to a remote board' do
       board.add_items do |b|
         b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
-        b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
+        b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
         b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
         b.add_file_at(path: fixtures_dir + 'Japan-02.jpg')
       end
@@ -54,8 +54,8 @@ describe WeTransfer::Boards do
     it 'throws a error when a links already exisits in the board' do
       expect{
         board.add_items do |b|
-          b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
-          b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
+          b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
+          b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
         end
       }.to raise_error ArgumentError, 'Duplicate link entry'
     end
@@ -64,7 +64,7 @@ describe WeTransfer::Boards do
   describe '#upload_file!' do
     before do
       board.add_items do |b|
-        b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
+        b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
         b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
         b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
       end
@@ -109,7 +109,7 @@ describe WeTransfer::Boards do
   describe '#complete_file' do
     before do
       board.add_items do |b|
-        b.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
+        b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
         b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
         b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
       end
@@ -140,7 +140,5 @@ describe WeTransfer::Boards do
         board.complete_file!(name: 'Japan-02.jpg')
       }.to raise_error WeTransfer::TransferIOError
     end
-
-
   end
 end

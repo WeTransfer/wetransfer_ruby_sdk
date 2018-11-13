@@ -4,8 +4,8 @@ describe WeTransfer::RemoteLink do
   let(:params) {
     {
       id:     SecureRandom.uuid,
-      url:    'http://www.wetransfer.com',
-      meta:   {title:  'wetransfer.com'},
+      url:    'https://www.developers.wetransfer.com',
+      meta:   {title:  'WeTransfer Dev Portal'},
       type:   'link',
     }
   }

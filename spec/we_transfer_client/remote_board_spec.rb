@@ -3,7 +3,9 @@ require 'spec_helper'
 
 describe WeTransfer::RemoteBoard do
   subject { described_class.new(params) }
-
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  let(:board) { WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
+  let(:remote_file) { WeTransfer::RemoteFile.new(id: SecureRandom.uuid, name: 'Board name', size: Random.rand(9999999), url: nil, multipart: { part_numbers: Random.rand(10), id: SecureRandom.uuid, chunk_size: WeTransfer::RemoteBoard::CHUNK_SIZE, }, type: 'file',) }
   let(:params) {
     {
       id: SecureRandom.uuid,
@@ -24,15 +26,16 @@ describe WeTransfer::RemoteBoard do
         },
         {
           id: 'storr6ua2l1fsl8lt20180911093826',
-          url: 'http://www.wetransfer.com',
-          meta: {title: 'WeTransfer Website'},
+          url: 'https://www.developers.wetransfer.com',
+          meta: {title: 'WeTransfer Dev Portal'},
           type: 'link',
         }
-      ]
+      ],
+      success: true,
     }
   }
 
-  describe '#initializer' do
+  describe '#initializer', :focus do
     it 'is valid with all params' do
       subject
     end
@@ -58,7 +61,7 @@ describe WeTransfer::RemoteBoard do
 
     describe 'items' do
       it 'are instantiated' do
-        expect(subject.items.map(&:class)).to eq([RemoteFile, RemoteLink])
+        expect(subject.items.map(&:class)).to eq([WeTransfer::RemoteFile, WeTransfer::RemoteLink])
       end
 
       it 'raises ItemTypeError if the item has a wrong type' do
@@ -79,6 +82,13 @@ describe WeTransfer::RemoteBoard do
     it 'returns only link item' do
       expect(subject.items.size).to eq(2)
       expect(subject.links.size).to eq(1)
+    end
+  end
+
+  describe '#prepare_file_upload', :focus do
+    it 'returns a Array with url and Chunksize' do
+      resp = subject.prepare_file_upload(client: client, file: remote_file, part_number: 1)
+      binding.pry
     end
   end
 

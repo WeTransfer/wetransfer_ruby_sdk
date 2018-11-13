@@ -65,27 +65,18 @@ describe WeTransfer::RemoteFile do
     end
   end
 
-  describe 'Getters' do
+  describe '#request_transfer_upload_url' do
+    # TODO
+  end
+
+
+  describe 'getters' do
     let(:subject) { described_class.new(params) }
 
-    it '#multipart' do
-      subject.multipart
-    end
-
-    it '#name' do
-      subject.name
-    end
-
-    it '#type' do
-      subject.type
-    end
-
-    it '#id' do
-      subject.id
-    end
-
-    it '#url' do
-      subject.url
+    %i[multipart name type id url].each do |getter|
+      it "responds to #{getter}" do
+        subject.send getter
+      end
     end
   end
 end

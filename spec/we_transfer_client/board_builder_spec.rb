@@ -60,7 +60,7 @@ describe WeTransfer::BoardBuilder do
     end
   end
 
-  describe '#add_file_at', :focus do
+  describe '#add_file_at' do
     before do
       subject.add_file_at(path: __FILE__)
     end

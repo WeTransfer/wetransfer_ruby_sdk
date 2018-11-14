@@ -5,7 +5,7 @@ describe WeTransfer::RemoteBoard do
   subject { described_class.new(params) }
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
   let(:board) { WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
-  let(:remote_file) { WeTransfer::RemoteFile.new(id: SecureRandom.uuid, name: 'Board name', size: Random.rand(9999999), url: nil, multipart: { part_numbers: Random.rand(10), id: SecureRandom.uuid, chunk_size: WeTransfer::RemoteBoard::CHUNK_SIZE, }, type: 'file',) }
+  let(:fake_remote_file) { WeTransfer::RemoteFile.new(id: SecureRandom.uuid, name: 'Board name', size: Random.rand(9999999), url: nil, multipart: { part_numbers: Random.rand(10), id: SecureRandom.uuid, chunk_size: WeTransfer::RemoteBoard::CHUNK_SIZE, }, type: 'file',) }
   let(:params) {
     {
       id: SecureRandom.uuid,
@@ -35,7 +35,7 @@ describe WeTransfer::RemoteBoard do
     }
   }
 
-  describe '#initializer', :focus do
+  describe '#initializer' do
     it 'is valid with all params' do
       subject
     end
@@ -85,11 +85,85 @@ describe WeTransfer::RemoteBoard do
     end
   end
 
-  describe '#prepare_file_upload', :focus do
-    it 'returns a Array with url and Chunksize' do
-      resp = subject.prepare_file_upload(client: client, file: remote_file, part_number: 1)
-      binding.pry
+  describe '#prepare_file_upload' do
+    before do
+      board.add_items { |f| f.add_file(name: 'foo.gif', size: 123456) }
     end
+
+    let(:remote_file) { board.remote_board.items.first }
+    let(:response) { subject.prepare_file_upload(client: client, file: remote_file, part_number: 1) }
+
+    it 'returns a Array with url and Chunksize' do
+      expect(response).to be_kind_of(Array)
+      expect(response.size).to be(2)
+    end
+
+    it 'returns the upload url for the part_number first' do
+      expect(response.first).to start_with('https://wetransfer-eu-prod-spaceship')
+    end
+
+    it 'reutrns the size of the part as second item in the array' do
+      expect(response.last).to be_kind_of(Integer)
+    end
+  end
+
+  describe '#prepare_file_completion' do
+    before do
+      @new_board = WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
+      @new_board.add_items { |f| f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__)) }
+    end
+    let(:remote_file) { @new_board.remote_board.items.first }
+
+    it 'send the file to the complete action' do
+      @new_board.upload_file!(io: File.open(__FILE__, 'rb'))
+      resp = @new_board.remote_board.prepare_file_completion(client: client, file: remote_file)
+      expect(resp[:success]).to be true
+      expect(resp[:message]).to eq('File is marked as complete.')
+    end
+
+    it 'returns an error when file is not uploaded' do
+      expect {
+        subject.prepare_file_completion(client: client, file: remote_file)
+      }.to raise_error WeTransfer::Client::Error, /expected at least 1 part/
+    end
+
+    it 'returns an error when file is not in collection' do
+      expect {
+        subject.prepare_file_completion(client: client, file: fake_remote_file)
+      }.to raise_error WeTransfer::Client::Error, /File not found./
+    end
+  end
+
+  describe '#Files' do
+    before do
+      @new_board = WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
+      @new_board.add_items do |f|
+        f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
+        f.add_web_url(url: 'http://www.developers.wetransfer.com')
+      end
+    end
+
+    it 'it only lists files from remote board' do
+      expect(@new_board.remote_board.files.map(&:class)).to_not include(WeTransfer::RemoteLink)
+    end
+  end
+
+  describe '#links' do
+    before do
+      @new_board = WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
+      @new_board.add_items do |f|
+        f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
+        f.add_web_url(url: 'http://www.developers.wetransfer.com')
+      end
+    end
+
+    it 'it only lists files from remote board' do
+      expect(@new_board.remote_board.links.map(&:class)).to_not include(WeTransfer::RemoteFile)
+    end
+  end
+
+  describe '#select_file_on_name' do
+    #todo
   end
 
   describe 'getters' do

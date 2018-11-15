@@ -35,8 +35,8 @@ module WeTransfer
       complete_transfer_call(transfer)
     end
 
-    def create_future_transfer(message:, future_transfer_class: FutureTransfer, transfer_builder_class: TransferBuilder)
-      builder = transfer_builder_class.new
+    def create_future_transfer(message:, future_transfer_class: FutureTransfer, transfer_builder_class: WeTransfer::TransferBuilder)
+      builder = transfer_builder_class.new(client: @client)
       yield(builder)
       future_transfer_class.new(message: message, files: builder.files)
     rescue LocalJumpError

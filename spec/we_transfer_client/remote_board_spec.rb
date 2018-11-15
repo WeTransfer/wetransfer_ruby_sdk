@@ -5,7 +5,21 @@ describe WeTransfer::RemoteBoard do
   subject { described_class.new(params) }
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
   let(:board) { WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
-  let(:fake_remote_file) { WeTransfer::RemoteFile.new(id: SecureRandom.uuid, name: 'Board name', size: Random.rand(9999999), url: nil, multipart: { part_numbers: Random.rand(10), id: SecureRandom.uuid, chunk_size: WeTransfer::RemoteBoard::CHUNK_SIZE, }, type: 'file',) }
+  let(:fake_remote_file) {
+    WeTransfer::RemoteFile.new(
+      id: SecureRandom.uuid,
+      name: 'Board name',
+      size: Random.rand(9999999),
+      url: nil,
+      multipart: {
+        part_numbers: Random.rand(10),
+        id: SecureRandom.uuid,
+        chunk_size: WeTransfer::RemoteBoard::CHUNK_SIZE,
+       },
+      type: 'file',
+      client: client,
+    )
+  }
   let(:params) {
     {
       id: SecureRandom.uuid,
@@ -23,6 +37,7 @@ describe WeTransfer::RemoteBoard do
             chunk_size: 3036
           },
           type: 'file',
+          client: client,
         },
         {
           id: 'storr6ua2l1fsl8lt20180911093826',
@@ -32,7 +47,6 @@ describe WeTransfer::RemoteBoard do
         }
       ],
       success: true,
-      client: client,
     }
   }
 
@@ -92,7 +106,7 @@ describe WeTransfer::RemoteBoard do
     end
 
     let(:remote_file) { board.remote_board.items.first }
-    let(:response) { subject.prepare_file_upload(client: client, file: remote_file, part_number: 1) }
+    let(:response) { subject.prepare_file_upload(file: remote_file, part_number: 1) }
 
     it 'returns a Array with url and Chunksize' do
       expect(response).to be_kind_of(Array)

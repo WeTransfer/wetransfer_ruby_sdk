@@ -2,12 +2,13 @@ module WeTransfer
   class TransferBuilder
     attr_reader :files
 
-    def initialize
+    def initialize(client:)
+      @client = client
       @files = []
     end
 
     def add_file(name:, size:)
-      @files << FutureFile.new(name: name, size: size)
+      @files << FutureFile.new(name: name, size: size, client: @client)
     end
 
     def add_file_at(path:)

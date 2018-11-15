@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe WeTransfer::TransferBuilder do
-  let(:transfer) { described_class.new }
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  let(:transfer) { described_class.new(client: client) }
 
   describe '#initialze' do
     it 'initializes with an empty files array' do

@@ -1,8 +1,10 @@
 require 'spec_helper'
 
 describe WeTransfer::RemoteTransfer do
+  before do
+    skip
+  end
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-  # let(:transfer) { WeTransfer::Transfer.new(client: client, nam)}
   let(:params) {
     {
       id: '2ae97886522f375c1c6696799a56f0d820180912075119',
@@ -25,7 +27,8 @@ describe WeTransfer::RemoteTransfer do
             multipart: {part_numbers: 2, chunk_size: 5242880},
             type: 'file',
           }
-        ]
+        ],
+      client: client
     }
   }
 

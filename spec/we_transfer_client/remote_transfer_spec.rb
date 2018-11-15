@@ -1,6 +1,8 @@
 require 'spec_helper'
 
-describe RemoteTransfer do
+describe WeTransfer::RemoteTransfer do
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  # let(:transfer) { WeTransfer::Transfer.new(client: client, nam)}
   let(:params) {
     {
       id: '2ae97886522f375c1c6696799a56f0d820180912075119',
@@ -56,46 +58,26 @@ describe RemoteTransfer do
         described_class.new(params)
       }.to raise_error NoMethodError
     end
-
-    it 'fails when files is a string' do
-      params.delete(:files)
-      params[:files] = 'Not an array'
-      expect {
-        described_class.new(params)
-      }.to raise_error NoMethodError
-    end
   end
 
   describe '#files_to_class' do
     it 'creates classes of remote files' do
       transfer = described_class.new(params)
-      expect(transfer.files.map(&:class)).to eq([RemoteFile, RemoteFile])
+      expect(transfer.files.map(&:class)).to eq([WeTransfer::RemoteFile, WeTransfer::RemoteFile])
     end
   end
 
   describe '#prepare_file_upload' do
-    pending 'it retreives the upload url' do
-      fail
-    end
+    # pending 'it retreives the upload url' do
+    #   # fail
+    # end
   end
 
-  describe '#Getters' do
-    subject { described_class.new(params) }
-
-    it '#files' do
-      subject.files
-    end
-
-    it '#url' do
-      subject.url
-    end
-
-    it '#state' do
-      subject.state
-    end
-
-    it '#id' do
-      subject.id
+  describe 'getters' do
+    %i[files urls id state].each do |getter|
+      it "responds to ##{getter}" do
+        subject.send getter
+      end
     end
   end
 end

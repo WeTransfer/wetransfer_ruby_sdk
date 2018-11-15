@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe WeTransfer::BoardBuilder do
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  let(:subject) { described_class.new(client: client)}
   describe '#initialize' do
     it 'initializes with instance variable @files' do
       expect(subject.instance_variables).to include(:@files)
@@ -27,10 +29,13 @@ describe WeTransfer::BoardBuilder do
     end
 
     it 'is an array of files and links' do
+      subject.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
+      subject.add_web_url(url: 'https://www.developers.wetransfer.com')
       expect(subject.items).to be_kind_of(Array)
+      expect(subject.items.map(&:class)).to include(WeTransfer::FutureFile, WeTransfer::FutureLink)
     end
 
-    it 'shows all items that were added' do
+    it 'knows how many items were added' do
       subject.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
       subject.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Website')
       expect(subject.items.count).to be(2)

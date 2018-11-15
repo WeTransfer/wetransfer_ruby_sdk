@@ -18,9 +18,7 @@ require_relative 'we_transfer_client/boards'
 
 module WeTransfer
   class Client
-
-    class Error < StandardError
-    end
+    class Error < StandardError; end
 
     NULL_LOGGER = Logger.new(nil)
 

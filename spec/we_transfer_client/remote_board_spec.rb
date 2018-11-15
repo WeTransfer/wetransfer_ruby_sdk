@@ -32,6 +32,7 @@ describe WeTransfer::RemoteBoard do
         }
       ],
       success: true,
+      client: client,
     }
   }
 
@@ -116,20 +117,20 @@ describe WeTransfer::RemoteBoard do
 
     it 'send the file to the complete action' do
       @new_board.upload_file!(io: File.open(__FILE__, 'rb'))
-      resp = @new_board.remote_board.prepare_file_completion(client: client, file: remote_file)
+      resp = @new_board.remote_board.prepare_file_completion(file: remote_file)
       expect(resp[:success]).to be true
       expect(resp[:message]).to eq('File is marked as complete.')
     end
 
     it 'returns an error when file is not uploaded' do
       expect {
-        subject.prepare_file_completion(client: client, file: remote_file)
+        subject.prepare_file_completion(file: remote_file)
       }.to raise_error WeTransfer::Client::Error, /expected at least 1 part/
     end
 
     it 'returns an error when file is not in collection' do
       expect {
-        subject.prepare_file_completion(client: client, file: fake_remote_file)
+        subject.prepare_file_completion(file: fake_remote_file)
       }.to raise_error WeTransfer::Client::Error, /File not found./
     end
   end

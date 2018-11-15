@@ -3,12 +3,13 @@
 require 'spec_helper'
 
 describe WeTransfer::Client do
+
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
   let(:file_locations) { %w[Japan-01.jpg Japan-02.jpg] }
 
-  describe described_class::Transfers do
+  describe 'Transfers' do
     pending 'creates a transfer with multiple files' do
-      skip "this interface is still experimental"
+      fail
       transfer = client.create_transfer(message: 'Japan: 🏯 & 🎎') do |builder|
         file_locations.each do |file_location|
           builder.add_file(name: File.basename(file_location), io: File.open(fixtures_dir + file_location, 'rb'))

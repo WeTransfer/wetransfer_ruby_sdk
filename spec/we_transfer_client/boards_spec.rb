@@ -48,7 +48,7 @@ describe WeTransfer::Boards do
           b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
           b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
         end
-      }.to raise_error ArgumentError, 'Duplicate file entry'
+      }.to raise_error WeTransfer::TransferIOError, 'Duplicate file entry'
     end
 
     it 'throws a error when a links already exisits in the board' do
@@ -57,7 +57,7 @@ describe WeTransfer::Boards do
           b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
           b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
         end
-      }.to raise_error ArgumentError, 'Duplicate link entry'
+      }.to raise_error WeTransfer::TransferIOError, 'Duplicate link entry'
     end
   end
 
@@ -103,6 +103,11 @@ describe WeTransfer::Boards do
       expect{
         board.upload_file!(name: 'Japan-01.jpg', io: File.open(fixtures_dir + 'Japan-01.jpg', 'rb'))
       }.not_to raise_error
+    end
+
+    it 'returns a RemoteFile after uploading' do
+      response = board.upload_file!(name: 'Japan-01.jpg', io: File.open(fixtures_dir + 'Japan-01.jpg', 'rb'))
+      expect(response).to be_kind_of(WeTransfer::RemoteFile)
     end
   end
 

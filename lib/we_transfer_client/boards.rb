@@ -6,7 +6,7 @@ module WeTransfer
     def initialize(client:, name:, description:)
       @client = client
       @remote_board = create_remote_board(name: name, description: description)
-      @builder ||= WeTransfer::BoardBuilder.new
+      @builder ||= WeTransfer::BoardBuilder.new(client: @client)
     end
 
     def add_items
@@ -18,14 +18,12 @@ module WeTransfer
 
     def upload_file!(io:, name: File.basename(io.to_path))
       local_file = @builder.select_file_on_name(name: name)
-      remote_file = @remote_board.select_file_on_name(name: local_file.name)
-      local_file.upload_file(client: @client, remote_object: @remote_board, remote_file: remote_file, io: io)
+      local_file.upload_file(io: io)
     end
 
-    def complete_file!(name: )
+    def complete_file!(name:)
       local_file = @builder.select_file_on_name(name: name)
-      remote_file = @remote_board.select_file_on_name(name: local_file.name)
-      local_file.complete_file(client: @client, remote_object: @remote_board, remote_file: remote_file)
+      local_file.complete_file
     end
 
     private
@@ -43,10 +41,9 @@ module WeTransfer
     end
 
     def add_items_to_remote_board(future_items:)
-      future_items.group_by(&:class).each do |group, grouped_items|
+      future_items.group_by(&:class).each do |_group, grouped_items|
         grouped_items.each do |item|
-          item.check_for_duplicates(grouped_items)
-          item_response = item.add_to_board(client: @client, remote_board: @remote_board)
+          item.add_to_board(remote_board: @remote_board)
         end
       end
       @remote_board

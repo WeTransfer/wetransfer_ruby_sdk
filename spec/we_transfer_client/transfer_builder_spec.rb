@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe TransferBuilder do
+describe WeTransfer::TransferBuilder do
   let(:transfer) { described_class.new }
 
   describe '#initialze' do
@@ -19,40 +19,31 @@ describe TransferBuilder do
     it 'returns an error when io is missing' do
       expect {
         transfer.add_file(name: 'file name')
-      }.to raise_error ArgumentError, /io/
+      }.to raise_error ArgumentError, /size/
     end
 
     it 'returns a error when file doesnt exists' do
       expect {
-        transfer.add_file(name: 'file name', io: File.open('foo', 'rb'))
+        transfer.add_file(name: 'file name', size: File.size('foo.gif',))
       }.to raise_error Errno::ENOENT
     end
 
     it 'adds a file when name and io is given' do
-      transfer.add_file(name: 'file name', io: File.open(__FILE__, 'rb'))
-      expect(transfer.files.first).to be_kind_of(FutureFile)
+      transfer.add_file(name: 'file name', size: File.size(__FILE__))
+      expect(transfer.files.first).to be_kind_of(WeTransfer::FutureFile)
     end
   end
 
   describe '#add_file_at' do
     it 'adds a file from a path' do
       transfer.add_file_at(path: __FILE__)
-      expect(transfer.files.first).to be_kind_of(FutureFile)
+      expect(transfer.files.first).to be_kind_of(WeTransfer::FutureFile)
     end
 
     it 'throws a Error when file doesnt exists' do
       expect {
         transfer.add_file_at(path: '/this/path/leads/to/nothing.exe')
       }.to raise_error Errno::ENOENT
-    end
-
-    pending 'should call #add_file' do
-      skip "Lets not trigger status:400 errors"
-      client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
-      client.create_transfer(message: 'A transfer message') do |builder|
-        expect(builder).to receive(:add_file).with(name: kind_of(String), io: kind_of(::File))
-        builder.add_file_at(path: __FILE__)
-      end
     end
   end
 end

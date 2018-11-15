@@ -15,27 +15,21 @@ module WeTransfer
       @items = to_instances(items: items)
     end
 
-    def prepare_file_upload(client:, file:, part_number:)
-      url = file.request_board_upload_url(client: client, board_id: @id, part_number: part_number)
+    def prepare_file_upload(file:, part_number:)
+      url = file.request_board_upload_url(board_id: @id, part_number: part_number)
       [url, CHUNK_SIZE]
     end
 
-    def prepare_file_completion(client:, file:)
-      file.complete_board_file(client: client, board_id: @id)
+    def prepare_file_completion(file:)
+      file.complete_board_file(board_id: @id)
     end
 
     def files
-      @items.select { |item| item.class == RemoteFile }
+      @items.select { |item| item.class == WeTransfer::RemoteFile }
     end
 
     def links
-      @items.select { |item| item.class == RemoteLink }
-    end
-
-    def select_file_on_name(name: )
-      file = files.select{|f| f.name == name}.first
-      return file if file #Todo: this could be done different
-      raise WeTransfer::TransferIOError, 'File not found'
+      @items.select { |item| item.class == WeTransfer::RemoteLink }
     end
 
     private

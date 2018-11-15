@@ -45,7 +45,7 @@ describe WeTransfer::Boards do
     end
 
     it 'fails when board is not a existing remote board' do
-      new_board = RemoteBoard.new(id: 123456, state: 'proccessing', url: 'https://www.we.tl/123456', name: 'fake board')
+      new_board = WeTransfer::RemoteBoard.new(id: 123456, state: 'proccessing', url: 'https://www.we.tl/123456', name: 'fake board', client: client)
       expect {
         client.add_items(board: new_board) do |b|
           b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))

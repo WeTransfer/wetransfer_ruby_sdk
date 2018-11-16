@@ -3,7 +3,7 @@ require 'spec_helper'
 describe WeTransfer::FutureLink do
   let(:params) { { url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal', client: client } }
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-  let(:board) { WeTransfer::Boards.new(client: client, name: 'future_file_spec.rb', description: 'this test the behaviour of the future_file') }
+  let(:board) { WeTransfer::Board.new(client: client, name: 'future_file_spec.rb', description: 'this test the behaviour of the future_file') }
   let(:link) { described_class.new(params) }
   let(:fake_remote_board) {
     WeTransfer::RemoteBoard.new(

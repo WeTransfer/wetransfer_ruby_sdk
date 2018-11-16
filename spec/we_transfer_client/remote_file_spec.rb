@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe WeTransfer::RemoteFile do
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-  let(:board) { WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
+  let(:board) { WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
 
   let(:params) {
     {
@@ -75,7 +75,7 @@ describe WeTransfer::RemoteFile do
 
   describe '#request_board_upload_url' do
     before do
-      @new_board = WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
+      @new_board = WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
       @new_board.add_items { |f| f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__)) }
     end
     let(:remote_file) { @new_board.remote_board.items.first }
@@ -95,7 +95,7 @@ describe WeTransfer::RemoteFile do
 
   describe '#complete_board_file' do
     before do
-      @new_board = WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
+      @new_board = WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
       @new_board.add_items { |f| f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__)) }
       @new_board.upload_file!(io: File.open(__FILE__, 'rb'))
     end

@@ -4,7 +4,7 @@ require 'spec_helper'
 describe WeTransfer::RemoteBoard do
   subject { described_class.new(params) }
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-  let(:board) { WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
+  let(:board) { WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
   let(:fake_remote_file) {
     WeTransfer::RemoteFile.new(
       id: SecureRandom.uuid,
@@ -124,7 +124,7 @@ describe WeTransfer::RemoteBoard do
 
   describe '#prepare_file_completion' do
     before do
-      @new_board = WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
+      @new_board = WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
       @new_board.add_items { |f| f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__)) }
     end
     let(:remote_file) { @new_board.remote_board.items.first }
@@ -151,7 +151,7 @@ describe WeTransfer::RemoteBoard do
 
   describe '#Files' do
     before do
-      @new_board = WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
+      @new_board = WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
       @new_board.add_items do |f|
         f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
         f.add_web_url(url: 'http://www.developers.wetransfer.com')
@@ -165,7 +165,7 @@ describe WeTransfer::RemoteBoard do
 
   describe '#links' do
     before do
-      @new_board = WeTransfer::Boards.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
+      @new_board = WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
       @new_board.add_items do |f|
         f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
         f.add_web_url(url: 'http://www.developers.wetransfer.com')

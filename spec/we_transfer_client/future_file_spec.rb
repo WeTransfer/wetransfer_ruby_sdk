@@ -3,7 +3,7 @@ require 'spec_helper'
 describe WeTransfer::FutureFile do
 
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-  let(:board) { WeTransfer::Boards.new(client: client, name: 'future_file_spec.rb', description: 'this test the behaviour of the future_file') }
+  let(:board) { WeTransfer::Board.new(client: client, name: 'future_file_spec.rb', description: 'this test the behaviour of the future_file') }
   let(:fake_remote_board) {
     WeTransfer::RemoteBoard.new(
       id: SecureRandom.uuid,
@@ -85,14 +85,6 @@ describe WeTransfer::FutureFile do
       it 'uploads the file and returns ok status' do
         response = file.upload_file(io: File.open(__FILE__, 'rb'))
         expect(response).to be_kind_of(WeTransfer::RemoteFile)
-      end
-
-      it 'raises an error when file is not opened for readings' do
-        local_file_io = File.new("foo.txt", "w") { |f| f.write('bar, baz, qux, quux, garply, waldo, fred, plugh, xyzzy, thud') }
-        expect {
-          file.upload_file(io: local_file_io)
-        }.to raise_error WeTransfer::TransferIOError
-        File.delete(local_file_io.to_path)
       end
 
       it 'raises an error when file is not io compliant' do

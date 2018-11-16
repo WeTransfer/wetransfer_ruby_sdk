@@ -7,8 +7,8 @@ describe WeTransfer::Client do
 
   it 'creates a board, let you add items to it, upload files and complete them' do
     # Initiate a new board
-    board = WeTransfer::Boards.new(client: client, name: 'Integration Test', description: 'Test the functionality of this SDK')
-    expect(board).to be_kind_of(WeTransfer::Boards)
+    board = WeTransfer::Board.new(client: client, name: 'Integration Test', description: 'Test the functionality of this SDK')
+    expect(board).to be_kind_of(WeTransfer::Board)
 
     # Add the items to board
     board.add_items do |b|

@@ -1,58 +1,45 @@
 require 'spec_helper'
 
-describe WeTransfer::Boards do
-  before do
-    skip
-  end
+describe WeTransfer::Board do
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
   let(:board) do
-    client.create_board(name: 'Test Board', description: 'Test Descritpion')
+    WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: 'Test the functionality of the SDK')
   end
 
   describe '#add_items' do
-    before do
-      skip "this interface is still experimental"
-    end
-
     it 'adds items to a board' do
-      client.add_items(board: board) do |b|
-        b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+      board.add_items do |b|
+        b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
         b.add_file_at(path: fixtures_dir + 'Japan-02.jpg')
         b.add_web_url(url: 'http://www.google.com', title: 'google')
+      end
+
+      board.add_items do |b|
+        b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
+        b.add_web_url(url: 'https://developers.wetransfer.com', title: 'developers portal')
       end
     end
 
     it 'fails when no block is given' do
       expect {
-        client.add_items(board: board)
+        board.add_items
       }.to raise_error ArgumentError, /No items/
-    end
-
-    it 'fails when no board is passed as keyword argument' do
-      expect {
-        client.add_items do |b|
-          b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
-        end
-      }.to raise_error ArgumentError, /board/
     end
 
     it 'fails when file is not found' do
       expect {
-        client.add_items(board: board) do |b|
-          b.add_file(name: 'file_not_found.rb', io: File.open('/path/to/non-existent-file.rb', 'r'))
+        board.add_items do |b|
+          b.add_file(name: 'file_not_found.rb', size: File.size('/path/to/non-existent-file.rb'))
         end
       }.to raise_error Errno::ENOENT, /No such file/
     end
 
-    it 'fails when board is not a existing remote board' do
-      new_board = WeTransfer::RemoteBoard.new(id: 123456, state: 'proccessing', url: 'https://www.we.tl/123456', name: 'fake board', client: client)
+    it 'fails when file name is missing' do
       expect {
-        client.add_items(board: new_board) do |b|
-          b.add_file(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-          b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
-          b.add_web_url(url: 'http://www.google.com', title: 'google')
+        board.add_items do |b|
+          b.add_file(name: '', size: 13 )
         end
-      }.to raise_error WeTransfer::Client::Error, /404 code/
+      }.to raise_error WeTransfer::Client::Error
     end
   end
 end

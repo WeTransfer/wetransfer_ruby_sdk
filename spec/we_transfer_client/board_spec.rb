@@ -2,12 +2,12 @@ require 'spec_helper'
 
 require_relative '../../lib/we_transfer_client.rb'
 
-describe WeTransfer::Boards do
+describe WeTransfer::Board do
   let (:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
 
   describe 'Initialize' do
     it 'creates a empty board ' do
-      expect(described_class.new(client: client, name: 'New Board', description: 'This is the description')).to be_kind_of(WeTransfer::Boards)
+      expect(described_class.new(client: client, name: 'New Board', description: 'This is the description')).to be_kind_of(WeTransfer::Board)
     end
 
     it 'has client, future and remote board as instance_variable' do
@@ -27,7 +27,7 @@ describe WeTransfer::Boards do
   end
 
   describe '#add_items' do
-    let (:board) {
+    let(:board) {
       described_class.new(client: client, name: 'Board', description: 'pre-made board')
     }
 
@@ -43,7 +43,7 @@ describe WeTransfer::Boards do
     end
 
     it 'throws a error when a filename already exists in the board' do
-      expect{
+      expect {
         board.add_items do |b|
           b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
           b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
@@ -52,7 +52,7 @@ describe WeTransfer::Boards do
     end
 
     it 'throws a error when a links already exisits in the board' do
-      expect{
+      expect {
         board.add_items do |b|
           b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
           b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')

@@ -1,12 +1,11 @@
 module WeTransfer
-  class TransferIOError < StandardError; end
-  class Boards
+  class Board
     attr_reader :remote_board
 
-    def initialize(client:, name:, description:)
+    def initialize(client:, name:, description: nil)
       @client = client
       @remote_board = create_remote_board(name: name, description: description)
-      @builder ||= WeTransfer::BoardBuilder.new(client: @client)
+      @builder = WeTransfer::BoardBuilder.new(client: @client)
     end
 
     def add_items

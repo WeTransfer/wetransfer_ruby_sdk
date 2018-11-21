@@ -37,7 +37,7 @@ describe WeTransfer::Board do
     it 'fails when file name is missing' do
       expect {
         board.add_items do |b|
-          b.add_file(name: '', size: 13 )
+          b.add_file(name: '', size: 13)
         end
       }.to raise_error WeTransfer::Client::Error
     end

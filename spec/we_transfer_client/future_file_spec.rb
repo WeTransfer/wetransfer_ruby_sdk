@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe WeTransfer::FutureFile do
-
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
   let(:board) { WeTransfer::Board.new(client: client, name: 'future_file_spec.rb', description: 'this test the behaviour of the future_file') }
   let(:fake_remote_board) {

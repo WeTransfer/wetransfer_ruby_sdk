@@ -15,7 +15,7 @@ describe WeTransfer::RemoteBoard do
         part_numbers: Random.rand(10),
         id: SecureRandom.uuid,
         chunk_size: WeTransfer::RemoteBoard::CHUNK_SIZE,
-       },
+      },
       type: 'file',
       client: client,
     )
@@ -178,7 +178,7 @@ describe WeTransfer::RemoteBoard do
   end
 
   describe '#select_file_on_name' do
-    #todo
+    # todo
   end
 
   describe 'getters' do

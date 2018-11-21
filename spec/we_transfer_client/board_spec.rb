@@ -3,7 +3,7 @@ require 'spec_helper'
 require_relative '../../lib/we_transfer_client.rb'
 
 describe WeTransfer::Board do
-  let (:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
 
   describe 'Initialize' do
     it 'creates a empty board ' do
@@ -75,14 +75,14 @@ describe WeTransfer::Board do
     }
 
     it 'after adding links and files the files are uploaded to the board' do
-      expect{
+      expect {
         board.upload_file!(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
         board.upload_file!(io: File.open(fixtures_dir + 'Japan-01.jpg', 'rb'))
       }.not_to raise_error
     end
 
     it 'raises a error when io keyword is missing' do
-      expect{
+      expect {
         board.upload_file!(name: File.basename(__FILE__))
       }.to raise_error ArgumentError
     end
@@ -100,7 +100,7 @@ describe WeTransfer::Board do
     end
 
     it 'uploads a file if name and path are given' do
-      expect{
+      expect {
         board.upload_file!(name: 'Japan-01.jpg', io: File.open(fixtures_dir + 'Japan-01.jpg', 'rb'))
       }.not_to raise_error
     end
@@ -128,14 +128,14 @@ describe WeTransfer::Board do
     }
 
     it 'completes files without raising a error' do
-      expect{
+      expect {
         board.complete_file!(name: 'Japan-01.jpg')
         board.complete_file!(name: File.basename(__FILE__))
       }.not_to raise_error
     end
 
     it 'raises an error when file doenst exists' do
-      expect{
+      expect {
         board.complete_file!(name: 'i-do-not-exist.gif')
       }.to raise_error WeTransfer::TransferIOError
     end

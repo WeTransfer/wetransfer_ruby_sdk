@@ -1,12 +1,16 @@
 module WeTransfer
-  class Transfers
+  class Transfer
 
-    def initialize(client:, message:)
+    def initialize(client:, message: ,&block)
       @client = client
       @message = message
-
+      create_transfer(&block)
     end
 
+
+    def create_transfer(&block)
+      binding.pry
+    end
 
     def create_transfer_and_upload_files(message:, &block)
       future_transfer = create_future_transfer(message: message, &block)

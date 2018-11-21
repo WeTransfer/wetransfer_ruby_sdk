@@ -1,6 +1,8 @@
 require 'spec_helper'
 
-describe WeTransfer::Client::Transfers do
+require_relative '../../lib/we_transfer_client.rb'
+
+describe WeTransfer::Transfers do
   let(:client) do
     WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger)
   end

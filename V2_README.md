@@ -24,7 +24,7 @@ board = client.create_board(name: 'Dog Collection', description: 'A collection o
   item.add_file(name: 'dalmatian.jpg', io: File.open('path/to/dalmatian.jpg', 'r'))
   item.add_file(name: 'beagle.jpg', io: File.open('path/to/beagle.jpg', 'r'))
   item.add_file(name: 'great_dane.jpg', io: File.open('path/to/great_dane.jpg', 'r'))
-  item.add_web_url(url: 'http://www.wetransfer.com', title: 'WeTransfer Website')
+  item.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
 end
 ```
 

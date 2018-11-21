@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe WeTransfer::BoardBuilder do
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-  let(:subject) { described_class.new(client: client)}
+  let(:subject) { described_class.new(client: client) }
   describe '#initialize' do
     it 'initializes with instance variable @files' do
       expect(subject.instance_variables).to include(:@files)

@@ -13,7 +13,7 @@ require_relative 'we_transfer_client/remote_transfer'
 require_relative 'we_transfer_client/remote_board'
 require_relative 'we_transfer_client/remote_link'
 require_relative 'we_transfer_client/remote_file'
-require_relative 'we_transfer_client/transfers'
+require_relative 'we_transfer_client/transfer'
 require_relative 'we_transfer_client/board'
 
 module WeTransfer

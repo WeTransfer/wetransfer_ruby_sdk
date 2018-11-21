@@ -7,7 +7,11 @@ module WeTransfer
       @client ||= client
       @name = name.to_s
       @size = size.to_i
+      @state = PENDING
     end
+
+    COMPLETED = 'completed'
+    PENDING = 'pending'
 
     def to_request_params
       {
@@ -17,6 +21,7 @@ module WeTransfer
     end
 
     def add_to_board(remote_board:)
+      return if @state == COMPLETED
       @parent_object = remote_board
       check_for_duplicates
       @client.authorize_if_no_bearer_token!
@@ -29,6 +34,7 @@ module WeTransfer
       file_item = JSON.parse(response.body, symbolize_names: true).first
       @remote_file ||= WeTransfer::RemoteFile.new(file_item.merge(client: @client))
       @parent_object.items << @remote_file
+      @state = COMPLETED
       @remote_file
     end
 
@@ -67,7 +73,7 @@ module WeTransfer
     end
 
     def select_file_on_name(name:)
-      @remote_file ||=  files.select{ |f| f.name == name }.first
+      @remote_file ||= files.select { |f| f.name == name }.first
       return @remote_file if @remote_file
       raise WeTransfer::TransferIOError, 'File not found'
     end
@@ -80,9 +86,9 @@ module WeTransfer
 
     def ensure_io_compliant!(io)
       io.seek(0)
-      io.read(1) # Will cause things like Errno::EACCESS to happen early, before the upload begins
-      io.seek(0) # Also rewinds the IO for later uploading action
-      size = io.size # Will cause a NoMethodError
+      io.read(1) # Could raise  Errno::EACCESS and IOError
+      io.seek(0)
+      size = io.size # Could cause a NoMethodError
       raise TransferIOError, "#{File.basename(io)}, given to add_file has a size of 0" if size <= 0
     rescue NoMethodError, IOError
       raise TransferIOError, "#{File.basename(io)}, given to add_file must respond to seek(), read() and size(), but #{io.inspect} did not"

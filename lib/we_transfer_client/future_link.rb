@@ -6,7 +6,11 @@ module WeTransfer
       @client = client
       @url = url.to_str
       @title = title.to_str
+      @state = PENDING
     end
+
+    COMPLETED = 'completed'
+    PENDING = 'pending'
 
     def to_request_params
       {
@@ -16,6 +20,7 @@ module WeTransfer
     end
 
     def add_to_board(remote_board:)
+      return if @state == COMPLETED
       @parent_object = remote_board
       check_for_duplicates
       @client.authorize_if_no_bearer_token!
@@ -28,6 +33,7 @@ module WeTransfer
       file_item = JSON.parse(response.body, symbolize_names: true).first
       @remote_link = WeTransfer::RemoteLink.new(file_item)
       @parent_object.items << @remote_link
+      @state = COMPLETED
       @remote_link
     end
 

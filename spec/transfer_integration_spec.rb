@@ -3,53 +3,57 @@
 require 'spec_helper'
 
 describe WeTransfer::Client do
-
   let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
   let(:file_locations) { %w[Japan-01.jpg Japan-02.jpg] }
 
   describe 'Transfers' do
-    pending 'creates a transfer with multiple files' do
-      fail
-      transfer = client.create_transfer(message: 'Japan: 🏯 & 🎎') do |builder|
-        file_locations.each do |file_location|
-          builder.add_file(name: File.basename(file_location), io: File.open(fixtures_dir + file_location, 'rb'))
-        end
+    it 'creates a transfer with multiple files', :focus do
+
+      transfer = WeTransfer::Transfer.new(message: File.basename(__FILE__)) do |f|
+        f.add_and_upload_file(name: File.basename(__FILE__), size: File.size(__FILE__))
       end
 
-      expect(transfer).to be_kind_of(RemoteTransfer)
+      binding.pry
+      # transfer = client.create_transfer(message: 'Japan: 🏯 & 🎎') do |builder|
+      #   file_locations.each do |file_location|
+      #     builder.add_file(name: File.basename(file_location), io: File.open(fixtures_dir + file_location, 'rb'))
+      #   end
+      # end
 
-      # it has an url that is not available (yet)
-      expect(transfer.url).to be(nil)
-      # it has no files (yet)
-      expect(transfer.files.first.url).to be(nil)
-      # it is in an uploading state
-      expect(transfer.state).to eq('uploading')
+      # expect(transfer).to be_kind_of(RemoteTransfer)
 
-      # TODO: uncouple file_locations and transfer.files
-      file_locations.each_with_index do |location, index|
-        client.upload_file(
-          object: transfer,
-          file: transfer.files[index],
-          io: File.open(fixtures_dir + location, 'rb')
-        )
-        client.complete_file!(
-          object: transfer,
-          file: transfer.files[index]
-        )
-      end
+      # # it has an url that is not available (yet)
+      # expect(transfer.url).to be(nil)
+      # # it has no files (yet)
+      # expect(transfer.files.first.url).to be(nil)
+      # # it is in an uploading state
+      # expect(transfer.state).to eq('uploading')
 
-      result = client.complete_transfer(transfer: transfer)
+      # # TODO: uncouple file_locations and transfer.files
+      # file_locations.each_with_index do |location, index|
+      #   client.upload_file(
+      #     object: transfer,
+      #     file: transfer.files[index],
+      #     io: File.open(fixtures_dir + location, 'rb')
+      #   )
+      #   client.complete_file!(
+      #     object: transfer,
+      #     file: transfer.files[index]
+      #   )
+      # end
 
-      # it has an url that is available
-      expect(result.url =~ %r|^https://we.tl/t-|).to be_truthy
+      # result = client.complete_transfer(transfer: transfer)
 
-      # it is in a processing state
-      expect(result.state).to eq('processing')
+      # # it has an url that is available
+      # expect(result.url =~ %r|^https://we.tl/t-|).to be_truthy
 
-      response = Faraday.get(result.url)
-      # it hits the short-url with redirect
-      expect(response.status).to eq(302)
-      expect(response['location']).to start_with('https://wetransfer.com/')
+      # # it is in a processing state
+      # expect(result.state).to eq('processing')
+
+      # response = Faraday.get(result.url)
+      # # it hits the short-url with redirect
+      # expect(response.status).to eq(302)
+      # expect(response['location']).to start_with('https://wetransfer.com/')
     end
   end
 end

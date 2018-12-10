@@ -1,7 +1,7 @@
 class RemoteTransfer
   attr_reader :files, :url, :state, :id
 
-  def initialize(id:, state:, url:, message:, files: [])
+  def initialize(id:, state:, url:, message:, files: [], **)
     @id = id
     @state = state
     @message = message

@@ -7,6 +7,7 @@ describe RemoteTransfer do
       state: 'uploading',
       message: 'Test transfer',
       url: nil,
+      success: true,
       files:
         [
           {

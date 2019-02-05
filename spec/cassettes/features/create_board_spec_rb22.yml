@@ -1,0 +1,109 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/authorize
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '252'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:19:25 GMT
+      X-Amzn-Requestid:
+      - 8b5544b7-ef3b-11e8-be0a-47a3ad81d605
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=300; includeSubdomains
+      X-Amz-Apigw-Id:
+      - Q0tGGGsBDoEFlrg=
+      X-Amzn-Trace-Id:
+      - Root=1-5bf8288d-805cf4401271e8a244424b78;Sampled=0
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 919df27e6545a230c475c50a2dc46d7e.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - MKqzLppNRw5jXmaQPQNGbPbcSp_r4SupueWpTTRMHsRpnUu7Rp1KeQ==
+    body:
+      encoding: UTF-8
+      string: "  {\n    \"success\" : true,\n    \"token\": \"<SENSITIVE>\"\n  }\n
+        \ "
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:19:25 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "name": "",
+          "description": "Test the functionality of the SDK"
+        }
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '124'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:19:25 GMT
+      X-Amzn-Requestid:
+      - 8b78ab27-ef3b-11e8-8978-17a5e5b75608
+      X-Amz-Apigw-Id:
+      - Q0tGIEI6DoEF0ew=
+      X-Amzn-Trace-Id:
+      - Root=1-5bf8288d-5a9771acce51feed18a3030f;Sampled=0
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 8e55f0de4d538f549650ba46e729188c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - XvfV1peTrD-Hq1isNZ1FDF_R5tV96L_oQHxJpTxEGWxm2dQYXF76NA==
+    body:
+      encoding: UTF-8
+      string: '{"success":false,"message":"\"board.name\" is not allowed to be empty.
+        See https://developers.wetransfer.com/documentation"}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:19:25 GMT
+recorded_with: VCR 3.0.3

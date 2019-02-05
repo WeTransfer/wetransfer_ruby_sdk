@@ -1,0 +1,225 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/authorize
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '252'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 01 Feb 2019 09:41:51 GMT
+      X-Amzn-Requestid:
+      - 99ec9011-2605-11e9-aed8-a3a72aa98511
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=300; includeSubdomains
+      X-Amz-Apigw-Id:
+      - Uage2GJDjoEF34w=
+      X-Amzn-Trace-Id:
+      - Root=1-5c54145f-95b42a249a1cddbc6d21da54;Sampled=0
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 ab893471b5a59476ea5ac37775a1c16c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - XpuGkoKd3LlzF7iUvBICXPOKa31AkZxVhQRLXIjqj7m5isLCUNaNUg==
+    body:
+      encoding: UTF-8
+      string: "  {\n    \"success\" : true,\n    \"token\": \"<SENSITIVE>\"\n  }\n
+        \ "
+    http_version: 
+  recorded_at: Fri, 01 Feb 2019 09:41:51 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/transfers
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "message": "Testcase",
+          "files": [
+            {
+              "name": "small",
+              "size": 1
+            }
+          ]
+        }
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '129'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 01 Feb 2019 09:41:51 GMT
+      X-Amzn-Requestid:
+      - 9a33d218-2605-11e9-8f95-c12392248b18
+      X-Amz-Apigw-Id:
+      - Uage7EJyjoEFpCA=
+      X-Amzn-Trace-Id:
+      - Root=1-5c54145f-e00a1016cd4cbec52ecf2051;Sampled=0
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 84181e9506b7e75393f77c574cba4387.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - Njwc_8_dSuF-GykzwUoG5XLvj71ek3DDR2XOXPKivk8CAvLvktQdYQ==
+    body:
+      encoding: UTF-8
+      string: '{"success":false,"message":"\"transfer.files.size\" must be greater
+        than 1. See https://developers.wetransfer.com/documentation"}'
+    http_version: 
+  recorded_at: Fri, 01 Feb 2019 09:41:51 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/authorize
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '252'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 01 Feb 2019 11:49:02 GMT
+      X-Amzn-Requestid:
+      - 5e8860fd-2617-11e9-9b3c-e5ee0546444a
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=300; includeSubdomains
+      X-Amz-Apigw-Id:
+      - UazHPGw2joEF8cQ=
+      X-Amzn-Trace-Id:
+      - Root=1-5c54322e-f5e922cbf6ff33a938bc89d5;Sampled=0
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 6b9307a4ff156c1982d7df5743ccd46d.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - dOFAgFwN_4jZAOZQ0auJaB-dkYcb20OqQEiQyzw1YWLM7mPc191lvg==
+    body:
+      encoding: UTF-8
+      string: "  {\n    \"success\" : true,\n    \"token\": \"<SENSITIVE>\"\n  }\n
+        \ "
+    http_version: 
+  recorded_at: Fri, 01 Feb 2019 11:49:02 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/transfers
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "message": "Testcase",
+          "files": [
+            {
+              "name": "small",
+              "size": 1
+            }
+          ]
+        }
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '129'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 01 Feb 2019 11:49:03 GMT
+      X-Amzn-Requestid:
+      - 5ed6a7d3-2617-11e9-a35a-db9f5b7dc079
+      X-Amz-Apigw-Id:
+      - UazHUH_KjoEFo9A=
+      X-Amzn-Trace-Id:
+      - Root=1-5c54322e-0c0919502b6e393045b07000;Sampled=0
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 fe843ed327cefb9c06d08a7369d7ed2c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - Jzt8g_EA97RDz834yp87kjf648TO3UIQoDbxU3rup9lwb-TYE-ShVw==
+    body:
+      encoding: UTF-8
+      string: '{"success":false,"message":"\"transfer.files.size\" must be greater
+        than 1. See https://developers.wetransfer.com/documentation"}'
+    http_version: 
+  recorded_at: Fri, 01 Feb 2019 11:49:03 GMT
+recorded_with: VCR 3.0.3

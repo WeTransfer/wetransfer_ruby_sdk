@@ -1,0 +1,120 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/authorize
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '252'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:19:50 GMT
+      X-Amzn-Requestid:
+      - 99dff444-ef3b-11e8-8978-17a5e5b75608
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=300; includeSubdomains
+      X-Amz-Apigw-Id:
+      - Q0tJ6FvFDoEF0ew=
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828a5-aa762ca4680045306f0744c3;Sampled=0
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 9b2d149ed73388c68a54b134bfe81238.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - 9GIHiWYk-g6yolfrsS2I-AKajbK6NSHrvdI3DjfUdTP4bIrhuHmPNw==
+    body:
+      encoding: UTF-8
+      string: "  {\n    \"success\" : true,\n    \"token\": \"<SENSITIVE>\"\n  }\n
+        \ "
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:19:50 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "name": "board_test",
+          "description": ""
+        }
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '163'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:19:50 GMT
+      X-Amzn-Requestid:
+      - 9a05f27a-ef3b-11e8-a097-c542013a52d7
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '209'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tJ8GlaDoEFvXg=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828a6-0a2e16d03f38eed8cfd2272a;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:19:50 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 1b560ac8d85778ec3bf92ca7a40d464a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - FijHZFffU1NfSawcTrkRCE36h7T0mrYOFFJl_rHTg_zLFmxYYgJBng==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"id":"sji5vaw6n7r61upet20181123161950","state":"downloadable","url":"https://we.tl/b-WfA01kTgHv","name":"board_test","description":null,"items":[]}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:19:50 GMT
+recorded_with: VCR 3.0.3

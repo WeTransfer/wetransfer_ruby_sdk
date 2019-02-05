@@ -106,7 +106,6 @@ After you create your client, you can
 
 ### Create a board and upload items
 
-
 ```ruby
 board = client.create_board(name: 'Meow', description: 'On Cats') do |items|
   items.add_file(name: 'big file.jpg', io: File.open('/path/to/huge_file.jpg', 'rb')items.add_file_at(path: '/path/to/another/file.txt')
@@ -120,7 +119,7 @@ You've just created a board. It is visible on the internet, to share it with any
 
 ## Development
 
-You'll need to retrieve an API key from [our developer portal](https://developers.wetransfer.com), and as described above, store it in a local `.env` file. As always, do not commit this file to github! :)
+You'll need to retrieve an API key from [the developer portal](https://developers.wetransfer.com), and as described above, store it in a local `.env` file. As always, do not commit this file to github! :)
 
 After forking and cloning down the repo, run `bundle install` to install dependencies. Then, run `bundle exec rspec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 

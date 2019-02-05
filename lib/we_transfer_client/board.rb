@@ -1,11 +1,14 @@
 module WeTransfer
   class Board
+    extend WeTransfer::CommunicationHelper
+    include WeTransfer::CommunicationHelper
+
     attr_reader :remote_board
 
     def initialize(client:, name:, description: nil)
       @client = client
       @remote_board = create_remote_board(name: name, description: description)
-      @builder = WeTransfer::BoardBuilder.new(client: @client)
+      @builder = WeTransfer::BoardBuilder.new(board: self)
     end
 
     def add_items
@@ -29,18 +32,17 @@ module WeTransfer
 
     def create_remote_board(name:, description:, future_board_class: FutureBoard)
       future_board = future_board_class.new(name: name, description: description)
-      @client.authorize_if_no_bearer_token!
-      response = @client.faraday.post(
+      response = request_as.post(
         '/v2/boards',
-        JSON.pretty_generate(future_board.to_initial_request_params),
-        @client.auth_headers.merge('Content-Type' => 'application/json')
+        future_board.to_initial_request_params.to_json,
       )
-      @client.ensure_ok_status!(response)
-      WeTransfer::RemoteBoard.new(JSON.parse(response.body, symbolize_names: true))
+      ensure_ok_status!(response)
+      WeTransfer::RemoteBoard.new({client: @client}.merge(JSON.parse(response.body, symbolize_names: true)))
     end
 
     def add_items_to_remote_board(future_items:)
       future_items.group_by(&:class).each do |_group, grouped_items|
+        binding.pry
         grouped_items.each do |item|
           item.add_to_board(remote_board: @remote_board)
         end

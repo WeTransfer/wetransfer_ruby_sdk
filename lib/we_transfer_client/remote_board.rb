@@ -6,7 +6,7 @@ module WeTransfer
 
     CHUNK_SIZE = 6 * 1024 * 1024
 
-    def initialize(id:, state:, url:, name:, description: '', items: [], **_omitted)
+    def initialize(id:, state:, url:, name:, client:, description: '', items: [], **)
       @id = id
       @state = state
       @url = url

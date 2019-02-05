@@ -8,7 +8,7 @@ describe FutureTransfer do
       expect(transfer.new(message: 'transfer').files).to be_kind_of(Array)
     end
 
-    it 'throws a error when message is not given' do
+    it 'raises an error when message is not given' do
       expect {
         transfer.new
       }.to raise_error ArgumentError

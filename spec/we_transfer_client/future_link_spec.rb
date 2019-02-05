@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe WeTransfer::FutureLink do
   let(:params) { { url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal', client: client } }
-  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger) }
   let(:board) { WeTransfer::Board.new(client: client, name: 'future_file_spec.rb', description: 'this test the behaviour of the future_file') }
   let(:link) { described_class.new(params) }
   let(:fake_remote_board) {
@@ -34,13 +34,13 @@ describe WeTransfer::FutureLink do
       described_class.new(params)
     end
 
-    it 'raises a error when input cant be converted to string' do
+    it 'raises an error when input cant be converted to string' do
       expect {
         described_class.new(url: 'https://www.developers.wetransfer.com', title: 12354, client: client)
       }.to raise_error NoMethodError, /undefined method `to_str'/
     end
 
-    it 'raises a error when nil passed as argument' do
+    it 'raises an error when nil passed as argument' do
       expect {
         described_class.new(url: nil, title: 12354, client: client)
       }.to raise_error NoMethodError, /undefined method `to_str'/
@@ -67,7 +67,7 @@ describe WeTransfer::FutureLink do
       expect(response).to be_kind_of(WeTransfer::RemoteLink)
     end
 
-    it 'raises an error when board doenst exists' do
+    it "raises an error when board doesn't exists" do
       expect {
         link.add_to_board(remote_board: fake_remote_board)
       }.to raise_error WeTransfer::Client::Error, /This board does not exist/

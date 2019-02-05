@@ -4,7 +4,7 @@ describe WeTransfer::RemoteTransfer do
   before do
     skip
   end
-  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger) }
   let(:params) {
     {
       id: '2ae97886522f375c1c6696799a56f0d820180912075119',
@@ -63,7 +63,7 @@ describe WeTransfer::RemoteTransfer do
     end
   end
 
-  describe '#files_to_class' do
+  describe '#instantiate_files' do
     it 'creates classes of remote files' do
       transfer = described_class.new(params)
       expect(transfer.files.map(&:class)).to eq([WeTransfer::RemoteFile, WeTransfer::RemoteFile])

@@ -1,9 +1,8 @@
-
 require 'spec_helper'
 
 describe WeTransfer::RemoteBoard do
   subject { described_class.new(params) }
-  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger) }
   let(:board) { WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
   let(:fake_remote_file) {
     WeTransfer::RemoteFile.new(
@@ -27,6 +26,7 @@ describe WeTransfer::RemoteBoard do
       url: 'http://wt.tl/123abcd',
       name: 'RemoteBoard',
       description: 'Test Description',
+      board: board,
       items: [
         {
           id: 's7l1urvgqs1b6u9v720180911093825',
@@ -42,12 +42,26 @@ describe WeTransfer::RemoteBoard do
         {
           id: 'storr6ua2l1fsl8lt20180911093826',
           url: 'https://www.developers.wetransfer.com',
-          meta: {title: 'WeTransfer Dev Portal'},
+          meta: { title: 'WeTransfer Dev Portal' },
           type: 'link',
         }
       ],
       success: true,
     }
+  }
+
+  let!(:authentication_stub) {
+    stub_request(:post, "#{WeTransfer::CommunicationHelper::API_URI_BASE}/v2/authorize")
+      .to_return(status: 200, body: {token: 'test-token'}.to_json, headers: {})
+  }
+  let!(:board_create_stub) {
+    stub_request(:post, "#{WeTransfer::CommunicationHelper::API_URI_BASE}/v2/boards")
+      .to_return(status: 200, body: {
+        id: "fakeBoardId",
+        state: "testState",
+        url: "we.tl/b-1234321",
+        name: "meh",
+      }.to_json, headers: {})
   }
 
   describe '#initializer' do
@@ -136,13 +150,13 @@ describe WeTransfer::RemoteBoard do
       expect(resp[:message]).to eq('File is marked as complete.')
     end
 
-    it 'returns an error when file is not uploaded' do
+    it 'raises an error when file is not uploaded' do
       expect {
         subject.prepare_file_completion(file: remote_file)
       }.to raise_error WeTransfer::Client::Error, /expected at least 1 part/
     end
 
-    it 'returns an error when file is not in collection' do
+    it 'raises an error when file is not in collection' do
       expect {
         subject.prepare_file_completion(file: fake_remote_file)
       }.to raise_error WeTransfer::Client::Error, /File not found./
@@ -163,7 +177,7 @@ describe WeTransfer::RemoteBoard do
     end
   end
 
-  describe '#links' do
+  describe '#links', :focus do
     before do
       @new_board = WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
       @new_board.add_items do |f|

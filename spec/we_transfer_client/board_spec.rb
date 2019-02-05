@@ -1,28 +1,27 @@
 require 'spec_helper'
 
-require_relative '../../lib/we_transfer_client.rb'
-
 describe WeTransfer::Board do
-  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger) }
+  let(:small_file_location) { fixtures_dir + 'small_file.1.txt' }
   describe 'Initialize' do
-    it 'creates a empty board ' do
-      expect(described_class.new(client: client, name: 'New Board', description: 'This is the description')).to be_kind_of(WeTransfer::Board)
-    end
-
     it 'has client, future and remote board as instance_variable' do
-      expect(described_class.new(client: client, name: 'New Board', description: 'This is the description').instance_variables).to include(:@client, :@remote_board)
+      WtVCR.laserdisc do
+        expect(described_class.new(client: client, name: 'New Board', description: 'This is the description').instance_variables).to include(:@client, :@remote_board)
+      end
     end
 
     it 'creates a board and uploads the files' do
-      board = described_class.new(client: client, name: 'test', description: 'test description')
-      board.add_items do |b|
-        b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
-        b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
+      WtVCR.laserdisc do
+        board = described_class.new(client: client, name: 'test', description: 'test description')
+        board.add_items do |b|
+          b.add_file(name: File.basename(small_file_location), size: File.size(small_file_location))
+          b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
+        end
+
+        expect(board.remote_board).to be_kind_of(WeTransfer::RemoteBoard)
+        expect(board.remote_board.url).to start_with('https://we.tl/')
+        expect(board.remote_board.state).to eq('downloadable')
       end
-      expect(board.remote_board).to be_kind_of(WeTransfer::RemoteBoard)
-      expect(board.remote_board.url).to start_with('https://we.tl/')
-      expect(board.remote_board.state).to eq('downloadable')
     end
   end
 
@@ -31,119 +30,136 @@ describe WeTransfer::Board do
       described_class.new(client: client, name: 'Board', description: 'pre-made board')
     }
 
-    it 'adds items to a remote board' do
-      board.add_items do |b|
-        b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
-        b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
-        b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
-        b.add_file_at(path: fixtures_dir + 'Japan-02.jpg')
+    # it 'adds items to a remote board' do
+    #   board.add_items do |b|
+    #     b.add_file(name: File.basename(small_file_location), size: File.size(small_file_location))
+    #     b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
+    #     b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
+    #     b.add_file_at(path: fixtures_dir + 'Japan-02.jpg')
+    #   end
+    #   expect(board.remote_board.items.count).to eq(4)
+    #   expect(board.remote_board.files.count).to eq(3)
+    # end
+
+    it 'raises an error when a filename already exists in the board' do
+      WtVCR.laserdisc do
+        expect {
+          board.add_items do |b|
+            b.add_file(name: File.basename(small_file_location), size: File.size(small_file_location))
+            b.add_file(name: File.basename(small_file_location), size: File.size(small_file_location))
+          end
+        }.to raise_error WeTransfer::TransferIOError, 'Duplicate file entry'
       end
-      expect(board.remote_board.items.count).to eq(4)
-      expect(board.remote_board.files.count).to eq(3)
     end
 
-    it 'throws a error when a filename already exists in the board' do
-      expect {
-        board.add_items do |b|
-          b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
-          b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
-        end
-      }.to raise_error WeTransfer::TransferIOError, 'Duplicate file entry'
-    end
-
-    it 'throws a error when a links already exisits in the board' do
-      expect {
-        board.add_items do |b|
-          b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
-          b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
-        end
-      }.to raise_error WeTransfer::TransferIOError, 'Duplicate link entry'
+    it 'raises an error when a links already exisits in the board' do
+      WtVCR.laserdisc do
+        expect {
+          board.add_items do |b|
+            b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
+            b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
+          end
+        }.to raise_error WeTransfer::TransferIOError, 'Duplicate link entry'
+      end
     end
   end
 
   describe '#upload_file!' do
-    before do
+    let(:board) {
+      board = described_class.new(client: client, name: 'Board', description: 'pre-made board')
       board.add_items do |b|
         b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
-        b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
-        b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
+        b.add_file(name: File.basename(small_file_location), size: File.size(small_file_location))
       end
-    end
-
-    let(:board) {
-      described_class.new(client: client, name: 'Board', description: 'pre-made board')
+      board
     }
 
     it 'after adding links and files the files are uploaded to the board' do
-      expect {
-        board.upload_file!(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
-        board.upload_file!(io: File.open(fixtures_dir + 'Japan-01.jpg', 'rb'))
-      }.not_to raise_error
+      WtVCR.laserdisc do
+        expect {
+          board.upload_file!(name: File.basename(small_file_location), io: File.open(small_file_location, 'rb'))
+        }.not_to raise_error
+      end
     end
 
-    it 'raises a error when io keyword is missing' do
-      expect {
-        board.upload_file!(name: File.basename(__FILE__))
-      }.to raise_error ArgumentError
+    it 'raises an error when io keyword is missing' do
+      WtVCR.laserdisc do
+        expect {
+          board.upload_file!(name: File.basename(small_file_location))
+        }.to raise_error ArgumentError
+      end
     end
 
-    it 'returns a error when trying to upload non existing files' do
-      expect {
-        board.upload_file!(name: 'nowhere.gif', io: File.open('/this/is/a/path/to/nowhere.gif', 'rb'))
-      }.to raise_error Errno::ENOENT
+    it 'raises an error when trying to upload non existing files' do
+      WtVCR.laserdisc do
+        expect {
+          board.upload_file!(name: 'nowhere.gif', io: File.open('/this/is/a/path/to/nowhere.gif', 'rb'))
+        }.to raise_error Errno::ENOENT
+      end
     end
 
-    it 'returns an error when file size doenst match' do
-      expect {
-        board.upload_file!(name: 'Japan-01.jpg', io: File.open(fixtures_dir + 'Japan-02.jpg', 'rb'))
-      }.to raise_error WeTransfer::TransferIOError
+    it "raises an error when file size doesn't match" do
+      WtVCR.laserdisc do
+        expect {
+          board.upload_file!(name: 'Japan-01.jpg', io: File.open(small_file_location))
+        }.to raise_error WeTransfer::TransferIOError
+      end
     end
 
     it 'uploads a file if name and path are given' do
-      expect {
-        board.upload_file!(name: 'Japan-01.jpg', io: File.open(fixtures_dir + 'Japan-01.jpg', 'rb'))
-      }.not_to raise_error
+      WtVCR.laserdisc do
+        expect {
+          board.upload_file!(name: File.basename(small_file_location), io: File.open(small_file_location, 'rb'))
+        }.not_to raise_error
+      end
     end
 
     it 'returns a RemoteFile after uploading' do
-      response = board.upload_file!(name: 'Japan-01.jpg', io: File.open(fixtures_dir + 'Japan-01.jpg', 'rb'))
-      expect(response).to be_kind_of(WeTransfer::RemoteFile)
+      WtVCR.laserdisc do
+        response = board.upload_file!(name: File.basename(small_file_location), io: File.open(small_file_location, 'rb'))
+
+        expect(response).to be_kind_of(WeTransfer::RemoteFile)
+      end
     end
   end
 
   describe '#complete_file' do
-    before do
+    let(:board) {
+      board = described_class.new(client: client, name: 'Board', description: 'pre-made board')
       board.add_items do |b|
         b.add_web_url(url: 'https://www.developers.wetransfer.com', title: 'WeTransfer Dev Portal')
-        b.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
+        b.add_file(name: File.basename(small_file_location), size: File.size(small_file_location))
         b.add_file_at(path: fixtures_dir + 'Japan-01.jpg')
       end
 
-      board.upload_file!(name: File.basename(__FILE__), io: File.open(__FILE__, 'rb'))
+      board.upload_file!(name: File.basename(small_file_location), io: File.open(small_file_location, 'rb'))
       board.upload_file!(io: File.open(fixtures_dir + 'Japan-01.jpg', 'rb'))
-    end
-
-    let(:board) {
-      described_class.new(client: client, name: 'Board', description: 'pre-made board')
+      board
     }
 
-    it 'completes files without raising a error' do
-      expect {
-        board.complete_file!(name: 'Japan-01.jpg')
-        board.complete_file!(name: File.basename(__FILE__))
-      }.not_to raise_error
+    it 'completes files without raising an error' do
+      WtVCR.laserdisc do
+        expect {
+          board.complete_file!(name: 'Japan-01.jpg')
+          board.complete_file!(name: File.basename(small_file_location))
+        }.not_to raise_error
+      end
     end
 
-    it 'raises an error when file doenst exists' do
-      expect {
-        board.complete_file!(name: 'i-do-not-exist.gif')
-      }.to raise_error WeTransfer::TransferIOError
+    it "raises an error when file doesn't exists" do
+      WtVCR.laserdisc do
+        expect {
+          board.complete_file!(name: 'i-do-not-exist.gif')
+        }.to raise_error WeTransfer::TransferIOError
+      end
     end
 
-    it 'raises an error when file doenst match' do
-      expect {
-        board.complete_file!(name: 'Japan-02.jpg')
-      }.to raise_error WeTransfer::TransferIOError
+    it "raises an error when file doesn't match" do
+      WtVCR.laserdisc do
+        expect {
+          board.complete_file!(name: 'Japan-02.jpg')
+        }.to raise_error WeTransfer::TransferIOError
+      end
     end
   end
 end

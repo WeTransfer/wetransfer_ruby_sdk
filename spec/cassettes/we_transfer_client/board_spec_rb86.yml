@@ -1,0 +1,256 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/authorize
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '252'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:21:34 GMT
+      X-Amzn-Requestid:
+      - d7e777ef-ef3b-11e8-ba93-7f09837446a6
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=300; includeSubdomains
+      X-Amz-Apigw-Id:
+      - Q0taLFayDoEFWHg=
+      X-Amzn-Trace-Id:
+      - Root=1-5bf8290d-442c81164771267882438010;Sampled=0
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 8e55f0de4d538f549650ba46e729188c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - POaz-4VwBTfJdc2O3A569Zl_KxTcAS8qHEDOlsgZZQu0pdrrV-VeGA==
+    body:
+      encoding: UTF-8
+      string: "  {\n    \"success\" : true,\n    \"token\": \"<SENSITIVE>\"\n  }\n
+        \ "
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:21:34 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "name": "Board",
+          "description": "pre-made board"
+        }
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '170'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:21:34 GMT
+      X-Amzn-Requestid:
+      - d8116ec7-ef3b-11e8-a878-d9ad4fdd9789
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '216'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0taNGMGjoEF_AQ=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf8290e-3bd96968709864f00bd2f378;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:21:34 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 b2053f9f1abb60895bf31f80837ba9b6.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - lXF-VfUZvSIk_a4JigDLkk5UqaNjWPgKlts3gKp2eEQSq9noJ3X36A==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"id":"spx33net8k4fca1l720181123162134","state":"downloadable","url":"https://we.tl/b-8fNMC7aSUC","name":"Board","description":"pre-made
+        board","items":[]}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:21:34 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards/spx33net8k4fca1l720181123162134/files
+    body:
+      encoding: UTF-8
+      string: |-
+        [
+          {
+            "name": "small_file.1.txt",
+            "size": 4
+          }
+        ]
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '297'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:21:34 GMT
+      X-Amzn-Requestid:
+      - d83c9d34-ef3b-11e8-bb80-f760926d4b92
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '1975'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0taQHmVjoEF5mg=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf8290e-ced13652c0dbb2a8b59920f1;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:21:34 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 fe843ed327cefb9c06d08a7369d7ed2c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - SgkQriCziNJcwODh5zZ8KGgbPSHD-H5XeyQQN0zv0PYgb9OsGIXaFg==
+    body:
+      encoding: UTF-8
+      string: '[{"id":"scnhg094p6mo2ki6w20181123162134","name":"small_file.1.txt","size":4,"multipart":{"id":"LIz8kFxP2IeYmhLR0WqWMVlwmwPm8_9BpTGVa3hXwW9B4Ai_Ke7VoP9SdlhXGYzOgtcrZGvQLufTTBvi7uGdPW31w3Vy7bo9TQ3S6Z0KweXkFURBMlZbgQbbJqmsjKdCHyKn_PsBL9_jXupaObyvXw--","part_numbers":1,"chunk_size":4},"type":"file"}]'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:21:34 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards/spx33net8k4fca1l720181123162134/links
+    body:
+      encoding: UTF-8
+      string: |-
+        [
+          {
+            "url": "https://www.developers.wetransfer.com",
+            "title": "WeTransfer Dev Portal"
+          }
+        ]
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '143'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:21:34 GMT
+      X-Amzn-Requestid:
+      - d860c739-ef3b-11e8-89fc-ad90739f8156
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '274'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0taTF9DjoEFlaA=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf8290e-913480d8335861201b14ab38;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:21:34 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 7a9ed25dd09a090668449cecd55a9d0d.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - vNCR37PiaIj6sCWZSpw0i_vw_E9UM9lIOGU5cPNFs4jcvqnugAqoBQ==
+    body:
+      encoding: UTF-8
+      string: '[{"id":"scd87z073jo2cbp4t20181123162134","url":"https://www.developers.wetransfer.com","meta":{"title":"WeTransfer
+        Dev Portal"},"type":"link"}]'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:21:34 GMT
+recorded_with: VCR 3.0.3

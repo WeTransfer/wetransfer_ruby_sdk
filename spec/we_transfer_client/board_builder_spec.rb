@@ -1,8 +1,34 @@
 require 'spec_helper'
 
 describe WeTransfer::BoardBuilder do
-  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-  let(:subject) { described_class.new(client: client) }
+  let(:client)  { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  let(:board)   {
+    WeTransfer::Board.new(
+      client: client,
+      name: 'test',
+      description: 'test description'
+    )
+  }
+  let(:subject) { described_class.new(board: board) }
+  let!(:authentication_stub) {
+    stub_request(:post, "#{WeTransfer::CommunicationHelper::API_URI_BASE}/v2/authorize")
+      .to_return(status: 200, body: {token: 'test-token'}.to_json, headers: {})
+  }
+
+  let!(:board_create_stub) {
+    stub_request(:post, "#{WeTransfer::CommunicationHelper::API_URI_BASE}/v2/boards")
+      .to_return(
+        status: 200,
+        body: {
+          id: "FakeBoardId",
+          state: "TestState",
+          url: "we.tl/b-12345",
+          name: "fake"
+        }.to_json,
+        headers: {}
+      )
+  }
+
   describe '#initialize' do
     it 'initializes with instance variable @files' do
       expect(subject.instance_variables).to include(:@files)
@@ -47,13 +73,13 @@ describe WeTransfer::BoardBuilder do
       subject.add_file(name: File.basename(__FILE__), size: File.size(__FILE__))
     end
 
-    it 'returns an error when name is missing' do
+    it 'raises an error when name is missing' do
       expect {
         subject.add_file(size: File.size(__FILE__))
       }.to raise_error ArgumentError, /name/
     end
 
-    it 'returns an error when size is missing' do
+    it 'raises an error when size is missing' do
       expect {
         subject.add_file(name: File.basename(__FILE__))
       }.to raise_error ArgumentError, /size/

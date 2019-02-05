@@ -1,2 +1,8 @@
 inherit_gem:
   wetransfer_style: ruby/default.yml
+
+# Enforcing double quotes reduces the times where you need to change them
+# when introducing an interpolation, and reducing reading time - one quote to
+# rule them all.
+Style/StringLiterals:
+  EnforcedStyle: double_quotes

@@ -1,17 +1,22 @@
-require 'simplecov'
-require 'securerandom'
+require 'bundler'
+Bundler.setup
 
+require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/'
 end
 
+require 'securerandom'
 require 'we_transfer_client'
 require 'pry'
 require 'rspec'
-require 'bundler'
-Bundler.setup
 require 'tempfile'
 require 'dotenv'
+require 'vcr_setup'
+require 'webmock/rspec'
+# WebMock.disable_net_connect!
+# require './setup'
+
 Dotenv.load
 
 module SpecHelpers
@@ -25,6 +30,11 @@ module SpecHelpers
 end
 
 RSpec.configure do |config|
+  config.before(:each) do
+    # puts "sleeping"
+    # sleep 120 / 5.0
+  end
+
   config.include SpecHelpers
   config.extend SpecHelpers
 

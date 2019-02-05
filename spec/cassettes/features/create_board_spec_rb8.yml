@@ -1,0 +1,121 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/authorize
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '252'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:19:01 GMT
+      X-Amzn-Requestid:
+      - 7cb892aa-ef3b-11e8-b91f-7ff3c49015f4
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=300; includeSubdomains
+      X-Amz-Apigw-Id:
+      - Q0tCRHGcjoEF1nw=
+      X-Amzn-Trace-Id:
+      - Root=1-5bf82874-ed5480c4af7f0abe5be25928;Sampled=0
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 7a9ed25dd09a090668449cecd55a9d0d.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - rhMcHoOUY_FskK2hgtk_TOxo0NAEgQlW0Ok3uio4RuX2mamMNV72sw==
+    body:
+      encoding: UTF-8
+      string: "  {\n    \"success\" : true,\n    \"token\": \"<SENSITIVE>\"\n  }\n
+        \ "
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:19:01 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "name": "board test",
+          "description": "Test the functionality of the SDK"
+        }
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '194'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:19:01 GMT
+      X-Amzn-Requestid:
+      - 7cdb5d1d-ef3b-11e8-9e45-055f32ca03bc
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '240'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tCTGuLjoEFl_A=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf82875-a45ed6f7fa53a76a1b8ec117;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:19:01 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 5fe8343a80de49928fae39084e131a25.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - BOSPxfaXbQiev0xmVi8Apn7f3f1Sd3Mj9mmu1hHHXoQMAxXa7UK-gg==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"id":"shebirix5wqj46xd320181123161901","state":"downloadable","url":"https://we.tl/b-Et7tgyfdn4","name":"board
+        test","description":"Test the functionality of the SDK","items":[]}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:19:01 GMT
+recorded_with: VCR 3.0.3

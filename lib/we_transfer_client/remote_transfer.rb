@@ -2,12 +2,15 @@ module WeTransfer
   class RemoteTransfer
     attr_reader :files, :url, :state, :id
 
-    def initialize(id:, state:, url:, message:, files: [])
+    def initialize(id:, state:, url:, message:, files: [], client:, **)
       @id = id
       @state = state
       @message = message
       @url = url
-      @files = files_to_class(files)
+      @client = client
+      @files = instantiate_files(files)
+      # Should this be frozen?
+      freeze
     end
 
     def prepare_file_upload(file:, part_number:)
@@ -20,8 +23,10 @@ module WeTransfer
       file.complete_transfer_file(transfer_id: @id)
     end
 
-    def files_to_class(files)
-      files.map { |x| WeTransfer::RemoteFile.new(x) }
+    def instantiate_files(files)
+      files.map do |file|
+        WeTransfer::RemoteFile.new(file.merge(transfer: self))
+      end
     end
   end
 end

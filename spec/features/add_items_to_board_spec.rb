@@ -1,7 +1,9 @@
 require 'spec_helper'
 
 describe WeTransfer::Board do
-  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
+  # let(:test_logger) { Logger.new(nil) }
+
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY', logger: test_logger)) }
   let(:board) do
     WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: 'Test the functionality of the SDK')
   end

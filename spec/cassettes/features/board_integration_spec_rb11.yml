@@ -1,0 +1,840 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/authorize
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '252'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:17 GMT
+      X-Amzn-Requestid:
+      - aa0f79e7-ef3b-11e8-9a36-cd78f37f9a2c
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=300; includeSubdomains
+      X-Amz-Apigw-Id:
+      - Q0tOKEv5joEFkEg=
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c1-011971536360db8ab07b4c47;Sampled=0
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 ff978d02ea59eea6b09e6414e6739603.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - efgQLDZ8xJgalMgNYgCwSZD2-gggjcSKsLCw0pFUU8yEiFh0nvsjhg==
+    body:
+      encoding: UTF-8
+      string: "  {\n    \"success\" : true,\n    \"token\": \"<SENSITIVE>\"\n  }\n
+        \ "
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:17 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "name": "Integration Test",
+          "description": "Test the functionality of this SDK"
+        }
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '201'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:17 GMT
+      X-Amzn-Requestid:
+      - aa3f6413-ef3b-11e8-ae10-a5c16f5e9265
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '247'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tONElDDoEFuIQ=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c1-576cbd980e2a462871ad3d58;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:17 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 1b560ac8d85778ec3bf92ca7a40d464a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - 71yZhm2FGfAEaJh2GHQYBQ8QgLPMW6N3aamWFGWuunzHjxCjzK3U_A==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"id":"si8a20pdx2cogk6kh20181123162017","state":"downloadable","url":"https://we.tl/b-EAmJEUkSLh","name":"Integration
+        Test","description":"Test the functionality of this SDK","items":[]}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:17 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/files
+    body:
+      encoding: UTF-8
+      string: |-
+        [
+          {
+            "name": "small_file.1.txt",
+            "size": 4
+          }
+        ]
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '297'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:17 GMT
+      X-Amzn-Requestid:
+      - aa6450de-ef3b-11e8-9d76-d988b36f779c
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '1985'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tOPHlGDoEF4TA=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c1-62eb0af94236efbc8b5559dc;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:17 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 6ff79e2331ef6a1ff8089b821bbb1a1f.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - nDr4KUmnS6d86Z0Y12hr3pw7ZgejaPETHYglDlXt32jGF2xhayZHpw==
+    body:
+      encoding: UTF-8
+      string: '[{"id":"s9e3vzgsuhaxtdsar20181123162017","name":"small_file.1.txt","size":4,"multipart":{"id":"YpSD1_10Knp4Hn071S3q4zr8SguCvwKtFN1tBKaGuOD23GPMYN4e1PNgT0tOf8r4ULoaNfMztlvfNCOJxmYkuPi5SpPtwNJBR3o4rGck9IA.4dhL0uBt5aPnu_omOm9j5JrNXDU5I4EvFcV6NHK94A--","part_numbers":1,"chunk_size":4},"type":"file"}]'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:17 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/files
+    body:
+      encoding: UTF-8
+      string: |-
+        [
+          {
+            "name": "small_file.2.txt",
+            "size": 4
+          }
+        ]
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '297'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:17 GMT
+      X-Amzn-Requestid:
+      - aa8b1347-ef3b-11e8-a5c8-e1f1a0b59e3d
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '1987'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tOSHWYjoEFatg=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c1-2a8b127b3b91f1e61841cd6d;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:17 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 9e5454fb922b04ff8f890bafc96e3458.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - 5Z6b0iWE6JeqqxZDDOD9Mrytg5cq4Pbw-d1HsKC8yKKjQZxpeQS3ZQ==
+    body:
+      encoding: UTF-8
+      string: '[{"id":"sszbra8864wk03igz20181123162017","name":"small_file.2.txt","size":4,"multipart":{"id":"eGPOPOzh0_AM2OfRF33.RlJFk9GcVUowPRiQ1c99JMRAlWHZaY_MjbRWcWbKU_IqN4bv7B4z._Hc4cFxCk5QgqkzxGFFNT0xaALk89Uit4_5vutuSIlXJQhd0RK5NRyMG5pxp6yEwCELNvFek7JXhA--","part_numbers":1,"chunk_size":4},"type":"file"}]'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:17 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/links
+    body:
+      encoding: UTF-8
+      string: |-
+        [
+          {
+            "url": "https://rubygems.org/gems/wetransfer",
+            "title": "WeTransfer Ruby SDK Rubygems"
+          }
+        ]
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '149'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:18 GMT
+      X-Amzn-Requestid:
+      - aaafd88c-ef3b-11e8-9857-8f145ca6a2ef
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '280'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tOUEZvDoEFaDA=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c2-9b26e158ab6aec0266f0e54e;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:18 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 823355654d69efaf19d467269c43b83a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - hPlOeu3DW_ZT1vIhr3ZlqpyyuUASkKrDxLesNQjGmhuEI6MmAfW3Xw==
+    body:
+      encoding: UTF-8
+      string: '[{"id":"s6m8058gorntjsuyc20181123162018","url":"https://rubygems.org/gems/wetransfer","meta":{"title":"WeTransfer
+        Ruby SDK Rubygems"},"type":"link"}]'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:18 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/links
+    body:
+      encoding: UTF-8
+      string: |-
+        [
+          {
+            "url": "https://github.com/WeTransfer/wetransfer_ruby_sdk",
+            "title": "WeTransfer Ruby SDK GitHub"
+          }
+        ]
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '160'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:18 GMT
+      X-Amzn-Requestid:
+      - aacf2076-ef3b-11e8-b5d3-fdcc613854fa
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '291'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tOWEacDoEFmnQ=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c2-2eef86b47e074fce114ad261;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:18 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 f28e24fc77d1445f54200a346eb5a04f.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - WTGKjnVNh3of7_CLGCvI-KkUOiqDCPCkuDGTPxT2GKV0obtmvKbLng==
+    body:
+      encoding: UTF-8
+      string: '[{"id":"s97v8j450vzyxor1620181123162018","url":"https://github.com/WeTransfer/wetransfer_ruby_sdk","meta":{"title":"WeTransfer
+        Ruby SDK GitHub"},"type":"link"}]'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:18 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/links
+    body:
+      encoding: UTF-8
+      string: |-
+        [
+          {
+            "url": "https://developers.wetransfer.com/",
+            "title": "WeTransfer Developers Website"
+          }
+        ]
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '148'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:18 GMT
+      X-Amzn-Requestid:
+      - aaf7de44-ef3b-11e8-8b10-19f89707cfc0
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '279'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tOZF-0DoEF_SQ=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c2-8a0ca716e9422ac4e8346de1;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:18 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 b2053f9f1abb60895bf31f80837ba9b6.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - i093SMK4YiUbwvYA8rWnjCCqUNfcce4YtFNYuyAeFnKi-PBaNf8owg==
+    body:
+      encoding: UTF-8
+      string: '[{"id":"shsclyp1mi4pxskx120181123162018","url":"https://developers.wetransfer.com/","meta":{"title":"WeTransfer
+        Developers Website"},"type":"link"}]'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:18 GMT
+- request:
+    method: get
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/files/s9e3vzgsuhaxtdsar20181123162017/upload-url/1/YpSD1_10Knp4Hn071S3q4zr8SguCvwKtFN1tBKaGuOD23GPMYN4e1PNgT0tOf8r4ULoaNfMztlvfNCOJxmYkuPi5SpPtwNJBR3o4rGck9IA.4dhL0uBt5aPnu_omOm9j5JrNXDU5I4EvFcV6NHK94A--
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '1332'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:18 GMT
+      X-Amzn-Requestid:
+      - ab152a23-ef3b-11e8-963b-3168bcf90a17
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '1578'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tObEmwjoEFeuQ=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c2-9aa53dc06904b8400852b1d0;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:18 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 ff978d02ea59eea6b09e6414e6739603.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - OWiznlHgzinzziW80s8nDE4MaU2ENrPrV8GghsBCta7mYmlYvpGs0Q==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"url":"https://wetransfer-eu-prod-spaceship.s3.eu-west-1.amazonaws.com/si8a20pdx2cogk6kh20181123162017/s9e3vzgsuhaxtdsar20181123162017?partNumber=1&uploadId=YpSD1_10Knp4Hn071S3q4zr8SguCvwKtFN1tBKaGuOD23GPMYN4e1PNgT0tOf8r4ULoaNfMztlvfNCOJxmYkuPi5SpPtwNJBR3o4rGck9IA.4dhL0uBt5aPnu_omOm9j5JrNXDU5I4EvFcV6NHK94A--&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAUNK32TAQ36GBOLNG%2F20181123%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20181123T162018Z&X-Amz-Expires=3600&X-Amz-Security-Token=FQoGZXIvYXdzENL%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDKilCSS7G%2FlwwdtuFiK3A%2BRQ9I5Y4dcQ24rYP9hUuCOnKHHmFDvyHnQY98U4cSJlLikvQisxr6PtKoadcmUqpv9dmWF%2FAqgAOJby3kH4rUHOebnXAc2cXUfO7aMY49Bv5DZlu4W14R0Gmkd8Oh7rkHj5Pf507gTjIPL7B4k8FVyIkEiCSVJ%2BrcfvUaQ27Hz272LUNgybDpc4vdgupH%2Bo2CZP%2FgGZVaGzL2WSnnskDAzOKBKav7YfS79kL1bRqit0OLgNlTi%2BeavGNq%2BgnorouxEwja1dawSoavyKFQICR%2BlMsMNjlRTlFv1kHNEzKWYtvydFsoeF2Fmz%2BaDDzUxxt63rxy%2BUChUWbY8BMxubGvKftlwj37cOULQ1q8e09ADTbPSWygxFS%2BjiHsoyU2%2Bno4qU3mw%2FUH%2FOwkmrs%2FetyCWUITfuIH8FjT%2BJcHpA7n%2BPrzldy15at7mFCwuZt9clYG2%2B6U31N3DVyhh%2BC1JkkGLz4QfZm8XgdVU9ScfNJzsZtC6SQPxMLDRZOo1VG88ZxM%2FRIUxgR0I%2Fq20GEl%2B5T0HCrrkUWk2C2uaqbvcQ%2BDqeSzLHXIo3UjeqAL0rdb6LJGmEGTLp8%2F8oq8zg3wU%3D&X-Amz-SignedHeaders=host&X-Amz-Signature=23e9fa2ba24a6eb8df42c1b4a5ac89ddc0579c9b2f4911e07531d391c7946fcf"}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:18 GMT
+- request:
+    method: put
+    uri: https://wetransfer-eu-prod-spaceship.s3.eu-west-1.amazonaws.com/si8a20pdx2cogk6kh20181123162017/s9e3vzgsuhaxtdsar20181123162017?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAUNK32TAQ36GBOLNG/20181123/eu-west-1/s3/aws4_request&X-Amz-Date=20181123T162018Z&X-Amz-Expires=3600&X-Amz-Security-Token=FQoGZXIvYXdzENL//////////wEaDKilCSS7G/lwwdtuFiK3A%2BRQ9I5Y4dcQ24rYP9hUuCOnKHHmFDvyHnQY98U4cSJlLikvQisxr6PtKoadcmUqpv9dmWF/AqgAOJby3kH4rUHOebnXAc2cXUfO7aMY49Bv5DZlu4W14R0Gmkd8Oh7rkHj5Pf507gTjIPL7B4k8FVyIkEiCSVJ%2BrcfvUaQ27Hz272LUNgybDpc4vdgupH%2Bo2CZP/gGZVaGzL2WSnnskDAzOKBKav7YfS79kL1bRqit0OLgNlTi%2BeavGNq%2BgnorouxEwja1dawSoavyKFQICR%2BlMsMNjlRTlFv1kHNEzKWYtvydFsoeF2Fmz%2BaDDzUxxt63rxy%2BUChUWbY8BMxubGvKftlwj37cOULQ1q8e09ADTbPSWygxFS%2BjiHsoyU2%2Bno4qU3mw/UH/Owkmrs/etyCWUITfuIH8FjT%2BJcHpA7n%2BPrzldy15at7mFCwuZt9clYG2%2B6U31N3DVyhh%2BC1JkkGLz4QfZm8XgdVU9ScfNJzsZtC6SQPxMLDRZOo1VG88ZxM/RIUxgR0I/q20GEl%2B5T0HCrrkUWk2C2uaqbvcQ%2BDqeSzLHXIo3UjeqAL0rdb6LJGmEGTLp8/8oq8zg3wU=&X-Amz-Signature=23e9fa2ba24a6eb8df42c1b4a5ac89ddc0579c9b2f4911e07531d391c7946fcf&X-Amz-SignedHeaders=host&partNumber=1&uploadId=YpSD1_10Knp4Hn071S3q4zr8SguCvwKtFN1tBKaGuOD23GPMYN4e1PNgT0tOf8r4ULoaNfMztlvfNCOJxmYkuPi5SpPtwNJBR3o4rGck9IA.4dhL0uBt5aPnu_omOm9j5JrNXDU5I4EvFcV6NHK94A--
+    body:
+      encoding: ASCII-8BIT
+      string: 'all
+
+'
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - binary/octet-stream
+      Content-Length:
+      - '4'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Amz-Id-2:
+      - fNegc/9Cyj/WhTDPilS8uHKVkyePVFmcwXnZ56J/sthanjjTKaL9Wg64C1a6hojF8SNEb/Y1CoM=
+      X-Amz-Request-Id:
+      - 46D299E5A00A0330
+      Date:
+      - Fri, 23 Nov 2018 16:20:19 GMT
+      Etag:
+      - '"4df9cc121afe1c00de4e9e396af4cdb1"'
+      X-Amz-Server-Side-Encryption:
+      - AES256
+      Content-Length:
+      - '0'
+      Server:
+      - AmazonS3
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:18 GMT
+- request:
+    method: get
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/files/sszbra8864wk03igz20181123162017/upload-url/1/eGPOPOzh0_AM2OfRF33.RlJFk9GcVUowPRiQ1c99JMRAlWHZaY_MjbRWcWbKU_IqN4bv7B4z._Hc4cFxCk5QgqkzxGFFNT0xaALk89Uit4_5vutuSIlXJQhd0RK5NRyMG5pxp6yEwCELNvFek7JXhA--
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '1320'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:19 GMT
+      X-Amzn-Requestid:
+      - ab469ac5-ef3b-11e8-a180-35d4c4967ee5
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '1566'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tOeEnRDoEF-Ug=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c3-441483684eae7800c8dec14c;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:19 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 7ef2c666ec525174bdefd4a6eac457dd.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - WoW2J1AOqGgkVZX_baNMpNG9u75f9F4GaM1-SMQluKPECfP1h6z4JQ==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"url":"https://wetransfer-eu-prod-spaceship.s3.eu-west-1.amazonaws.com/si8a20pdx2cogk6kh20181123162017/sszbra8864wk03igz20181123162017?partNumber=1&uploadId=eGPOPOzh0_AM2OfRF33.RlJFk9GcVUowPRiQ1c99JMRAlWHZaY_MjbRWcWbKU_IqN4bv7B4z._Hc4cFxCk5QgqkzxGFFNT0xaALk89Uit4_5vutuSIlXJQhd0RK5NRyMG5pxp6yEwCELNvFek7JXhA--&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAUNK32TAQY6Z6227C%2F20181123%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20181123T162019Z&X-Amz-Expires=3600&X-Amz-Security-Token=FQoGZXIvYXdzENH%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaDHxpWXXmzRzmltzqvCK3AwLXl5C9M1n%2FYWCJTi5Nok1nmSEqqVUAEHHxVLZNx0ITi1dkPcYuXDRRrujb3sedjtrvlZ0kIVgsN0XWaYxSQbHJnKvn1p%2F8ViwGdJ%2FE%2BoonbnK2BN5U5%2BfqZB1b2mfZIyhX8goXcVQPnnBdWaWnsM5wmxdBqGiIpWDWSpqXH53PVKJwzif6rT7eI3mfGdG4CMXz60ahMDP4XMQ0GBWb3ib%2BoaQVwHU0QbDU8zK77EADIkNfJH8qiwNRn5dSaArzNRlq1Qe055bmsrD2QRZlozSGa819zgLZ0yG5jiVIqbhob2%2FGlat1Rl1Os%2FL1uSONUAr8x2WuOlSK6f4AxSKesnRWRGg47qHdD2FlfchghGi5MkBSSICv%2BOYZbY1v8yq6rMG0Tf0dgL1A5FW635tMQtQg2Bg8HLs1St%2FvP6NmPBYFcAjVk2tvPR8dYe70aMDVnGY8NMmjVo2JDpa%2BMXgxiL6S2I8sw3JSBpA8h9%2FalqqDQi6WifUXQCV6Gl%2FnT0Kf92sIYd%2Bm06aLvLu4VNR%2F6YMmUbcC94EQpuDhIO59x%2Bs0Skvc1htf%2FGH0A23YB7ovtCb95rUa%2FfYo%2Frrg3wU%3D&X-Amz-SignedHeaders=host&X-Amz-Signature=2a9d2380ca341066113aa3f65411bcdb1e11aec21d8d4b794c427eac2f775d26"}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:19 GMT
+- request:
+    method: put
+    uri: https://wetransfer-eu-prod-spaceship.s3.eu-west-1.amazonaws.com/si8a20pdx2cogk6kh20181123162017/sszbra8864wk03igz20181123162017?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAUNK32TAQY6Z6227C/20181123/eu-west-1/s3/aws4_request&X-Amz-Date=20181123T162019Z&X-Amz-Expires=3600&X-Amz-Security-Token=FQoGZXIvYXdzENH//////////wEaDHxpWXXmzRzmltzqvCK3AwLXl5C9M1n/YWCJTi5Nok1nmSEqqVUAEHHxVLZNx0ITi1dkPcYuXDRRrujb3sedjtrvlZ0kIVgsN0XWaYxSQbHJnKvn1p/8ViwGdJ/E%2BoonbnK2BN5U5%2BfqZB1b2mfZIyhX8goXcVQPnnBdWaWnsM5wmxdBqGiIpWDWSpqXH53PVKJwzif6rT7eI3mfGdG4CMXz60ahMDP4XMQ0GBWb3ib%2BoaQVwHU0QbDU8zK77EADIkNfJH8qiwNRn5dSaArzNRlq1Qe055bmsrD2QRZlozSGa819zgLZ0yG5jiVIqbhob2/Glat1Rl1Os/L1uSONUAr8x2WuOlSK6f4AxSKesnRWRGg47qHdD2FlfchghGi5MkBSSICv%2BOYZbY1v8yq6rMG0Tf0dgL1A5FW635tMQtQg2Bg8HLs1St/vP6NmPBYFcAjVk2tvPR8dYe70aMDVnGY8NMmjVo2JDpa%2BMXgxiL6S2I8sw3JSBpA8h9/alqqDQi6WifUXQCV6Gl/nT0Kf92sIYd%2Bm06aLvLu4VNR/6YMmUbcC94EQpuDhIO59x%2Bs0Skvc1htf/GH0A23YB7ovtCb95rUa/fYo/rrg3wU=&X-Amz-Signature=2a9d2380ca341066113aa3f65411bcdb1e11aec21d8d4b794c427eac2f775d26&X-Amz-SignedHeaders=host&partNumber=1&uploadId=eGPOPOzh0_AM2OfRF33.RlJFk9GcVUowPRiQ1c99JMRAlWHZaY_MjbRWcWbKU_IqN4bv7B4z._Hc4cFxCk5QgqkzxGFFNT0xaALk89Uit4_5vutuSIlXJQhd0RK5NRyMG5pxp6yEwCELNvFek7JXhA--
+    body:
+      encoding: ASCII-8BIT
+      string: 'yes
+
+'
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - binary/octet-stream
+      Content-Length:
+      - '4'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      X-Amz-Id-2:
+      - gKoIBauuR2Qis+1L/rhZL/jEJLHijrRU1ZGmr0TXsqEF02BpXTo8n0bZ4FGrdWYCNEAXp9t/M/4=
+      X-Amz-Request-Id:
+      - 8821AA253DE77DD5
+      Date:
+      - Fri, 23 Nov 2018 16:20:20 GMT
+      Etag:
+      - '"eb4585ad9fe0426781ed7c49252f8225"'
+      X-Amz-Server-Side-Encryption:
+      - AES256
+      Content-Length:
+      - '0'
+      Server:
+      - AmazonS3
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:19 GMT
+- request:
+    method: put
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/files/s9e3vzgsuhaxtdsar20181123162017/upload-complete
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 202
+      message: Accepted
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '56'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:19 GMT
+      X-Amzn-Requestid:
+      - ab717b67-ef3b-11e8-ba93-7f09837446a6
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '51'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tOhEI8DoEFWHg=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c3-ae93984ce060ec5a073e14c0;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:19 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 823355654d69efaf19d467269c43b83a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - M1YL5Cz8DTmvrBrF25DAil3g7aqTULkuUNTRHTeaW6Ol7Kexh9CAuQ==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"message":"File is marked as complete."}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:19 GMT
+- request:
+    method: put
+    uri: https://dev.wetransfer.com/v2/boards/si8a20pdx2cogk6kh20181123162017/files/sszbra8864wk03igz20181123162017/upload-complete
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 202
+      message: Accepted
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '56'
+      Connection:
+      - keep-alive
+      Date:
+      - Fri, 23 Nov 2018 16:20:19 GMT
+      X-Amzn-Requestid:
+      - ab9ef3cd-ef3b-11e8-809f-2b7b699de2fc
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '51'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Amz-Apigw-Id:
+      - Q0tOkEWpDoEFbiA=
+      X-Content-Type-Options:
+      - nosniff
+      X-Amzn-Trace-Id:
+      - Root=1-5bf828c3-730ac4d04f07b7c039824e60;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Fri, 23 Nov 2018 16:20:19 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 ab893471b5a59476ea5ac37775a1c16c.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - s-YBY_wLcos_6DwQq3SVxLssJKRDs76vaa8TCsOXPzmxKq8JR33bZQ==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"message":"File is marked as complete."}'
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:19 GMT
+- request:
+    method: get
+    uri: https://we.tl/b-EAmJEUkSLh
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.3
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Moved Temporarily
+    headers:
+      Content-Type:
+      - text/html;charset=utf-8
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - public, max-age=3600
+      Date:
+      - Fri, 23 Nov 2018 16:20:20 GMT
+      Expires:
+      - Fri, 23 Nov 2018 17:20:20 GMT
+      Location:
+      - https://boards.wetransfer.com/board/si8a20pdx2cogk6kh20181123162017/latest
+      Server:
+      - nginx/1.12.2
+      X-Content-Type-Options:
+      - nosniff
+      X-Request-Id:
+      - 4d38233d2ee1396393608f36abf0ce2d
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 9635c619f121d7a236fe1312f20e5f1b.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - I6yLJc7elQcJ9amVtTMSUtd6FcsIXmLzmsk_ApcnAdirO0g8i1I_Zw==
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Fri, 23 Nov 2018 16:20:20 GMT
+recorded_with: VCR 3.0.3

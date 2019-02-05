@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 describe WeTransfer::RemoteFile do
-  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY')) }
-  let(:board) { WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'), logger: test_logger) }
+  # let(:board) { WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__)) }
+  let(:transfer) { WeTransfer::Transfer.new(client: client, message: "testTransfer") }
 
   let(:params) {
     {
@@ -17,7 +18,9 @@ describe WeTransfer::RemoteFile do
       },
       type: 'file',
       client: client,
-    }}
+      transfer: transfer,
+    }
+  }
 
   describe '#initializer' do
     it 'initialized when no url is given' do
@@ -30,32 +33,13 @@ describe WeTransfer::RemoteFile do
       described_class.new(params)
     end
 
-    it 'fails when id is missing' do
-      params.delete(:id)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /id/
-    end
-
-    it 'fails when state is missing' do
-      params.delete(:size)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /size/
-    end
-
-    it 'fails when url is missing' do
-      params.delete(:multipart)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /multipart/
-    end
-
-    it 'fails when name is missing' do
-      params.delete(:name)
-      expect {
-        described_class.new(params)
-      }.to raise_error ArgumentError, /name/
+    %i[id size multipart name].each do |required_param|
+      it "fails when #{required_param} is missing" do
+        params.delete(required_param)
+        expect {
+          described_class.new(params)
+        }.to raise_error ArgumentError, %r(#{required_param})
+      end
     end
 
     it 'must have a struct in multipart' do
@@ -75,6 +59,7 @@ describe WeTransfer::RemoteFile do
 
   describe '#request_board_upload_url' do
     before do
+      skip
       @new_board = WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
       @new_board.add_items { |f| f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__)) }
     end
@@ -95,6 +80,7 @@ describe WeTransfer::RemoteFile do
 
   describe '#complete_board_file' do
     before do
+      skip
       @new_board = WeTransfer::Board.new(client: client, name: File.basename(__FILE__), description: File.basename(__FILE__))
       @new_board.add_items { |f| f.add_file(name: File.basename(__FILE__), size: File.size(__FILE__)) }
       @new_board.upload_file!(io: File.open(__FILE__, 'rb'))

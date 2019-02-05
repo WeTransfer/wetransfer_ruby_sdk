@@ -1,0 +1,139 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/authorize
+    body:
+      encoding: UTF-8
+      string: "{}"
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '252'
+      Connection:
+      - keep-alive
+      Date:
+      - Wed, 30 Jan 2019 13:07:08 GMT
+      X-Amzn-Requestid:
+      - f2b2fc08-248f-11e9-b791-cd78c231f711
+      Access-Control-Allow-Origin:
+      - "*"
+      Strict-Transport-Security:
+      - max-age=300; includeSubdomains
+      X-Amz-Apigw-Id:
+      - UUYraEclDoEFz-w=
+      X-Amzn-Trace-Id:
+      - Root=1-5c51a17c-11fa543825b1c82294090ff0;Sampled=0
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 1fcad26913988e10fd175698baa6f474.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - UHiKXf4k03fKJvl6I0JKkDepAjHolJlFSLJj-A0pD84THgtCWQ9ayA==
+    body:
+      encoding: UTF-8
+      string: "  {\n    \"success\" : true,\n    \"token\": \"<SENSITIVE>\"\n  }\n
+        \ "
+    http_version: 
+  recorded_at: Wed, 30 Jan 2019 13:07:08 GMT
+- request:
+    method: post
+    uri: https://dev.wetransfer.com/v2/transfers
+    body:
+      encoding: UTF-8
+      string: |-
+        {
+          "message": "Testcase",
+          "files": [
+            {
+              "name": "foo.bar",
+              "size": 10
+            }
+          ]
+        }
+    headers:
+      User-Agent:
+      - WetransferRubySdk/0.9.0.beta2 Ruby 2.5.3
+      Content-Type:
+      - application/json
+      X-Api-Key:
+      - "<SENSITIVE>"
+      Authorization:
+      - "<SENSITIVE>"
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '312'
+      Connection:
+      - keep-alive
+      Date:
+      - Wed, 30 Jan 2019 13:07:08 GMT
+      X-Amzn-Requestid:
+      - f2eb981a-248f-11e9-a36b-9b018e071e51
+      X-Runtime:
+      - '0.146275'
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Response-Generated-At-Epoch:
+      - '1548853628'
+      Strict-Transport-Security:
+      - max-age=15552000; includeSubDomains;
+      X-Amzn-Remapped-Content-Length:
+      - '472'
+      X-Amzn-Remapped-Connection:
+      - close
+      X-Request-Id:
+      - 6bf3b978-06f0-44b1-9a24-bc61ab433c62
+      X-Amz-Apigw-Id:
+      - UUYrdELMDoEFc1Q=
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Vary:
+      - Accept-Encoding, Origin
+      X-Content-Type-Options:
+      - nosniff
+      Etag:
+      - W/"4927d457d3b62050abdef0a8f2dc8cd8"
+      X-Opaque:
+      - 98683fc88d14bc6af0d2d1f794ed00bb94d6a317-016e4ef69ac317fe3-7524
+      X-Amzn-Trace-Id:
+      - Root=1-5c51a17c-08eec3b005ad9cceae0ac316;Sampled=0
+      X-Amzn-Remapped-Date:
+      - Wed, 30 Jan 2019 13:07:08 GMT
+      X-Cache:
+      - Miss from cloudfront
+      Via:
+      - 1.1 0f41d06e8ba218fe840908afa67fe1b9.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - JKazaoGfFUIzHj3kyh6UJUzt0r2wBLzIS2k32WQZK8jv8LdWS3bYGw==
+    body:
+      encoding: UTF-8
+      string: '{"success":true,"id":"00368b0dc8d6aebfa22f940dad1bf7ab20190130130707","state":"uploading","message":"Testcase","url":null,"files":[{"id":"ba62dc372ae905cf17875117719a3bbe20190130130707","name":"foo.bar","size":10,"multipart":{"part_numbers":1,"chunk_size":10},"type":"file"}],"expires_at":"2019-02-06T13:07:07Z"}'
+    http_version: 
+  recorded_at: Wed, 30 Jan 2019 13:07:09 GMT
+recorded_with: VCR 3.0.3

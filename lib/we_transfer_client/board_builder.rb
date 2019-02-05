@@ -1,23 +1,20 @@
 module WeTransfer
-  class BoardBuilder
-    attr_reader :files, :links
+  class BoardBuilder < TransferBuilder
+    # TRANSFER_XOR_BOARD_PRESENT_ERROR =
+    #   "#{name} should be initialized with either a :board or a :transfer kw param".freeze
 
-    def initialize(client:)
-      @client = client
-      @files = []
+    attr_reader :links
+
+    def initialize(board:, transfer: nil, **_args)
+      raise WeTransfer::Client::Error, TRANSFER_XOR_BOARD_PRESENT_ERROR unless transfer.nil? ^ board.nil?
+      super
+
+      @board = board
       @links = []
     end
 
     def items
-      (@files + @links).flatten
-    end
-
-    def add_file(name:, size:)
-      @files << FutureFile.new(name: name, size: size, client: @client)
-    end
-
-    def add_file_at(path:)
-      add_file(name: File.basename(path), size: File.size(path))
+      (files + links).flatten
     end
 
     def add_web_url(url:, title: url)

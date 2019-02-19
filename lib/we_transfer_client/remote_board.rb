@@ -5,7 +5,7 @@ class RemoteBoard
 
   CHUNK_SIZE = 6 * 1024 * 1024
 
-  def initialize(id:, state:, url:, name:, description: '', items: [])
+  def initialize(id:, state:, url:, name:, description: '', items: [], **)
     @id = id
     @state = state
     @url = url

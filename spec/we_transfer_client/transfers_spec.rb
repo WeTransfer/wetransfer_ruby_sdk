@@ -35,7 +35,7 @@ describe WeTransfer::Client::Transfers do
           builder.add_file(name: 'README.txt', io: StringIO.new("A thing"))
           builder.add_file(name: 'README.txt', io: StringIO.new("another thing"))
         end
-      }.to raise_error ArgumentError, /Duplicate file entry/
+      }.to raise_error WeTransfer::Client::Error
     end
   end
 

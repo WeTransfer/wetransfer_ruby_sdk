@@ -25,9 +25,9 @@ describe FutureFile do
     end
   end
 
-  describe '#to_request_params' do
+  describe '#as_json_request_params' do
     it 'returns a hash with name and size' do
-      as_params = described_class.new(params).to_request_params
+      as_params = described_class.new(params).as_json_request_params
 
       expect(as_params[:name]).to eq('yes')
       expect(as_params[:size]).to be_kind_of(Integer)

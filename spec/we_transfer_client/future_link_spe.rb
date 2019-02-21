@@ -21,9 +21,9 @@ describe FutureLink do
     end
   end
 
-  describe '#to_request_params' do
+  describe '#as_json_request_params' do
     it 'creates params properly' do
-      as_params = described_class.new(params).to_request_params
+      as_params = described_class.new(params).as_json_request_params
 
       expect(as_params[:url]).to eq('http://www.wetransfer.com')
       expect(as_params[:title]).to be_kind_of(String)

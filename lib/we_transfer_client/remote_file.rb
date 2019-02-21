@@ -13,7 +13,7 @@ class RemoteFile
   end
 
   def request_transfer_upload_url(client:, transfer_id:, part_number:)
-    response = client.faraday.get(
+    response = client.request_as.get(
       "/v2/transfers/#{transfer_id}/files/#{@id}/upload-url/#{part_number}",
       {},
       client.auth_headers.merge('Content-Type' => 'application/json')
@@ -23,7 +23,7 @@ class RemoteFile
   end
 
   def request_board_upload_url(client:, board_id:, part_number:)
-    response = client.faraday.get(
+    response = client.request_as.get(
       "/v2/boards/#{board_id}/files/#{@id}/upload-url/#{part_number}/#{@multipart.id}",
       {},
       client.auth_headers.merge('Content-Type' => 'application/json')
@@ -34,9 +34,9 @@ class RemoteFile
 
   def complete_transfer_file(client:, transfer_id:)
     body = {part_numbers: @multipart.part_numbers}
-    response = client.faraday.put(
+    response = client.request_as.put(
       "/v2/transfers/#{transfer_id}/files/#{@id}/upload-complete",
-      JSON.pretty_generate(body),
+      JSON.generate(body),
       client.auth_headers.merge('Content-Type' => 'application/json')
     )
     client.ensure_ok_status!(response)
@@ -44,7 +44,7 @@ class RemoteFile
   end
 
   def complete_board_file(client:, board_id:)
-    response = client.faraday.put(
+    response = client.request_as.put(
       "/v2/boards/#{board_id}/files/#{@id}/upload-complete",
       '{}',
       client.auth_headers.merge('Content-Type' => 'application/json')

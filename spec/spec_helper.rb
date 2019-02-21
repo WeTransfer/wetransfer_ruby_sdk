@@ -12,6 +12,7 @@ require 'bundler'
 Bundler.setup
 require 'tempfile'
 require 'dotenv'
+require 'webmock/rspec'
 Dotenv.load
 
 module SpecHelpers

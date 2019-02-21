@@ -30,15 +30,16 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'faraday', '~> 0.12'
 
-  spec.add_development_dependency 'dotenv', '~> 2.2'
   spec.add_development_dependency 'bundler', '~> 1.16'
+  spec.add_development_dependency 'dotenv', '~> 2.0'
+  spec.add_development_dependency 'guard-rspec', '~> 4.7'
+  spec.add_development_dependency 'guard-rubocop', '~> 1.3'
   spec.add_development_dependency 'pry', '~> 0.11'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'simplecov', '~> 0.15'
-  spec.add_development_dependency 'wetransfer_style', '0.6.0'
-  spec.add_development_dependency 'guard-rspec', '~> 4.7'
-  spec.add_development_dependency 'guard-rubocop', '~> 1.3'
+  spec.add_development_dependency 'webmock'
+  spec.add_development_dependency 'wetransfer_style', '0.6.4'
 end
 
 #   spec.add_development_dependency 'guard-flay'

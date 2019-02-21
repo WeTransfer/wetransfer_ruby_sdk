@@ -22,11 +22,11 @@ class FutureBoard
     }
   end
 
-  def to_request_params
+  def as_json_request_params
     {
       name: name,
       description: description,
-      items: items.map(&:to_request_params),
-    }
+      items: items.map(&:as_json_request_params),
+    }.to_json
   end
 end

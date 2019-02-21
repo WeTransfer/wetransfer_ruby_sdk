@@ -38,9 +38,9 @@ module WeTransfer
 
       def create_remote_transfer(xfer)
         authorize_if_no_bearer_token!
-        response = faraday.post(
+        response = request_as.post(
           '/v2/transfers',
-          JSON.pretty_generate(xfer.to_request_params),
+          JSON.generate(xfer.as_json_request_params),
           auth_headers.merge('Content-Type' => 'application/json')
         )
         ensure_ok_status!(response)
@@ -49,7 +49,7 @@ module WeTransfer
 
       def complete_transfer_call(object)
         authorize_if_no_bearer_token!
-        response = faraday.put(
+        response = request_as.put(
           "/v2/transfers/#{object.id}/finalize",
           '',
           auth_headers.merge('Content-Type' => 'application/json')
@@ -60,7 +60,7 @@ module WeTransfer
 
       def request_transfer(transfer_id)
         authorize_if_no_bearer_token!
-        response = faraday.get(
+        response = request_as.get(
           "/v2/transfers/#{transfer_id}",
           {},
           auth_headers.merge('Content-Type' => 'application/json')

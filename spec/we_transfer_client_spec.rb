@@ -8,50 +8,55 @@ describe WeTransfer::Client do
     expect(WeTransfer::VERSION).to be_kind_of(String)
   end
 
-  describe "#ensure_ok_status!" do
-    before(:all) { Response = Struct.new(:status) }
+  describe "#create_transfer" do
+    let(:transfer) { instance_double(WeTransfer::Transfer) }
 
-    context "on success" do
-      it "returns true if the status code is in the 2xx range" do
-        (200..299).each do |status_code|
-          response = Response.new(status_code)
-          expect(subject.ensure_ok_status!(response)).to be_truthy
-        end
-      end
+    it "raises an ArgumentError without the :message keyword param" do
+      expect { subject.create_transfer }.to raise_error(ArgumentError, %r/message/)
     end
 
-    context "unsuccessful" do
-      it "raises with a message including the status code the server returned" do
-        response = Response.new("404")
-        expect { subject.ensure_ok_status!(response) }
-          .to raise_error(WeTransfer::Client::Error, %r/Response had a 404 code/)
+    it "instantiates a Transfer" do
+      expect(WeTransfer::Transfer)
+        .to receive(:new)
+        .with(message: 'fake transfer')
+        .and_return(transfer)
 
-        response = Response.new("Mehh")
-        expect { subject.ensure_ok_status!(response) }
-          .to raise_error(WeTransfer::Client::Error, %r/Response had a Mehh code/)
-      end
+      subject.create_transfer(message: 'fake transfer')
+    end
 
-      it "if there is a server error, it raises with information that we can retry" do
-        (500..504).each do |status_code|
-          response = Response.new(status_code)
-          expect { subject.ensure_ok_status!(response) }
-            .to raise_error(WeTransfer::Client::Error, /we could retry/)
-        end
-      end
+    it "stores the transfer in @transfer" do
+      allow(WeTransfer::Transfer)
+        .to receive(:new)
+        .and_return(transfer)
+      subject.create_transfer(message: 'foo')
 
-      it "on client error, it raises with information that the server cannot understand this" do
-        (400..499).each do |status_code|
-          response = Response.new(status_code)
-          expect { subject.ensure_ok_status!(response) }
-            .to raise_error(WeTransfer::Client::Error, /server will not accept this request even if retried/)
-        end
-      end
+      expect(subject.instance_variable_get(:@transfer)).to eq transfer
+    end
 
-      it "if the status code is unknown, it raises a generic error" do
-        response = Response.new("I aint a status code")
-        expect { subject.ensure_ok_status!(response) }
-          .to raise_error(WeTransfer::Client::Error, /no idea what to do/)
+    it "accepts a block, that is passed to the Transfer instance" do
+      allow(WeTransfer::Transfer)
+        .to receive(:new) { |&transfer| transfer.call(name: 'meh') }
+        .with(message: "foo")
+        .and_return(transfer)
+
+      expect { |probe| subject.create_transfer(message: 'foo', &probe) }.to yield_with_args(name: 'meh')
+    end
+
+    it "returns self" do
+      allow(WeTransfer::Transfer)
+        .to receive(:new)
+        .and_return(transfer)
+      expect(subject.create_transfer(message: 'foo')).to eq subject
+    end
+  end
+
+  describe "integrations" do
+    it "works" do
+      client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
+      transfer = client.create_transfer(message: 'test transfer') do |transfer|
+        transfer.add_file(name: 'test_file', size: 30)
       end
+      # binding.pry
     end
   end
 end

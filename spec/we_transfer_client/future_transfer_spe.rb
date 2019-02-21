@@ -25,15 +25,15 @@ describe FutureTransfer do
     end
   end
 
-  describe 'to_request_params' do
+  describe 'as_json_request_params' do
     it 'includes the message' do
       new_transfer = transfer.new(message: 'test')
-      expect(new_transfer.to_request_params[:message]).to be(new_transfer.message)
+      expect(new_transfer.as_json_request_params[:message]).to be(new_transfer.message)
     end
 
     it 'includes the files as an array' do
       new_transfer = transfer.new(message: 'test')
-      expect(new_transfer.to_request_params[:files]).to eq([])
+      expect(new_transfer.as_json_request_params[:files]).to eq([])
     end
   end
 end

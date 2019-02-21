@@ -6,7 +6,7 @@ class FutureFile
     @io = io
   end
 
-  def to_request_params
+  def as_json_request_params
     {
       name: @name,
       size: @io.size,
@@ -15,10 +15,10 @@ class FutureFile
 
   def add_to_board(client:, remote_board:)
     client.authorize_if_no_bearer_token!
-    response = client.faraday.post(
+    response = client.request_as.post(
       "/v2/boards/#{remote_board.id}/files",
       # this needs to be a array with hashes => [{name, filesize}]
-      JSON.pretty_generate([to_request_params]),
+      JSON.generate([as_json_request_params]),
       client.auth_headers.merge('Content-Type' => 'application/json')
     )
     client.ensure_ok_status!(response)

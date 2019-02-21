@@ -33,21 +33,21 @@ describe FutureBoard do
     end
   end
 
-  describe '#to_request_params' do
+  describe '#as_json_request_params' do
     it 'has a name' do
-      as_params = described_class.new(params).to_request_params
+      as_params = described_class.new(params).as_json_request_params
       expect(as_params[:name]).to be_kind_of(String)
     end
 
     it 'has a description' do
-      as_params = described_class.new(params).to_request_params
+      as_params = described_class.new(params).as_json_request_params
       expect(as_params[:description]).to be(params[:description])
     end
 
     it 'has items' do
       file = FutureFile.new(name: 'yes', io: File.open(__FILE__, 'rb'))
       params[:items] << file
-      as_params = described_class.new(params).to_request_params
+      as_params = described_class.new(params).as_json_request_params
       expect(as_params[:items].count).to be(1)
     end
   end

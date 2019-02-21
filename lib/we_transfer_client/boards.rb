@@ -40,9 +40,9 @@ module WeTransfer
 
       def create_remote_board(board:, remote_board_class: RemoteBoard)
         authorize_if_no_bearer_token!
-        response = faraday.post(
+        response = request_as.post(
           '/v2/boards',
-          JSON.pretty_generate(board.to_initial_request_params),
+          JSON.generate(board.to_initial_request_params),
           auth_headers.merge('Content-Type' => 'application/json')
         )
         ensure_ok_status!(response)
@@ -61,7 +61,7 @@ module WeTransfer
 
       def request_board(board:, remote_board_class: RemoteBoard)
         authorize_if_no_bearer_token!
-        response = faraday.get(
+        response = request_as.get(
           "/v2/boards/#{board.id}",
           {},
           auth_headers.merge('Content-Type' => 'application/json')

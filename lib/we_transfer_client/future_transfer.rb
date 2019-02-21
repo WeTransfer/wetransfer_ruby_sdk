@@ -6,10 +6,10 @@ class FutureTransfer
     @files = files
   end
 
-  def to_request_params
+  def as_json_request_params
     {
       message: message,
-      files: files.map(&:to_request_params),
+      files: files.map(&:as_json_request_params),
     }
   end
 end

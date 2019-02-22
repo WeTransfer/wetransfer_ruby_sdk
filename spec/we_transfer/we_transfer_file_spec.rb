@@ -31,16 +31,32 @@ describe WeTransfer::WeTransferFile do
       described_class.new(io: io)
     end
 
-    it "delegates the size to io if unavailable" do
-      io = File.open('Gemfile')
-
-      expect(File)
-        .to receive(:basename)
+    it "wraps the io in MiniIO" do
+      io = :foo
+      expect(WeTransfer::MiniIO)
+        .to receive(:new)
         .with(io)
-        .and_return "delegated"
 
-      described_class.new(io: io)
+      described_class.new(io: io, name: 'test file', size: 8)
     end
-    it "wraps the IO in a MiniIO"
+  end
+
+  describe "getters" do
+    subject { described_class.new(io: File.open('Gemfile')) }
+
+    %i[name id io multipart].each do |getter|
+      it "has a getter for :#{getter}" do
+        expect { subject.send getter }.to_not raise_error
+      end
+    end
+  end
+
+  describe "#as_request_params" do
+    subject(:file) { described_class.new(name: 'test file', size: 8) }
+
+    it "has key/values for name and size only" do
+      expect(file.as_request_params.to_json)
+        .to eq %|{"name":"test file","size":8}|
+    end
   end
 end

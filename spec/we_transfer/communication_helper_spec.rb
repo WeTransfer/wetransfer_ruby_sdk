@@ -1,13 +1,10 @@
 require 'spec_helper'
 
-class CommHelper
-  include WeTransfer::CommunicationHelper
-  public :ensure_ok_status!
-end
-
 describe WeTransfer::CommunicationHelper do
-  context "#ensure_ok_status!" do
-    subject { CommHelper.new }
+  context ".ensure_ok_status!" do
+    subject { described_class }
+
+    before { pending }
 
     before(:all) do
       Response = Struct.new(:status, :body)

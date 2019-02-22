@@ -2,8 +2,16 @@ module WeTransfer
   class Transfer
     class DuplicateFileNameError < ArgumentError; end
     class NoFilesAddedError < StandardError; end
+    class FileMismatchError < StandardError; end
 
-    include CommunicationHelper
+    extend Forwardable
+
+    attr_reader :files, :id, :state, :url, :message
+
+    class << self
+      extend Forwardable
+      def_delegator CommunicationHelper, :find_transfer, :find
+    end
 
     def self.create(message:, &block)
       transfer = new(message: message)
@@ -17,50 +25,88 @@ module WeTransfer
       @unique_file_names = Set.new
     end
 
-    # Add files (if still needed)
     def persist
       yield(self) if block_given?
+      raise NoFilesAddedError if @unique_file_names.empty?
 
-      create_remote_transfer
-
-      ## files should now be in persisted status
-
+      CommunicationHelper.persist_transfer(self)
     end
 
     # Add one or more files to a transfer, so a transfer can be created over the
     # WeTransfer public API
     #
-    # @param name [String] (nil) the name of the file
+    # @params name [String] (nil) the name of the file
     #
-    # @return [WeTransfer::Client]
-    def add_file(name: nil, size: nil, io: nil)
-      file = WeTransferFile.new(name: name, size: size, io: io)
+    # @returns self [WeTransfer::Client]
+    def add_file(**args)
+      file = WeTransferFile.new(args)
       raise DuplicateFileNameError unless @unique_file_names.add?(file.name.downcase)
 
       @files << file
       self
     end
 
-    private
+    def upload_file(name:, io: nil)
+      file = find_file_by_name(name)
+      put_io = io || file.io
 
-    def as_json_request_params
+      raise(
+        WeTransfer::RemoteFile::NoIoError,
+        "IO for file with name '#{name}' cannot be uploaded."
+      ) unless WeTransfer::MiniIO.mini_io_able?(put_io)
+
+      (1..file.multipart.chunks).each do |chunk|
+        put_url = upload_url_for_chunk(name: name, chunk: chunk)
+        chunk_contents = StringIO.new(put_io.read(file.multipart.chunk_size))
+        chunk_contents.rewind
+
+        CommunicationHelper.upload_chunk(put_url, chunk_contents)
+      end
+    end
+
+    def upload_url_for_chunk(name:, chunk:)
+      file_id = find_file_by_name(name).id
+      CommunicationHelper.upload_url_for_chunk(id, file_id, chunk)
+    end
+
+    def complete_file(name:)
+      file = find_file_by_name(name)
+      CommunicationHelper.complete_file(id, file.id, file.multipart.chunks)
+    end
+
+    def finalize
+      CommunicationHelper.finalize_transfer(self)
+    end
+
+    def as_request_params
       {
         message: @message,
-        files: @files.map(&:as_json_request_params),
+        files: @files.map(&:as_request_params),
       }
     end
 
-    def create_remote_transfer
-      raise NoFilesAddedError if @unique_file_names.empty?
-
-      response = request_as.post(
-        '/v2/transfers',
-        as_json_request_params.to_json,
-        {}
-      )
-      ensure_ok_status!(response)
-
-      @remote_transfer = RemoteTransfer.new(JSON.parse(response.body, symbolize_names: true))
+    def to_json
+      to_h.to_json
     end
+
+    def to_h
+      prepared = %i[id state url message].each_with_object({}) do |prop, memo|
+        memo[prop] = send(prop)
+      end
+
+      prepared[:files] = files.map(&:to_h)
+      prepared
+    end
+
+    def find_file_by_name(name)
+      @found_files ||= Hash.new do |h, name|
+        h[name] = files.find { |file| file.name == name }
+      end
+
+      raise FileMismatchError unless @found_files[name]
+      @found_files[name]
+    end
+
+    def_delegator self, :remote_transfer_params
   end
 end

@@ -1,7 +1,7 @@
 
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'we_transfer_client/version'
+require 'we_transfer/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'wetransfer'
@@ -23,12 +23,14 @@ Gem::Specification.new do |spec|
       'public gem pushes.'
   end
 
+  # TODO: Only add the needed files. see https://github.com/thoughtbot/shoulda-matchers/pull/1180 for inspiration
   spec.files = `git ls-files -z`.split("\x0").reject { |f| f =~ /^spec/ }
-  spec.bindir        = 'exe'
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  # spec.bindir        = 'exe'
+  # spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
   spec.add_dependency 'faraday', '~> 0.12'
+  spec.add_dependency 'ks', '~> 0.0.2'
 
   spec.add_development_dependency 'bundler', '~> 1.16'
   spec.add_development_dependency 'dotenv', '~> 2.0'
@@ -41,8 +43,3 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'webmock'
   spec.add_development_dependency 'wetransfer_style', '0.6.4'
 end
-
-#   spec.add_development_dependency 'guard-flay'
-#   spec.add_development_dependency 'guard-flog'
-#   spec.add_development_dependency 'flay', '~> 2.4'
-#   spec.add_development_dependency 'flog'

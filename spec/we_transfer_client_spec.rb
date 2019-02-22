@@ -16,6 +16,9 @@ describe WeTransfer::Client do
     end
 
     it "instantiates a Transfer" do
+      allow(transfer)
+        .to receive(:persist)
+
       expect(WeTransfer::Transfer)
         .to receive(:new)
         .with(message: 'fake transfer')
@@ -25,38 +28,52 @@ describe WeTransfer::Client do
     end
 
     it "stores the transfer in @transfer" do
+      allow(transfer)
+        .to receive(:persist)
+
       allow(WeTransfer::Transfer)
         .to receive(:new)
         .and_return(transfer)
-      subject.create_transfer(message: 'foo')
+      subject.create_transfer(message: 'test transfer')
 
       expect(subject.instance_variable_get(:@transfer)).to eq transfer
     end
 
     it "accepts a block, that is passed to the Transfer instance" do
       allow(WeTransfer::Transfer)
-        .to receive(:new) { |&transfer| transfer.call(name: 'meh') }
-        .with(message: "foo")
+        .to receive(:new)
+        .with(message: 'test transfer')
         .and_return(transfer)
 
-      expect { |probe| subject.create_transfer(message: 'foo', &probe) }.to yield_with_args(name: 'meh')
+      expect(transfer)
+        .to receive(:persist) { |&transfer| transfer.call(name: 'test file', size: 8) }
+
+      expect { |probe| subject.create_transfer(message: 'test transfer', &probe) }
+        .to yield_with_args(name: 'test file', size: 8)
     end
 
     it "returns self" do
+      allow(transfer)
+        .to receive(:persist)
+
       allow(WeTransfer::Transfer)
         .to receive(:new)
         .and_return(transfer)
-      expect(subject.create_transfer(message: 'foo')).to eq subject
+
+      expect(subject.create_transfer(message: 'test transfer')).to eq subject
     end
   end
 
-  describe "integrations" do
-    it "works" do
-      client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
-      transfer = client.create_transfer(message: 'test transfer') do |transfer|
-        transfer.add_file(name: 'test_file', size: 30)
-      end
-      # binding.pry
+  describe "#find_transfer" do
+    it "delegates to Transfer.find" do
+      transfer_id = 'fake-transfer-id'
+      expect(WeTransfer::Transfer)
+        .to receive(:find)
+        .with(transfer_id)
+
+      subject.find_transfer(transfer_id)
     end
+
+    it "stores the found transfer in @transfer"
   end
 end

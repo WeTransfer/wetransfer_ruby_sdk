@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module WeTransfer
   class Client
     class Error < StandardError; end
@@ -29,10 +27,13 @@ module WeTransfer
       self
     end
 
-    def create_transfer_and_upload_files(message:, &block)
-      transfer = WeTransfer::Transfer.new(args)
-      transfer.persist(&block)
+    def create_transfer_and_upload_files(**args, &block)
+      create_transfer(args, &block)
+      @transfer.upload_files
+      @transfer.complete_files
+      @transfer.finalize
 
+      self
     end
 
     def find_transfer(transfer_id)

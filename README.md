@@ -75,14 +75,26 @@ client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 Now that you've got the client set up you can use  `create_transfer_and_upload_files` to, well, create a transfer, and upload all files!
 
 ```ruby
-transfer = client.create_transfer_and_upload_files(message: 'All the Things') do |upload|
-  upload.add_file_at(path: '/path/to/local/file.jpg')
-  upload.add_file_at(path: '/path/to/another/local/file.jpg')
-  upload.add_file(name: 'README.txt', io: StringIO.new("You should read All the Things!"))
+client.create_transfer_and_upload_files(message: 'All the Things') do |transfer|
+  transfer.add_file(io: File.open('Gemfile'))
+  transfer.add_file(
+    name: 'hello_world.rb',
+    io: File.open('path/to/different_name.rb')
+  )
+  transfer.add_file(
+    name: 'README.txt',
+    size: 31,
+    io: StringIO.new("You should read All the Things!")
+  )
 end
 
+transfer = client.transfer
+
 # To get a link to your transfer, call `url` on your transfer object:
-transfer.url => "https://we.tl/t-123234="
+transfer.url => "https://we.tl/t-1232346"
+
+# Or inspect the whole transfer:
+puts transfer.to_json
 ```
 
 The upload will be performed at the end of the block. Depending on your file sizes and network connection speed, this might take some time.

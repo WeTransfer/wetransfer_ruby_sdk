@@ -1,15 +1,29 @@
 require "spec_helper"
 
 describe "transfer integration" do
-  around do |example|
+  around(:each) do |example|
     WebMock.allow_net_connect!
     example.run
     WebMock.disable_net_connect!
   end
 
-  it "Create a client, a transfer, it uploads files and finalizes the transfer" do
-    client = WeTransfer::Client.new(api_key: ENV.fetch("WT_API_KEY"))
+  let(:client) { WeTransfer::Client.new(api_key: ENV.fetch("WT_API_KEY")) }
 
+  it "Convenience method create_transfer_and_upload_files does it all!" do
+    client.create_transfer_and_upload_files(message: "test transfer") do |transfer|
+      transfer.add_file(name: "small_file_with_io", size: 10, io: StringIO.new("#" * 10))
+    end
+    transfer = client.transfer
+
+    expect(transfer.files.map(&:name))
+      .to include("small_file_with_io")
+    expect(transfer.state)
+      .to eq "processing"
+    expect(transfer.url)
+      .to match %r|https://we.tl/t-|
+  end
+
+  it "Create a client, a transfer, it uploads files and finalizes the transfer" do
     client.create_transfer(message: "test transfer") do |transfer|
       transfer.add_file(name: "small_file", size: 80)
       transfer.add_file(name: "small_file_with_io", size: 10, io: StringIO.new("#" * 10))
@@ -17,8 +31,6 @@ describe "transfer integration" do
     end
 
     transfer = client.transfer
-
-    transfer.to_json
 
     expect(transfer.url)
       .to be_nil

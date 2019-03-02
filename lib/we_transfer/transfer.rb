@@ -46,8 +46,8 @@ module WeTransfer
       self
     end
 
-    def upload_file(name:, io: nil)
-      file = find_file_by_name(name)
+    def upload_file(name:, io: nil, file: nil)
+      file ||= find_file_by_name(name)
       put_io = io || file.io
 
       raise(
@@ -64,14 +64,33 @@ module WeTransfer
       end
     end
 
+    #
+    def upload_files
+      files.each do |file|
+        upload_file(
+          name: file.name,
+          file: file
+        )
+      end
+    end
+
     def upload_url_for_chunk(name:, chunk:)
       file_id = find_file_by_name(name).id
       Communication.upload_url_for_chunk(id, file_id, chunk)
     end
 
-    def complete_file(name:)
-      file = find_file_by_name(name)
+    def complete_file(name:, file: nil)
+      file ||= find_file_by_name(name)
       Communication.complete_file(id, file.id, file.multipart.chunks)
+    end
+
+    def complete_files
+      files.each do |file|
+        complete_file(
+          name: file.name,
+          file: file
+        )
+      end
     end
 
     def finalize
@@ -106,7 +125,5 @@ module WeTransfer
       raise FileMismatchError unless @found_files[name]
       @found_files[name]
     end
-
-    def_delegator self, :remote_transfer_params
   end
 end

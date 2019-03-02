@@ -16,5 +16,6 @@ matrix:
     - rvm: jruby-9.1.6
     - rvm: jruby-9.2.0
 script:
-  - RUBYOPT="--enable-frozen-string-literal" bundle exec rspec
+  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bundle exec rspec --exclude-pattern "spec/integration_spec.rb"; fi'
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bundle exec rspec; fi'
   - bundle exec rubocop -c .rubocop.yml --force-exclusion

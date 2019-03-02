@@ -1,18 +1,9 @@
 # frozen_string_literal: true
 
-require 'faraday'
-require 'logger'
-require 'json'
-require 'ks'
-
-%w[communication_helper transfer mini_io we_transfer_file remote_file version].each do |file|
-  require_relative "we_transfer/#{file}"
-end
-
 module WeTransfer
   class Client
     class Error < StandardError; end
-    include CommunicationHelper
+    include Communication
 
     NullLogger = Logger.new(nil)
 
@@ -25,9 +16,9 @@ module WeTransfer
     #
     # @return [WeTransfer::Client]
     def initialize(api_key:, logger: NullLogger)
-      CommunicationHelper.reset_authentication!
-      CommunicationHelper.api_key = api_key
-      CommunicationHelper.logger = logger
+      Communication.reset_authentication!
+      Communication.api_key = api_key
+      Communication.logger = logger
     end
 
     def create_transfer(**args, &block)
@@ -36,6 +27,12 @@ module WeTransfer
       @transfer = transfer
 
       self
+    end
+
+    def create_transfer_and_upload_files(message:, &block)
+      transfer = WeTransfer::Transfer.new(args)
+      transfer.persist(&block)
+
     end
 
     def find_transfer(transfer_id)

@@ -10,7 +10,7 @@ module WeTransfer
 
     class << self
       extend Forwardable
-      def_delegator CommunicationHelper, :find_transfer, :find
+      def_delegator Communication, :find_transfer, :find
     end
 
     def self.create(message:, &block)
@@ -29,7 +29,7 @@ module WeTransfer
       yield(self) if block_given?
       raise NoFilesAddedError if @unique_file_names.empty?
 
-      CommunicationHelper.persist_transfer(self)
+      Communication.persist_transfer(self)
     end
 
     # Add one or more files to a transfer, so a transfer can be created over the
@@ -60,22 +60,22 @@ module WeTransfer
         chunk_contents = StringIO.new(put_io.read(file.multipart.chunk_size))
         chunk_contents.rewind
 
-        CommunicationHelper.upload_chunk(put_url, chunk_contents)
+        Communication.upload_chunk(put_url, chunk_contents)
       end
     end
 
     def upload_url_for_chunk(name:, chunk:)
       file_id = find_file_by_name(name).id
-      CommunicationHelper.upload_url_for_chunk(id, file_id, chunk)
+      Communication.upload_url_for_chunk(id, file_id, chunk)
     end
 
     def complete_file(name:)
       file = find_file_by_name(name)
-      CommunicationHelper.complete_file(id, file.id, file.multipart.chunks)
+      Communication.complete_file(id, file.id, file.multipart.chunks)
     end
 
     def finalize
-      CommunicationHelper.finalize_transfer(self)
+      Communication.finalize_transfer(self)
     end
 
     def as_request_params

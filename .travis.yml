@@ -12,6 +12,5 @@ matrix:
   allow_failures:
     - rvm: jruby-9.0
 script:
-  - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then bundle exec rspec --exclude-pattern "spec/integration_spec.rb"; fi'
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bundle exec rspec; fi'
+  - RUBYOPT="--enable-frozen-string-literal" bundle exec rspec
   - bundle exec rubocop -c .rubocop.yml --force-exclusion

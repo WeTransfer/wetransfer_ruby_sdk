@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe WeTransfer::CommunicationHelper do
+describe WeTransfer::Communication do
   context ".ensure_ok_status!" do
     subject { described_class }
 
@@ -8,7 +8,7 @@ describe WeTransfer::CommunicationHelper do
 
     before(:all) do
       Response = Struct.new(:status, :body)
-      WeTransfer::CommunicationHelper.logger = Logger.new(nil)
+      WeTransfer::Communication.logger = Logger.new(nil)
     end
 
     context "on success" do

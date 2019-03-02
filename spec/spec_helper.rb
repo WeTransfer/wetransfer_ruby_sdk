@@ -5,7 +5,7 @@ SimpleCov.start do
   add_filter '/spec/'
 end
 
-require 'we_transfer_client'
+require 'we_transfer'
 require 'pry'
 require 'rspec'
 require 'bundler'

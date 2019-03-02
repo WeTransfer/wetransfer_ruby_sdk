@@ -2,12 +2,12 @@ require "spec_helper"
 
 describe WeTransfer::Transfer do
   let!(:authentication_stub) {
-    stub_request(:post, "#{WeTransfer::CommunicationHelper::API_URL_BASE}/v2/authorize")
+    stub_request(:post, "#{WeTransfer::Communication::API_URL_BASE}/v2/authorize")
     .to_return(status: 200, body: {token: "fake-test-token"}.to_json, headers: {})
   }
 
   let!(:create_transfer_stub) do
-    stub_request(:post, "#{WeTransfer::CommunicationHelper::API_URL_BASE}/v2/transfers").
+    stub_request(:post, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers").
     to_return(
       status: 200,
       body: {
@@ -24,7 +24,7 @@ describe WeTransfer::Transfer do
   end
 
   let!(:find_transfer_stub) do
-    stub_request(:get, "#{WeTransfer::CommunicationHelper::API_URL_BASE}/v2/transfers/fake-transfer-id").
+    stub_request(:get, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/fake-transfer-id").
     to_return(
       status: 200,
       body: {
@@ -354,7 +354,7 @@ describe WeTransfer::Transfer do
         file_size = 7_500_000
         contents = "-" * file_size
 
-        stub_request(:post, "#{WeTransfer::CommunicationHelper::API_URL_BASE}/v2/transfers")
+        stub_request(:post, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers")
           .to_return(
             status: 200,
             body: {
@@ -418,7 +418,7 @@ describe WeTransfer::Transfer do
         .to receive(:id)
         .and_return("file_id")
 
-      upload_complete_stub = stub_request(:put, "#{WeTransfer::CommunicationHelper::API_URL_BASE}/v2/transfers/transfer_id/files/file_id/upload-complete").
+      upload_complete_stub = stub_request(:put, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/transfer_id/files/file_id/upload-complete").
         with(
           body: { part_numbers: 1 }.to_json,
         )
@@ -449,7 +449,7 @@ describe WeTransfer::Transfer do
     end
 
     let!(:finalize_transfer_stub) do
-      stub_request(:put, "#{WeTransfer::CommunicationHelper::API_URL_BASE}/v2/transfers/fake-transfer-id/finalize").
+      stub_request(:put, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/fake-transfer-id/finalize").
         to_return(
           status: 200,
           body: {

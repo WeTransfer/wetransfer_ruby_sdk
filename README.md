@@ -24,7 +24,7 @@ For your API key and additional info please visit our [developer portal](https:/
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'wetransfer', version: '0.9.0.beta2'
+gem 'wetransfer', version: '0.9.0.beta3'
 ```
 
 And then execute:
@@ -57,7 +57,7 @@ Open the file in your text editor and add this line:
 
     WT_API_KEY=<your api key>
 
-Make sure to replace `<your api key>` by your actual api key. Don't include the pointy brackets!
+Make sure to replace `<your api key>` with your actual api key. Don't include the pointy brackets!
 
 Great! Now you can go to your project file and use the client.
 
@@ -66,8 +66,8 @@ Great! Now you can go to your project file and use the client.
 A transfer is a collection of files that can be created once, and downloaded until it expires. Once a transfer is ready for sharing, it is closed for modifications.
 
 ```ruby
-# In your project file:
-require 'we_transfer_client'
+# In your proje ct file:
+require 'we_transfer'
 
 client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
@@ -97,7 +97,7 @@ Boards need a WeTransfer Client to be present, just like transfers.
 
 ```ruby
 # In your project file:
-require 'we_transfer_client'
+require 'we_transfer'
 
 client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
@@ -105,7 +105,6 @@ client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 After you create your client, you can
 
 ### Create a board and upload items
-
 
 ```ruby
 board = client.create_board(name: 'Meow', description: 'On Cats') do |items|
@@ -150,7 +149,7 @@ Hooray!
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/wetransfer/wetransfer_ruby_sdk. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct. More extensive contribution guidelines can be found [here](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CONTRIBUTING.md).
+Bug reports and pull requests are welcome on GitHub at <https://github.com/wetransfer/wetransfer_ruby_sdk.> This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct. More extensive contribution guidelines can be found [here](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CONTRIBUTING.md).
 
 ## License
 
@@ -158,4 +157,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the WeTransfer Ruby SDK project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CODE_OF_CONDUCT.md).
+Everyone interacting in the WeTransfer Ruby SDK project’s code bases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CODE_OF_CONDUCT.md).

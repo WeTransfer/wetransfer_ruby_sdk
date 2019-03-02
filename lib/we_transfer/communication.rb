@@ -1,7 +1,7 @@
 module WeTransfer
   class CommunicationError < StandardError; end
 
-  module CommunicationHelper
+  module Communication
     extend Forwardable
 
     API_URL_BASE = "https://dev.wetransfer.com"

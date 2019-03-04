@@ -59,4 +59,45 @@ describe WeTransfer::WeTransferFile do
         .to eq %|{"name":"test file","size":8}|
     end
   end
+
+  describe "#to_h" do
+    let(:file) { described_class.new(name: 'foo', size: 8) }
+    let(:multipart_stub) { instance_double(WeTransfer::RemoteFile::Multipart) }
+
+    it "has keys and values for id, name, size and multipart" do
+      allow(file)
+        .to receive(:multipart)
+        .and_return(multipart_stub)
+
+      allow(file)
+        .to receive(:id)
+        .and_return('fake-id')
+
+      allow(multipart_stub)
+        .to receive(:to_h)
+        .and_return('fake-multipart')
+
+      expected = {
+        id: 'fake-id',
+        multipart: 'fake-multipart',
+        size: 8,
+        name: 'foo'
+
+      }
+
+      expect(file.to_h)
+        .to match(expected)
+    end
+
+    it "calls :to_h on multipart" do
+      allow(file)
+        .to receive(:multipart)
+        .and_return(multipart_stub)
+
+      expect(multipart_stub)
+        .to receive(:to_h)
+
+      file.to_h
+    end
+  end
 end

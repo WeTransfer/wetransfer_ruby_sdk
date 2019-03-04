@@ -3,13 +3,7 @@ module WeTransfer
     class FileMismatchError < StandardError; end
     class NoIoError < StandardError; end
 
-    class Multipart < ::Ks.strict(:chunks, :chunk_size)
-      def to_h
-        %i[chunks chunk_size].each_with_object({}) do |prop, memo|
-          memo[prop] = send(prop)
-        end
-      end
-    end
+    class Multipart < ::Ks.strict(:chunks, :chunk_size); end
 
     def self.upgrade(files_response:, transfer:)
       files_response.each do |file_response|

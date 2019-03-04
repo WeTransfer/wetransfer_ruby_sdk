@@ -492,4 +492,73 @@ describe WeTransfer::Transfer do
 
     it "url?"
   end
+
+  describe "#to_h" do
+    let(:transfer) { described_class.new(message: 'test transfer') }
+    let(:file_stub_1) { [instance_double(WeTransfer::WeTransferFile, name: 'foo', size: 8)] }
+
+    it "has keys and values for id, state, url, message and files" do
+      allow(file_stub_1)
+        .to receive(:to_h)
+        .and_return('fake-file-to_h')
+
+      allow(transfer)
+        .to receive(:files)
+        .and_return([file_stub_1])
+
+      allow(transfer)
+        .to receive(:id)
+        .and_return('fake-id')
+
+      allow(transfer)
+        .to receive(:state)
+        .and_return('fake-state')
+
+      allow(transfer)
+        .to receive(:url)
+        .and_return('fake-url')
+
+      expected = {
+        id: "fake-id",
+        state: "fake-state",
+        url: "fake-url",
+        message: "test transfer",
+        files: ["fake-file-to_h"]
+      }
+
+      expect(transfer.to_h)
+        .to match(expected)
+    end
+
+    it "calls :to_h on all files" do
+      file_stub_2 = instance_double(WeTransfer::WeTransferFile, name: 'bar', size: 8)
+
+      allow(transfer)
+        .to receive(:files)
+        .and_return([file_stub_1, file_stub_2])
+
+      expect(file_stub_1)
+        .to receive(:to_h)
+
+      expect(file_stub_2)
+        .to receive(:to_h)
+
+      transfer.to_h
+    end
+  end
+
+  describe "#to_json" do
+    it "converts the results of #to_h" do
+      transfer = described_class.new(message: 'test transfer')
+
+      transfer_hash = { "foo" => "bar" }
+
+      allow(transfer)
+        .to receive(:to_h)
+        .and_return(transfer_hash)
+
+      expect(JSON.parse(transfer.to_json))
+        .to eq(transfer_hash)
+    end
+  end
 end

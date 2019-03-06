@@ -8,19 +8,15 @@ module WeTransfer
 
     attr_reader :files, :id, :state, :url, :message
 
-    class << self
-      extend Forwardable
-      def_delegator Communication, :find_transfer, :find
-    end
-
-    def self.create(message:, &block)
-      transfer = new(message: message)
+    def self.create(message:, communicator:, &block)
+      transfer = new(message: message, communicator: communicator)
 
       transfer.persist(&block)
     end
 
-    def initialize(message:)
+    def initialize(message:, communicator:)
       @message = message
+      @communicator = communicator
       @files = []
       @unique_file_names = Set.new
     end
@@ -29,7 +25,7 @@ module WeTransfer
       yield(self) if block_given?
       raise NoFilesAddedError if @unique_file_names.empty?
 
-      Communication.persist_transfer(self)
+      @communicator.persist_transfer(self)
     end
 
     # Add one or more files to a transfer, so a transfer can be created over the
@@ -54,13 +50,12 @@ module WeTransfer
         WeTransfer::RemoteFile::NoIoError,
         "IO for file with name '#{name}' cannot be uploaded."
       ) unless WeTransfer::MiniIO.mini_io_able?(put_io)
-
       (1..file.multipart.chunks).each do |chunk|
-        put_url = upload_url_for_chunk(name: name, chunk: chunk)
+        put_url = upload_url_for_chunk(file_id: file.id, chunk: chunk)
         chunk_contents = StringIO.new(put_io.read(file.multipart.chunk_size))
         chunk_contents.rewind
 
-        Communication.upload_chunk(put_url, chunk_contents)
+        @communicator.upload_chunk(put_url, chunk_contents)
       end
     end
 
@@ -74,14 +69,18 @@ module WeTransfer
       end
     end
 
-    def upload_url_for_chunk(name:, chunk:)
-      file_id = find_file_by_name(name).id
-      Communication.upload_url_for_chunk(id, file_id, chunk)
+    def upload_url_for_chunk(file_id: nil, name: nil, chunk:)
+      raise ArgumentError, "missing keyword: either name or file_id is required" unless file_id || name
+
+      file_id ||= find_file_by_name(name).id
+      @communicator.upload_url_for_chunk(id, file_id, chunk)
     end
 
-    def complete_file(name:, file: nil)
+    def complete_file(file: nil, name: file&.name)
+      raise ArgumentError, "missing keyword: either name or file is required" unless file || name
+
       file ||= find_file_by_name(name)
-      Communication.complete_file(id, file.id, file.multipart.chunks)
+      @communicator.complete_file(id, file.id, file.multipart.chunks)
     end
 
     def complete_files
@@ -94,13 +93,13 @@ module WeTransfer
     end
 
     def finalize
-      Communication.finalize_transfer(self)
+      @communicator.finalize_transfer(self)
     end
 
-    def as_request_params
+    def as_persist_params
       {
         message: @message,
-        files: @files.map(&:as_request_params),
+        files: @files.map(&:as_persist_params),
       }
     end
 

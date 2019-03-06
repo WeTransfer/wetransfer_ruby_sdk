@@ -1,76 +1,30 @@
 require "spec_helper"
 
 describe WeTransfer::Transfer do
-  let!(:authentication_stub) {
-    stub_request(:post, "#{WeTransfer::Communication::API_URL_BASE}/v2/authorize")
-    .to_return(status: 200, body: {token: "fake-test-token"}.to_json, headers: {})
-  }
-
-  let!(:create_transfer_stub) do
-    stub_request(:post, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers").
-    to_return(
-      status: 200,
-      body: {
-        success: true,
-        id: "24cd3f4ccf15232e5660052a3688c03f20190221200022",
-        state: "uploading",
-        message: "test transfer",
-        url: nil,
-        files: files_stub,
-        expires_at: "2019-02-28T20:00:22Z"
-      }.to_json,
-      headers: {},
-    )
-  end
-
-  let!(:find_transfer_stub) do
-    stub_request(:get, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/fake-transfer-id").
-    to_return(
-      status: 200,
-      body: {
-        id: "24cd3f4ccf15232e5660052a3688c03f20190221200022",
-        state: "uploading",
-        message: "test transfer",
-        url: nil,
-        files: files_stub,
-        expires_at: "2019-02-28T20:00:22Z"
-      }.to_json,
-      headers: {},
-    )
-  end
-
-  let(:files_stub) {
-    [
-      {
-        id: "fake_file_id",
-        name: "test file",
-        size: 8,
-        multipart: {
-          part_numbers: 1,
-          chunk_size: 8
-        },
-        type: "file",
-      }
-    ]
-  }
+  let(:communicator) { instance_double(WeTransfer::Communication) }
 
   describe ".create" do
     it "instantiates a transfer" do
       expect(described_class)
         .to receive(:new)
-        .with(message: "through .create")
+        .with(message: "test transfer", communicator: communicator)
         .and_call_original
 
       begin
-        described_class.create(message: "through .create")
+        described_class.create(
+          message: "test transfer",
+          communicator: communicator
+        )
       rescue WeTransfer::Transfer::NoFilesAddedError
-        # TODO: a rescue that would break an initializer is kinda moot in an instantiation
-        #  test ¯\_(ツ)_/¯
+        # We're rescuing here: This tests just that :create calls the initializer.
       end
     end
 
     it "calls #persist on the instantiated transfer" do
       add_file_lambda = ->(transfer) { transfer.add_file(name: "test file", size: 8) }
+
+      allow(communicator)
+        .to receive(:persist_transfer)
 
       expect_any_instance_of(described_class)
         .to receive(:persist) do |*_args, &block|
@@ -78,11 +32,17 @@ describe WeTransfer::Transfer do
         end
         .and_call_original
 
-      described_class.create(message: "through .create", &add_file_lambda)
+      described_class.create(
+        message: "fake transfer",
+        communicator: communicator,
+        &add_file_lambda
+      )
     end
   end
 
   describe ".find" do
+    before { skip("This interface is removed") }
+
     it "GETs the transfer by its id" do
       described_class.find("fake-transfer-id")
 
@@ -102,20 +62,34 @@ describe WeTransfer::Transfer do
   end
 
   describe "initialize" do
-    it "passes with a message" do
-      expect { described_class.new(message: "test transfer") }
+    it "needs a :message and a :communicator kw argument" do
+      expect {
+        described_class.new(
+          message: "test transfer",
+          communicator: communicator
+        )
+      }
         .to_not raise_error
     end
 
-    it "fails without a message" do
-      expect { described_class.new }
+    it "fails without a :message" do
+      expect { described_class.new(communicator: communicator) }
         .to raise_error ArgumentError, %r|message|
+    end
+
+    it "fails without a :communicator" do
+      expect { described_class.new(message: "test transfer") }
+        .to raise_error ArgumentError, %r|communicator|
     end
   end
 
   describe "#files" do
     it "is a getter for @files" do
-      transfer = described_class.new(message: "test transfer")
+      transfer = described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
+
       transfer.instance_variable_set :@files, "this is a fake"
 
       expect(transfer.files).to eq "this is a fake"
@@ -123,6 +97,13 @@ describe WeTransfer::Transfer do
   end
 
   describe "#persist" do
+    subject(:transfer) {
+      described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
+    }
+
     context "adding multiple files, using a block" do
       let(:files_stub) {
         [
@@ -149,55 +130,47 @@ describe WeTransfer::Transfer do
       }
 
       it "works on a transfer without any files" do
-        transfer = described_class.new(message: "test transfer")
+        # transfer = described_class.new(message: "test transfer")
+
+        expect(communicator)
+          .to receive(:persist_transfer)
 
         transfer.persist do |transfer|
           transfer.add_file(name: "file1", size: 8)
           transfer.add_file(name: "file2", size: 8)
         end
-
-        expect(create_transfer_stub)
-          .to have_been_requested
       end
 
-      it "can be used  on a transfer that already has some files" do
-        transfer = described_class.new(message: "test transfer")
+      it "can be used on a transfer that already has some files" do
+        # transfer = described_class.new(message: "test transfer")
         transfer.add_file(name: "file1", size: 8)
 
-        transfer.persist { |transfer| transfer.add_file(name: "file2", size: 8) }
+        expect(communicator)
+          .to receive(:persist_transfer)
 
-        expect(create_transfer_stub)
-          .to have_been_requested
+        transfer.persist { |transfer| transfer.add_file(name: "file2", size: 8) }
       end
     end
 
     context "not adding files, using a block" do
       it "can create a remote transfer if the transfer already had one" do
-        transfer = described_class.new(message: "test transfer")
+        # transfer = described_class.new(message: "test transfer")
         transfer.add_file(name: "test file", size: 8)
 
+        expect(communicator)
+          .to receive(:persist_transfer)
+
         transfer.persist
-
-        expect(create_transfer_stub)
-          .to have_been_requested
       end
-    end
-
-    context "with files" do
-      it "can create a remote transfer if the transfer "
-    end
-    context "with files" do
-      it "creates a remote transfer"
-      it "exposes new methods on the WeTransferFile instances"
     end
   end
 
   describe "#add_file" do
     subject(:transfer) do
-      described_class.new(message: "test transfer") do |transfer|
-        # this block is used to add files using
-        # transfer.add_file(name:, size:, io:)
-      end
+      described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
     end
 
     let(:file_params)  { { name: "test file", size: :bar, io: :baz } }
@@ -272,229 +245,355 @@ describe WeTransfer::Transfer do
   end
 
   describe "#upload_file" do
+    subject(:transfer) do
+      described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
+    end
+
     it "should be called with :name" do
-      transfer = described_class.new(message: "test transfer")
       transfer.add_file(name: "test file", size: 8)
 
       expect { transfer.upload_file }
         .to raise_error ArgumentError, %r|name|
     end
 
-    context "without io keyword param" do
-      it "works if the WeTransferFile instance has an io" do
-        transfer = described_class.new(message: "test transfer")
-        transfer.add_file(name: "test file", size: 8, io: StringIO.new("12345678"))
-        transfer.persist
+    context "without io keyword param," do
+      context "if the WeTransferFile instance has an io" do
+        it "calls upload_chunk on the communicator" do
+          transfer.add_file(name: "test file", size: 8, io: StringIO.new("12345678"))
 
-        allow(transfer)
-          .to receive(:upload_url_for_chunk)
-          .with(name: "test file", chunk: kind_of(Numeric))
-          .and_return("https://signed.url/123")
+          # transfer.persist # does a network call
+          # fake-persist the transfer so we can spec the complete_file run
+          multipart = instance_double(
+            WeTransfer::RemoteFile::Multipart,
+            chunks: 1,
+            chunk_size: 20
+          )
+          transfer.instance_variable_set :@id, 'fake-transfer-id'
+          transfer.files.each do |f|
+            f.instance_variable_set :@id, 'fake-file-id'
+            f.instance_variable_set :@multipart, multipart
+          end
 
-        stub_request(:put, "https://signed.url/123")
-          .to_return(status: 200, body: "", headers: {})
+          allow(transfer)
+            .to receive(:upload_url_for_chunk)
+            .with(file_id: "fake-file-id", chunk: kind_of(Numeric))
+            .and_return("https://fake.upload.url/123")
 
-        expect { transfer.upload_file(name: "test file") }
-          .to_not raise_error
+          expect(communicator)
+            .to receive(:upload_chunk)
+            .with("https://fake.upload.url/123", kind_of(StringIO))
+
+          transfer.upload_file(name: "test file")
+        end
+
+        it "invokes :upload_url_for_chunk to obtain a PUT url" do
+          transfer.add_file(name: "test file", size: 8, io: StringIO.new("12345678"))
+
+          # transfer.persist # does a network call
+          # fake-persist the transfer so we can spec the complete_file run
+          multipart = instance_double(
+            WeTransfer::RemoteFile::Multipart,
+            chunks: 1,
+            chunk_size: 20
+          )
+          transfer.instance_variable_set :@id, 'fake-transfer-id'
+          transfer.files.each do |f|
+            f.instance_variable_set :@id, 'fake-file-id'
+            f.instance_variable_set :@multipart, multipart
+          end
+
+          allow(communicator)
+            .to receive(:upload_chunk)
+
+          expect(transfer)
+            .to receive(:upload_url_for_chunk)
+            .with(file_id: "fake-file-id", chunk: 1)
+
+          transfer.upload_file(name: "test file")
+        end
       end
 
       it "breaks if the WeTransferFile instance does not have an io" do
-        transfer = described_class.new(message: "test transfer")
         transfer.add_file(name: "test file", size: 8)
 
         expect { transfer.upload_file(name: "test file") }
           .to raise_error WeTransfer::RemoteFile::NoIoError, %r|'test file' cannot be uploaded|
       end
-
-      it "invokes :upload_url_for_chunk to obtain a PUT url" do
-        transfer = described_class.new(message: "test transfer")
-        transfer.add_file(name: "test file", size: 8, io: StringIO.new("12345678"))
-        transfer.persist
-
-        stub_request(:put, "https://signed.url/123")
-          .to_return(status: 200, body: "", headers: {})
-
-        expect(transfer)
-          .to receive(:upload_url_for_chunk)
-          .with(name: "test file", chunk: kind_of(Numeric))
-          .and_return("https://signed.url/123")
-
-        transfer.upload_file(name: "test file")
-      end
     end
 
     context "uploads each chunk" do
       it "upload is triggered once if the io smaller than the server's chunk size" do
-        transfer = described_class.new(message: "test transfer")
-
         file_name = "test file"
         contents = "12345678"
 
-        upload_request_stub = stub_request(:put, "https://signed.url/123")
-          .with(body: contents)
-
         transfer.add_file(name: file_name, io: StringIO.new(contents))
-        transfer.persist
+
+        # transfer.persist # does a network call
+        # fake-persist the transfer so we can spec the complete_file run
+        multipart = instance_double(
+          WeTransfer::RemoteFile::Multipart,
+          chunks: 1,
+          chunk_size: 20
+        )
+        transfer.instance_variable_set :@id, 'fake-transfer-id'
+        transfer.files.each do |f|
+          f.instance_variable_set :@id, 'fake-file-id'
+          f.instance_variable_set :@multipart, multipart
+        end
+
+        allow(communicator)
+          .to receive(:upload_chunk)
 
         expect(transfer)
           .to receive(:upload_url_for_chunk)
-          .with(name: file_name, chunk: 1)
+          .with(file_id: 'fake-file-id', chunk: 1)
           .and_return("https://signed.url/123")
           .once
 
         transfer.upload_file(name: file_name)
-
-        expect(upload_request_stub).to have_been_requested
       end
 
-      it "upload is triggered twice if the io is 1.5 times the server's chunk size" do
-        remove_request_stub(create_transfer_stub)
-
+      it "upload is triggered twice if the io is has 2 chunks" do
         file_name = "test file"
-        file_size = 7_500_000
+        file_size = 1_000
         contents = "-" * file_size
 
-        stub_request(:post, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers")
-          .to_return(
-            status: 200,
-            body: {
-              success: true,
-              id: "04a1828e9a193adacb3ea110cdcf773320190226161412",
-              state: "uploading",
-              message: "test transfer",
-              url: nil,
-              files: [
-                {
-                  id: "3a2b2c5e01657dbe09e104aa5fdd01f020190226161412",
-                  name: file_name,
-                  size: file_size,
-                  multipart: {
-                    part_numbers: 2,
-                    chunk_size: 5242880
-                  },
-                  type: "file"
-                }
-              ],
-              expires_at: "2019-03-05T1614:12Z"
-            }.to_json,
-            headers: {}
-          )
+        transfer.add_file(name: file_name, size: file_size, io: StringIO.new(contents))
+        # transfer.persist # does a network call
+        # fake-persist the transfer so we can spec the complete_file run
+        multipart = instance_double(
+          WeTransfer::RemoteFile::Multipart,
+          chunks: 2,
+          chunk_size: 750 # not the right number, but we allow the server to set it
+        )
+        transfer.instance_variable_set(:@id, 'fake-transfer-id')
 
-        transfer = described_class.new(message: "test transfer")
+        transfer.files.each do |f|
+          f.instance_variable_set :@id, 'fake-file-id'
+          f.instance_variable_set :@multipart, multipart
+        end
 
         expect(transfer)
           .to receive(:upload_url_for_chunk)
-          .with(name: file_name, chunk: kind_of(Numeric))
-          .and_return("https://signed.url/big-chunk-1", "https://signed.url/big-chunk-2")
+          .with(file_id: 'fake-file-id', chunk: kind_of(Numeric))
+          .and_return("https://fake.upload.url/big-chunk-1", "https://fake.upload.url/big-chunk-2")
 
-        put_1 = stub_request(:put, "https://signed.url/big-chunk-1")
-        put_2 = stub_request(:put, "https://signed.url/big-chunk-2")
-
-        transfer.add_file(name: file_name, size: file_size, io: StringIO.new(contents))
-        transfer.persist
+        expect(communicator)
+          .to receive(:upload_chunk)
+          .with(%r|https://fake.upload.url/big-chunk-\d|, kind_of(StringIO))
+          .exactly(2).times
 
         transfer.upload_file(name: file_name)
-        expect(put_1).to have_been_requested
-        expect(put_2).to have_been_requested
       end
     end
   end
 
-  describe "#upload_url_for_chunk" do
-    it "does something"
+  describe "#upload_files" do
+    subject(:transfer) do
+      described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
+    end
+
+    let(:file_factory) { Struct.new(:name) }
+
+    it "invokes :upload_file for each file in the files collection" do
+      transfer.instance_variable_set(:@files, 2.times.map { |n| file_factory.new("file-#{n}") })
+
+      expect(transfer)
+        .to receive(:upload_file)
+        .with(hash_including(:file, :name))
+        .twice
+
+      transfer.upload_files
+    end
   end
 
-  describe "#complete_file" do
-    it "works" do
-      transfer = described_class.new(message: "test transfer")
-      transfer.add_file(name: "test file", size: 8)
-      transfer.persist
+  describe "#upload_url_for_chunk" do
+    subject(:transfer) do
+      described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
+    end
 
+    it "must be invoked with a :chunk kw param" do
+      expect { transfer.upload_url_for_chunk }
+        .to raise_error(ArgumentError, %r|chunk|)
+    end
+
+    it "must be invoked with either a :file_id or :name kw param" do
+      expect { transfer.upload_url_for_chunk(chunk: :foo) }
+        .to raise_error(ArgumentError, %r|name.*file_id|)
+
+      allow(communicator)
+        .to receive(:upload_url_for_chunk)
+
+      transfer.add_file(name: 'bar', size: 8)
+      transfer.files.first.instance_variable_set :@id, 'baz'
+
+      expect { transfer.upload_url_for_chunk(chunk: :foo, name: 'bar') }
+        .not_to raise_error
+
+      expect { transfer.upload_url_for_chunk(chunk: :foo, file_id: 'baz') }
+        .not_to raise_error
+    end
+
+    it "invokes :upload_url_for_chunk on the communicator" do
       allow(transfer)
         .to receive(:id)
-        .and_return("transfer_id")
+        .and_return 'fake-transfer-id'
 
-      allow(transfer.files.first)
-        .to receive(:id)
-        .and_return("file_id")
+      file = Struct.new(:id).new('fake-file-id')
+      chunk = 3
 
-      upload_complete_stub = stub_request(:put, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/transfer_id/files/file_id/upload-complete").
-        with(
-          body: { part_numbers: 1 }.to_json,
-        )
-        .to_return(
-          status: 200,
-          body: {
-            success: true,
-            id: "26a8bb18b75d8c67c744cdf3655c3fdd20190227112811",
-            retries: 0,
-            name: "test_file_1",
-            size: 10,
-            chunk_size: 5242880
-          }.to_json,
-          headers: {}
-        )
+      expect(communicator)
+        .to receive(:upload_url_for_chunk)
+        .with(transfer.id, file.id, chunk)
 
-      transfer.complete_file(name: "test file")
+      transfer.upload_url_for_chunk(file_id: file.id, chunk: chunk)
+    end
+  end
 
-      expect(upload_complete_stub).to have_been_requested
+  describe "#complete_file"  do
+    subject(:transfer) do
+      described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
+    end
+
+    let(:file) {
+      instance_double(
+        WeTransfer::WeTransferFile,
+        id: 8,
+        name: 'meh',
+        multipart: multipart
+      )
+    }
+
+    let(:multipart) {
+      instance_double(
+        WeTransfer::RemoteFile::Multipart,
+        chunks: 1,
+        chunk_size: 20
+      )
+    }
+
+    it "can be invoked with a :name kw param" do
+      transfer.add_file(name: 'meh', size: 8)
+
+      # fake-persist the transfer so we can spec the complete_file run
+      transfer.instance_variable_set :@id, 'fake-transfer-id'
+      transfer.files.each do |f|
+        f.instance_variable_set :@id, 'fake-file-id'
+        f.instance_variable_set :@multipart, multipart
+      end
+
+      expect(communicator)
+        .to receive(:complete_file)
+
+      transfer.complete_file(name: 'meh')
+    end
+
+    it "can be invoked with a :file kw param" do
+      allow(communicator)
+        .to receive(:complete_file)
+
+      transfer.complete_file(file: file)
+    end
+
+    it "if invoked with both a :name or a :file param, the :file is used" do
+      allow(communicator)
+        .to receive(:complete_file)
+
+      expect(transfer)
+        .to_not receive(:find_file_by_name)
+
+      transfer.complete_file(name: 'foo', file: file)
+    end
+
+    it "needs to be invoked with either a :name or a :file kw param" do
+      expect { transfer.complete_file }
+        .to raise_error(ArgumentError, %r|name.*file|)
+    end
+  end
+
+  describe "#complete_files" do
+    subject(:transfer) do
+      described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
+    end
+
+    let(:file_factory) { Struct.new(:name) }
+
+    it "invokes :complete_file for each file in the files collection" do
+      transfer.instance_variable_set(:@files, 2.times.map { |n| file_factory.new("file-#{n}") })
+
+      expect(transfer)
+        .to receive(:complete_file)
+        .with(hash_including(:file, :name))
+        .twice
+
+      transfer.complete_files
     end
   end
 
   describe "#finalize" do
     subject(:transfer) do
       WeTransfer::Transfer
-        .new(message: "test transfer")
-        .add_file(name: "test file", size: 30)
-    end
-
-    let!(:finalize_transfer_stub) do
-      stub_request(:put, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/fake-transfer-id/finalize").
-        to_return(
-          status: 200,
-          body: {
-            success: true,
-            id: "fake-transfer-id",
-            state: "processing",
-            message: "test transfer",
-            url: "https://we.tl/t-c5mHAyq1iO",
-            files: [
-              {
-                id: "b40157b36830c0ca37059af5b054a45b20190225084239",
-                name: "test file",
-                size: 30,
-                multipart: {
-                  part_numbers: 1,
-                  chunk_size: 30
-                },
-                type: "file"
-              }
-            ],
-            expires_at: "2019-03-04T08:42:39Z"
-          }.to_json,
-          headers: {},
+        .new(
+          message: "test transfer",
+          communicator: communicator,
         )
+        .add_file(name: "test file", size: 30)
     end
 
     before { allow(transfer).to receive(:id).and_return("fake-transfer-id") }
 
-    it "PUTs to the finalize endpoint" do
-      transfer.finalize
+    it "invokes :finalize_transfer on the communicator" do
+      expect(communicator)
+        .to receive(:finalize_transfer)
+        .with(transfer)
 
-      expect(finalize_transfer_stub).to have_been_requested
+      transfer.finalize
+    end
+  end
+
+  describe "#as_persist_params" do
+    subject(:transfer) do
+      described_class.new(
+        message: "test transfer",
+        communicator: communicator
+      )
     end
 
-    it "gets a new status" do
-      expect(transfer.state).to be_nil
-      transfer.finalize
-      expect(transfer.state).to eq "processing"
+    it "returns a hash with the right values for :message and :files" do
+      expected = { message: "test transfer", files: [] }
+      expect(transfer.as_persist_params)
+        .to eq expected
     end
 
-    it "url?"
+    it "invokes :as_persist_params on each member of files" do
+      transfer.add_file(name: "test file 1", size: 8)
+      transfer.add_file(name: "test file 2", size: 8)
+
+      transfer.files.each do |file|
+        expect(file)
+          .to receive(:as_persist_params)
+      end
+      transfer.as_persist_params
+    end
   end
 
   describe "#to_h" do
-    let(:transfer) { described_class.new(message: 'test transfer') }
+    let(:transfer) { described_class.new(message: 'test transfer', communicator: nil) }
     let(:file_stub_1) { [instance_double(WeTransfer::WeTransferFile, name: 'foo', size: 8)] }
 
     it "has keys and values for id, state, url, message and files" do
@@ -549,7 +648,7 @@ describe WeTransfer::Transfer do
 
   describe "#to_json" do
     it "converts the results of #to_h" do
-      transfer = described_class.new(message: 'test transfer')
+      transfer = described_class.new(message: 'test transfer', communicator: nil)
 
       transfer_hash = { "foo" => "bar" }
 

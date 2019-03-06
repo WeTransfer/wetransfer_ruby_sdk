@@ -66,7 +66,7 @@ Great! Now you can go to your project file and use the client.
 A transfer is a collection of files that can be created once, and downloaded until it expires. Once a transfer is ready for sharing, it is closed for modifications.
 
 ```ruby
-# In your proje ct file:
+# In your project file:
 require 'we_transfer'
 
 client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
@@ -75,20 +75,27 @@ client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 Now that you've got the client set up you can use  `create_transfer_and_upload_files` to, well, create a transfer, and upload all files!
 
 ```ruby
-client.create_transfer_and_upload_files(message: 'All the Things') do |transfer|
+transfer = client.create_transfer_and_upload_files(message: 'All the Things') do |transfer|
+  # Add a file using File.open. If you do it like this, :name and :io params are optional
   transfer.add_file(io: File.open('Gemfile'))
+
+  # Add a file with File.open, but give it a different name inside the transfer
   transfer.add_file(
     name: 'hello_world.rb',
     io: File.open('path/to/different_name.rb')
   )
+
+  # Using :name, :size and :io params.
+  # Specifying the size is not very useful in this case, but feel free to explicitly
+  # communicate the size of the coming io.
+  #
+  # The :name param is compulsory if it cannot be derived from the IO.
   transfer.add_file(
     name: 'README.txt',
     size: 31,
     io: StringIO.new("You should read All the Things!")
   )
 end
-
-transfer = client.transfer
 
 # To get a link to your transfer, call `url` on your transfer object:
 transfer.url => "https://we.tl/t-1232346"

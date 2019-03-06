@@ -10,7 +10,7 @@ module WeTransfer
       raise ArgumentError, "Need a file name and a size, or io should provide it" unless @name && @size
     end
 
-    def as_request_params
+    def as_persist_params
       {
         name: @name,
         size: @size,

@@ -51,11 +51,11 @@ describe WeTransfer::WeTransferFile do
     end
   end
 
-  describe "#as_request_params" do
+  describe "#as_persist_params" do
     subject(:file) { described_class.new(name: 'test file', size: 8) }
 
     it "has key/values for name and size only" do
-      expect(file.as_request_params.to_json)
+      expect(file.as_persist_params.to_json)
         .to eq %|{"name":"test file","size":8}|
     end
   end

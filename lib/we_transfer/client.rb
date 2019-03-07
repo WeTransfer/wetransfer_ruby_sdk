@@ -1,6 +1,7 @@
 module WeTransfer
   class Client
     class Error < StandardError; end
+    extend Forwardable
 
     # Initialize a WeTransfer::Client
     #
@@ -8,7 +9,7 @@ module WeTransfer
     #
     # @return [WeTransfer::Client]
     def initialize(api_key:)
-      @communicator = Communication.new(api_key)
+      @communicator = Communicator.new(api_key)
     end
 
     def create_transfer(**args, &block)
@@ -18,13 +19,12 @@ module WeTransfer
 
     def create_transfer_and_upload_files(**args, &block)
       transfer = create_transfer(args, &block)
-      transfer.upload_files
-      transfer.complete_files
-      transfer.finalize
+      transfer
+        .upload_files
+        .complete_files
+        .finalize
     end
 
-    def find_transfer(transfer_id)
-      @communicator.find_transfer(transfer_id)
-    end
+    def_delegator :@communicator, :find_transfer
   end
 end

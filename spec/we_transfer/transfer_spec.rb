@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe WeTransfer::Transfer do
-  let(:communicator) { instance_double(WeTransfer::Communication) }
+  let(:communicator) { instance_double(WeTransfer::Communicator) }
 
   describe ".create" do
     it "instantiates a transfer" do

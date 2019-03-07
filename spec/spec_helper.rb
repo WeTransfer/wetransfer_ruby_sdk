@@ -15,20 +15,7 @@ require 'dotenv'
 require 'webmock/rspec'
 Dotenv.load
 
-module SpecHelpers
-  def fixtures_dir
-    __dir__ + '/fixtures/'
-  end
-
-  def test_logger
-    Logger.new($stderr).tap { |log| log.level = Logger::WARN }
-  end
-end
-
 RSpec.configure do |config|
-  config.include SpecHelpers
-  config.extend SpecHelpers
-
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
@@ -38,3 +25,5 @@ RSpec.configure do |config|
   config.default_formatter = 'doc'
   config.order = :random
 end
+
+RSpec::Mocks.configuration.verify_partial_doubles = true

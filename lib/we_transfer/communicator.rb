@@ -1,7 +1,7 @@
 module WeTransfer
   class CommunicationError < StandardError; end
 
-  class Communication
+  class Communicator
     include Logging
     extend Forwardable
 
@@ -17,8 +17,6 @@ module WeTransfer
       "Content-Type" => "application/json"
     }.freeze
 
-    attr_accessor :api_key
-
     def initialize(api_key)
       @api_key = api_key
     end
@@ -31,14 +29,15 @@ module WeTransfer
     #
     # @return [WeTransfer::Transfer]
     def find_transfer(transfer_id)
-      response = request_as.get(TRANSFER_URI % transfer_id)
-      ensure_ok_status!(response)
+      response = ensure_ok_status!(request_as.get(TRANSFER_URI % transfer_id))
+
       response_body = remote_transfer_params(response.body)
       found_transfer = Transfer.new(message: response_body[:message], communicator: self)
       setup_transfer(
         transfer: found_transfer,
         data: response_body
       )
+      found_transfer
     end
 
     # GET an URL we can PUT a chunk of a file to.
@@ -55,8 +54,7 @@ module WeTransfer
     # @return [String] a signed URL, valid for an hour
     #
     def upload_url_for_chunk(transfer_id, file_id, chunk)
-      response = request_as.get(UPLOAD_URL_URI % [transfer_id, file_id, chunk])
-      ensure_ok_status!(response)
+      response = ensure_ok_status!(request_as.get(UPLOAD_URL_URI % [transfer_id, file_id, chunk]))
 
       JSON.parse(response.body).fetch("url")
     end
@@ -74,13 +72,14 @@ module WeTransfer
     #         but some instance variables will be different.
     #
     def persist_transfer(transfer)
-      response = request_as.post(
-        TRANSFERS_URI,
-        transfer.as_persist_params.to_json,
+      response = ensure_ok_status!(
+        request_as.post(
+          TRANSFERS_URI,
+          transfer.as_persist_params.to_json,
+        )
       )
-      ensure_ok_status!(response)
 
-      handle_new_transfer_data(
+      handle_remote_transfer_data(
         transfer: transfer,
         data: remote_transfer_params(response.body)
       )
@@ -100,16 +99,11 @@ module WeTransfer
     #         be different.
     #
     def finalize_transfer(transfer)
-      response = request_as.put(FINALIZE_URI % transfer.id)
-      ensure_ok_status!(response)
-      handle_new_transfer_data(
+      response = ensure_ok_status!(request_as.put(FINALIZE_URI % transfer.id))
+      handle_remote_transfer_data(
         transfer: transfer,
         data: remote_transfer_params(response.body)
       )
-    end
-
-    def remote_transfer_params(response_body)
-      JSON.parse(response_body, symbolize_names: true)
     end
 
     def upload_chunk(put_url, chunk_contents)
@@ -124,16 +118,21 @@ module WeTransfer
     end
 
     def complete_file(transfer_id, file_id, chunks)
-      response = request_as.put(
-        "/v2/transfers/%s/files/%s/upload-complete" % [transfer_id, file_id],
-        { part_numbers: chunks }.to_json
+      response = ensure_ok_status!(
+        request_as.put(
+          "/v2/transfers/%s/files/%s/upload-complete" % [transfer_id, file_id],
+          { part_numbers: chunks }.to_json
+        )
       )
 
-      ensure_ok_status!(response)
       remote_transfer_params(response.body)
     end
 
     private
+
+    def remote_transfer_params(response_body)
+      JSON.parse(response_body, symbolize_names: true)
+    end
 
     def request_as
       @request_as ||= Faraday.new(API_URL_BASE) do |c|
@@ -150,10 +149,10 @@ module WeTransfer
         )
       end
 
-      handle_new_transfer_data(transfer: transfer, data: data)
+      handle_remote_transfer_data(transfer: transfer, data: data)
     end
 
-    def handle_new_transfer_data(transfer:, data:)
+    def handle_remote_transfer_data(transfer:, data:)
       %i[id state url].each do |i_var|
         transfer.instance_variable_set "@#{i_var}", data[i_var]
       end
@@ -162,6 +161,7 @@ module WeTransfer
         transfer: transfer,
         files_response: data[:files]
       )
+
       transfer
     end
 
@@ -169,37 +169,33 @@ module WeTransfer
       authorize_if_no_bearer_token!
 
       {
-        'X-API-Key' => api_key,
+        'X-API-Key' => @api_key,
         'Authorization' => "Bearer #{@bearer_token}"
       }
     end
 
     def ensure_ok_status!(response)
+      return response if (200..299).include?(response.status)
+
+      logger.error(response)
       case response.status
-      when 200..299
-        true
       when 400..499
-        logger.error response
         raise WeTransfer::CommunicationError, JSON.parse(response.body)["message"]
       when 500..504
-        logger.error response
         raise WeTransfer::CommunicationError, "Response had a #{response.status} code, we could retry"
-      else
-        logger.error response
-        raise WeTransfer::CommunicationError, "Response had a #{response.status} code, no idea what to do with that"
       end
+      raise WeTransfer::CommunicationError, "Response had a #{response.status} code, no idea what to do with that"
     end
 
     def authorize_if_no_bearer_token!
       return @bearer_token if @bearer_token
 
-      response = Faraday.new(API_URL_BASE) do |c|
-        minimal_faraday_config(c)
-        c.headers = DEFAULT_HEADERS.merge('X-API-Key' => api_key)
-      end.post(
-        '/v2/authorize',
+      response = ensure_ok_status!(
+        Faraday.new(API_URL_BASE) do |c|
+          minimal_faraday_config(c)
+          c.headers = DEFAULT_HEADERS.merge('X-API-Key' => @api_key)
+        end.post(AUTHORIZE_URI)
       )
-      ensure_ok_status!(response)
       bearer_token = JSON.parse(response.body)['token']
       raise WeTransfer::CommunicationError, "The authorization call returned #{response.body} and no usable :token key could be found there" if bearer_token.nil? || bearer_token.empty?
       @bearer_token = bearer_token
@@ -210,7 +206,4 @@ module WeTransfer
       config.adapter Faraday.default_adapter
     end
   end
-
-  # def_delegator self, :minimal_faraday_config
-  # end
 end

@@ -7,7 +7,7 @@ require 'ks'
 
 %w[
   logging
-  communication
+  communicator
   client
   transfer
   mini_io

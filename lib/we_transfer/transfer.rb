@@ -67,6 +67,7 @@ module WeTransfer
           file: file
         )
       end
+      self
     end
 
     def upload_url_for_chunk(file_id: nil, name: nil, chunk:)
@@ -90,6 +91,7 @@ module WeTransfer
           file: file
         )
       end
+      self
     end
 
     def finalize

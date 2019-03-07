@@ -40,13 +40,12 @@ module WeTransfer
     end
 
     # The name of the io, guessed using File.basename. If this raises a TypeError
-    # we swallow the error, since this is used only as the default name for a
+    # we swallow the error, since this is used only as fallback for naming a
     # WeTransferFile
     #
     def name
       File.basename(@io)
     rescue TypeError
-      # yeah, what?
     end
 
     def_delegators :@io, :read, :rewind, :seek, :size

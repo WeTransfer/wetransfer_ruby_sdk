@@ -12,10 +12,13 @@ describe "transfer integration" do
   it "Convenience method create_transfer_and_upload_files does it all!" do
     transfer = client.create_transfer_and_upload_files(message: "test transfer") do |transfer|
       transfer.add_file(name: "small_file_with_io", size: 10, io: StringIO.new("#" * 10))
+      transfer.add_file(io: File.open('Gemfile'))
     end
 
+    # the transfer is (soon) ready to be downloaded. Time to inspect it:
+
     expect(transfer.files.map(&:name))
-      .to include("small_file_with_io")
+      .to match_array(%w[small_file_with_io Gemfile])
     expect(transfer.state)
       .to eq "processing"
     expect(transfer.url)
@@ -26,15 +29,15 @@ describe "transfer integration" do
     transfer = client.create_transfer(message: "test transfer") do |transfer|
       transfer.add_file(name: "small_file", size: 80)
       transfer.add_file(name: "small_file_with_io", size: 10, io: StringIO.new("#" * 10))
-      transfer.add_file(name: "multi_chunk_big_file", io: File.open('spec/fixtures/Japan-01.jpg'))
+      transfer.add_file(name: "multi_chunk_big_image.jpg", io: File.open('spec/fixtures/Japan-01.jpg'))
     end
 
-    expect(transfer.url)
-      .to be_nil
+    expect(transfer.url.nil?)
+      .to eq true
 
     expect(transfer.id.nil?).to eq false
     expect(transfer.state).to eq "uploading"
-    expect(transfer.files.none? { |f| f.id.nil? }).to eq true
+    expect(transfer.files.any? { |f| f.id.nil? }).to eq false
 
     transfer.upload_file(name: "small_file", io: StringIO.new("#" * 80))
     transfer.complete_file(name: "small_file")
@@ -42,8 +45,8 @@ describe "transfer integration" do
     transfer.upload_file(name: "small_file_with_io")
     transfer.complete_file(name: "small_file_with_io")
 
-    transfer.upload_file(name: "multi_chunk_big_file")
-    transfer.complete_file(name: "multi_chunk_big_file")
+    transfer.upload_file(name: "multi_chunk_big_image.jpg")
+    transfer.complete_file(name: "multi_chunk_big_image.jpg")
 
     transfer.finalize
 

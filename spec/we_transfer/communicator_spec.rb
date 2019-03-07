@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe WeTransfer::Communication do
+describe WeTransfer::Communicator do
   subject(:communicator) { described_class.new('fake api key') }
 
   let(:fake_transfer_id) { "fake-transfer-id" }
@@ -16,7 +16,7 @@ describe WeTransfer::Communication do
   describe ".ensure_ok_status!" do
     context "on a successful request" do
       let!(:find_transfer_stub) do
-        stub_request(:get, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/fake-transfer-id")
+        stub_request(:get, "#{WeTransfer::Communicator::API_URL_BASE}/v2/transfers/fake-transfer-id")
         .to_return(
           status: 200,
           body: {
@@ -51,7 +51,7 @@ describe WeTransfer::Communication do
 
     context "on a client error" do
       let!(:find_transfer_stub) do
-        stub_request(:get, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/fake-transfer-id").
+        stub_request(:get, "#{WeTransfer::Communicator::API_URL_BASE}/v2/transfers/fake-transfer-id").
         to_return(
           status: 405,
           body: '{
@@ -75,7 +75,7 @@ describe WeTransfer::Communication do
 
     context "on a server error" do
       let!(:find_transfer_stub) do
-        stub_request(:get, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/fake-transfer-id").
+        stub_request(:get, "#{WeTransfer::Communicator::API_URL_BASE}/v2/transfers/fake-transfer-id").
         to_return(
           status: 501,
           body: '',
@@ -95,7 +95,7 @@ describe WeTransfer::Communication do
 
       context "everything else" do
         let(:find_transfer_stub) do
-          stub_request(:get, "#{WeTransfer::Communication::API_URL_BASE}/v2/transfers/fake-transfer-id").
+          stub_request(:get, "#{WeTransfer::Communicator::API_URL_BASE}/v2/transfers/fake-transfer-id").
           to_return(
             status: 302,
             body: '',

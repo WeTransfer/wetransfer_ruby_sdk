@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module WeTransfer
   module RemoteFile
     class FileMismatchError < StandardError; end

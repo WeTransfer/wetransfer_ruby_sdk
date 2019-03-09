@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module WeTransfer
   # Wrapper around an IO object, delegating only methods we need for creating
   # and sending a file in chunks.

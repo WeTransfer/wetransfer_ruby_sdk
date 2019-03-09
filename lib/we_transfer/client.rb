@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module WeTransfer
   class Client
     class Error < StandardError; end

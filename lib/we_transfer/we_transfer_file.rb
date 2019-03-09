@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module WeTransfer
   class WeTransferFile
     attr_reader :name, :id, :io, :multipart, :size

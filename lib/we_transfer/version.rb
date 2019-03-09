@@ -1,3 +1,3 @@
 module WeTransfer
-  VERSION = '0.9.0.beta3'
+  VERSION = '0.10.0.beta1'
 end

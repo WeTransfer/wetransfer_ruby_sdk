@@ -61,7 +61,6 @@ module WeTransfer
       end
     end
 
-    #
     def upload_files
       files.each do |file|
         upload_file(
@@ -79,10 +78,10 @@ module WeTransfer
       @communicator.upload_url_for_chunk(id, file_id, chunk)
     end
 
-    def complete_file(file: nil, name: file&.name)
-      raise ArgumentError, "missing keyword: either name or file is required" unless file || name
+    def complete_file(file: nil, name: file&.name, file_id: file&.id)
+      raise ArgumentError, "missing keyword: either name or file is required" unless file || name || file_id
 
-      file ||= find_file_by_name(name)
+      file ||= find_file_by_name(name || file_id)
       @communicator.complete_file(id, file.id, file.multipart.chunks)
     end
 
@@ -120,13 +119,14 @@ module WeTransfer
       prepared
     end
 
-    def find_file_by_name(name)
-      @found_files ||= Hash.new do |h, name|
-        h[name] = files.find { |file| file.name == name }
+    def find_file_by_name_or_id(name_or_id)
+      @found_files ||= Hash.new do |h, name_or_id|
+        h[name_or_id] = files.find { |file| [file.name, file.id].include? name_or_id }
       end
 
-      raise FileMismatchError unless @found_files[name]
-      @found_files[name]
+      raise FileMismatchError unless @found_files[name_or_id]
+      @found_files[name_or_id]
     end
+    alias_method :find_file_by_name, :find_file_by_name_or_id
   end
 end

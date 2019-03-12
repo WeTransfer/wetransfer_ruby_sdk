@@ -30,12 +30,17 @@ module WeTransfer
       @communicator.persist_transfer(self)
     end
 
-    # Add one or more files to a transfer, so a transfer can be created over the
-    # WeTransfer public API
+    # Add a file to a transfer.
     #
-    # @params name [String] (nil) the name of the file
+    # @param args   [Hash] (See WeTransferFile#initialize)
+    # # @option args  :name [String] The name of the file, as you want it to show up
+    # #         inside the transfer
+    # # @option args  :size
+    # # @param name [String] (nil) the name of the file
     #
-    # @returns self [WeTransfer::Client]
+    # @raise [DuplicateFileNameError] If multiple files share the same name
+    #
+    # @return self [WeTransfer::Transfer]
     def add_file(**args)
       file = WeTransferFile.new(args)
       raise DuplicateFileNameError unless @unique_file_names.add?(file.name.downcase)

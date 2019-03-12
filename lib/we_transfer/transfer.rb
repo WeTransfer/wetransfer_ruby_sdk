@@ -45,7 +45,7 @@ module WeTransfer
     end
 
     def upload_file(name:, io: nil, file: nil)
-      file ||= find_file_by_name(name)
+      file ||= find_file(name)
       put_io = io || file.io
 
       raise(
@@ -74,14 +74,14 @@ module WeTransfer
     def upload_url_for_chunk(file_id: nil, name: nil, chunk:)
       raise ArgumentError, "missing keyword: either name or file_id is required" unless file_id || name
 
-      file_id ||= find_file_by_name(name).id
+      file_id ||= find_file(name).id
       @communicator.upload_url_for_chunk(id, file_id, chunk)
     end
 
     def complete_file(file: nil, name: file&.name, file_id: file&.id)
       raise ArgumentError, "missing keyword: either name or file is required" unless file || name || file_id
 
-      file ||= find_file_by_name(name || file_id)
+      file ||= find_file(name || file_id)
       @communicator.complete_file(id, file.id, file.multipart.chunks)
     end
 
@@ -119,7 +119,15 @@ module WeTransfer
       prepared
     end
 
-    def find_file_by_name_or_id(name_or_id)
+    # Find a file inside this transfer
+    #
+    # @param  [String] name_or_id, The name (as set by you) or the id (as returned)
+    #         by WeTransfer Public API of the file.
+    # @raise  [FileMismatchError] if a file with that name or id cannot be found for
+    #         this transfer
+    # @return [WeTransferFile] The file you requested
+    #
+    def find_file(name_or_id)
       @found_files ||= Hash.new do |h, name_or_id|
         h[name_or_id] = files.find { |file| [file.name, file.id].include? name_or_id }
       end
@@ -127,6 +135,5 @@ module WeTransfer
       raise FileMismatchError unless @found_files[name_or_id]
       @found_files[name_or_id]
     end
-    alias_method :find_file_by_name, :find_file_by_name_or_id
   end
 end

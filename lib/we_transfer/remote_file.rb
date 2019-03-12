@@ -9,7 +9,7 @@ module WeTransfer
 
     def self.upgrade(files_response:, transfer:)
       files_response.each do |file_response|
-        local_file = transfer.find_file_by_name(file_response[:name])
+        local_file = transfer.find_file(file_response[:name])
 
         local_file.instance_variable_set(
           :@id,

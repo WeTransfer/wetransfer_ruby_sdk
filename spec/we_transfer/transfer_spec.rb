@@ -512,7 +512,7 @@ describe WeTransfer::Transfer do
         .to receive(:complete_file)
 
       expect(transfer)
-        .to_not receive(:find_file_by_name)
+        .to_not receive(:find_file)
 
       transfer.complete_file(name: 'foo', file: file)
     end

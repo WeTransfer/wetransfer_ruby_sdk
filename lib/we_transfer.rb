@@ -6,6 +6,7 @@ require 'json'
 require 'ks'
 
 %w[
+  version
   logging
   communicator
   client

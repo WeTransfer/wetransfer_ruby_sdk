@@ -33,14 +33,15 @@ module WeTransfer
     # Add a file to a transfer.
     #
     # @param args   [Hash] (See WeTransferFile#initialize)
-    # # @option args  :name [String] The name of the file, as you want it to show up
-    # #         inside the transfer
-    # # @option args  :size
-    # # @param name [String] (nil) the name of the file
     #
-    # @raise [DuplicateFileNameError] If multiple files share the same name
+    # @raise  [DuplicateFileNameError] Files should have a unique name -
+    #         case insensitive - within a transfer. If that is not true, it
+    #         will result in this error
     #
-    # @return self [WeTransfer::Transfer]
+    # @return [WeTransfer::Transfer] self
+    #
+    # @see WeTransferFile#initialize
+    #
     def add_file(**args)
       file = WeTransferFile.new(args)
       raise DuplicateFileNameError unless @unique_file_names.add?(file.name.downcase)
@@ -49,6 +50,22 @@ module WeTransfer
       self
     end
 
+    # Upload the file. Convenience method for uploading the parts of the file in
+    # chunks. This will upload all chunks in order, single threaded.
+    #
+    # @param  :name [String] The name used to add the file to the transfer
+    # @param  :io [optional, String] The contents to be uploaded. If the file was
+    #         added (See Transfer#add_file) including an io, this can be omitted.
+    #         If the file was added including an io, *and* it is included in this
+    #         call, the io from this invocation will be uploaded.
+    # @param :file [optional, WeTransferFile] The file instance that will be
+    #         uploaded.
+    #
+    # @raise  [WeTransfer::RemoteFile::NoIoError] Will be raised if the io does
+    #         not meet the minimal requirements (see MiniIo.mini_io_able?)
+    # @example
+    #
+    # @see MiniIo.mini_io_able?
     def upload_file(name:, io: nil, file: nil)
       file ||= find_file(name)
       put_io = io || file.io
@@ -66,6 +83,10 @@ module WeTransfer
       end
     end
 
+    # Trigger the upload for all files. Since this method does not accept any io,
+    # the files should be added (see #add_file) with a proper io object.
+    #
+    # @return [WeTransfer::Transfer] self
     def upload_files
       files.each do |file|
         upload_file(

@@ -26,10 +26,10 @@ module WeTransfer
 
   # Set the logger to your preferred logger
   #
-  # @params new_logger [Logger] the logger that WeTransfer SDK should use
+  # @param new_logger [Logger] the logger that WeTransfer SDK should use
   #
-  # example:
-  # WeTransfer.logger = Rails.logger
+  # @example  Send all logs to Rails logger
+  #           WeTransfer.logger = Rails.logger
   def self.logger=(new_logger)
     @logger = new_logger
   end

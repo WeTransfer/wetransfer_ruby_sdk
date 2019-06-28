@@ -10,7 +10,7 @@ module WeTransfer
     # isn't provided, but the io can provide it.
     #
     # @param  :io [optional, anything] The io of the file. This will be wrapped
-    #         in a MiniIo, or if absent in a NullMiniIo
+    #         in a MiniIo, or (if absent) wrapped in a NullMiniIo.
     # @param  :name [optional, String] The name you want to give your file. This
     #          does not have to match the original file name.
     # @param  :size [optional, Numeric] The size of the file. Has to be exact to

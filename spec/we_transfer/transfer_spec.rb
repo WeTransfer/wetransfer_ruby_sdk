@@ -3,6 +3,16 @@ require "spec_helper"
 describe WeTransfer::Transfer do
   let(:communicator) { instance_double(WeTransfer::Communicator) }
 
+  describe "Error classes" do
+    it "NothingToUploadError is a subtype of ArgumentError" do
+      expect(
+        WeTransfer::Transfer::NothingToUploadError
+          .new
+          .is_a?(ArgumentError)
+      ).to eq true
+    end
+  end
+
   describe ".create" do
     it "instantiates a transfer" do
       expect(described_class)
@@ -68,16 +78,15 @@ describe WeTransfer::Transfer do
           message: "test transfer",
           communicator: communicator
         )
-      }
-        .to_not raise_error
+      }.to_not raise_error
     end
 
-    it "fails without a :message" do
+    it "fails without a :message param" do
       expect { described_class.new(communicator: communicator) }
         .to raise_error ArgumentError, %r|message|
     end
 
-    it "fails without a :communicator" do
+    it "fails without a :communicator param" do
       expect { described_class.new(message: "test transfer") }
         .to raise_error ArgumentError, %r|communicator|
     end
@@ -252,11 +261,25 @@ describe WeTransfer::Transfer do
       )
     end
 
-    it "should be called with :name" do
-      transfer.add_file(name: "test file", size: 8)
+    context "called without :file, without :id, without :io params" do
+      it "raises" do
+        expect { transfer.upload_file }
+          .to raise_error WeTransfer::Transfer::NothingToUploadError, %r|file.*id.*io|
+      end
+    end
 
-      expect { transfer.upload_file }
-        .to raise_error ArgumentError, %r|name|
+    context "called with :id and with :io params" do
+      it "doesn't raise" do
+        expect { transfer.upload_file(id: 'fake', io: StringIO.new("a")) }
+          .to_not raise_error WeTransfer::Transfer::NothingToUploadError
+      end
+    end
+
+    context "called with :file param" do
+      it "doesn't raise" do
+        expect { transfer.upload_file(file: double(WeTransfer::WeTransferFile)) }
+          .to_not raise_error WeTransfer::Transfer::NothingToUploadError
+      end
     end
 
     context "without io keyword param," do
@@ -286,7 +309,7 @@ describe WeTransfer::Transfer do
             .to receive(:upload_chunk)
             .with("https://fake.upload.url/123", kind_of(StringIO))
 
-          transfer.upload_file(name: "test file")
+          transfer.upload_file(id: "fake-file-id")
         end
 
         it "invokes :upload_url_for_chunk to obtain a PUT url" do
@@ -312,31 +335,21 @@ describe WeTransfer::Transfer do
             .to receive(:upload_url_for_chunk)
             .with(file_id: "fake-file-id", chunk: 1)
 
-          transfer.upload_file(name: "test file")
+          transfer.upload_file(id: "fake-file-id")
         end
-      end
-
-      it "breaks if the WeTransferFile instance does not have an io" do
-        transfer.add_file(name: "test file", size: 8)
-
-        expect { transfer.upload_file(name: "test file") }
-          .to raise_error WeTransfer::RemoteFile::NoIoError, %r|'test file' cannot be uploaded|
       end
     end
 
     context "uploads each chunk" do
-      it "upload is triggered once if the io smaller than the server's chunk size" do
-        file_name = "test file"
-        contents = "12345678"
-
-        transfer.add_file(name: file_name, io: StringIO.new(contents))
+      it "upload is triggered once if the io is smaller than the server's chunk size" do
+        transfer.add_file(name: "test file", io: StringIO.new("12345678"))
 
         # transfer.persist # does a network call
         # fake-persist the transfer so we can spec the complete_file run
         multipart = instance_double(
           WeTransfer::RemoteFile::Multipart,
           chunks: 1,
-          chunk_size: 20
+          chunk_size: 8,
         )
         transfer.instance_variable_set :@id, 'fake-transfer-id'
         transfer.files.each do |f|
@@ -353,7 +366,7 @@ describe WeTransfer::Transfer do
           .and_return("https://signed.url/123")
           .once
 
-        transfer.upload_file(name: file_name)
+        transfer.upload_file(id: 'fake-file-id')
       end
 
       it "upload is triggered twice if the io is has 2 chunks" do
@@ -386,7 +399,7 @@ describe WeTransfer::Transfer do
           .with(%r|https://fake.upload.url/big-chunk-\d|, kind_of(StringIO))
           .exactly(2).times
 
-        transfer.upload_file(name: file_name)
+        transfer.upload_file(id: 'fake-file-id')
       end
     end
   end
@@ -399,14 +412,13 @@ describe WeTransfer::Transfer do
       )
     end
 
-    let(:file_factory) { Struct.new(:name) }
-
     it "invokes :upload_file for each file in the files collection" do
+      file_factory = Struct.new(:id)
       transfer.instance_variable_set(:@files, 2.times.map { |n| file_factory.new("file-#{n}") })
 
       expect(transfer)
         .to receive(:upload_file)
-        .with(hash_including(:file, :name))
+        .with(hash_including(:file, :id))
         .twice
 
       transfer.upload_files
@@ -426,7 +438,7 @@ describe WeTransfer::Transfer do
         .to raise_error(ArgumentError, %r|chunk|)
     end
 
-    it "must be invoked with either a :file_id or :name kw param" do
+    it "must be invoked with a :file_id or :name kw param" do
       expect { transfer.upload_url_for_chunk(chunk: :foo) }
         .to raise_error(ArgumentError, %r|name.*file_id|)
 
@@ -435,9 +447,6 @@ describe WeTransfer::Transfer do
 
       transfer.add_file(name: 'bar', size: 8)
       transfer.files.first.instance_variable_set :@id, 'baz'
-
-      expect { transfer.upload_url_for_chunk(chunk: :foo, name: 'bar') }
-        .not_to raise_error
 
       expect { transfer.upload_url_for_chunk(chunk: :foo, file_id: 'baz') }
         .not_to raise_error
@@ -470,7 +479,7 @@ describe WeTransfer::Transfer do
     let(:file) {
       instance_double(
         WeTransfer::WeTransferFile,
-        id: 8,
+        id: 'fake-file-id',
         name: 'meh',
         multipart: multipart
       )
@@ -485,7 +494,7 @@ describe WeTransfer::Transfer do
     }
 
     it "can be invoked with a :name kw param" do
-      transfer.add_file(name: 'meh', size: 8)
+      transfer.add_file(name: 'meh', size: 20)
 
       # fake-persist the transfer so we can spec the complete_file run
       transfer.instance_variable_set :@id, 'fake-transfer-id'
@@ -497,24 +506,31 @@ describe WeTransfer::Transfer do
       expect(communicator)
         .to receive(:complete_file)
 
-      transfer.complete_file(name: 'meh')
+      transfer.complete_file(id: 'fake-file-id')
     end
 
     it "can be invoked with a :file kw param" do
+      transfer.add_file(name: file.name, size: 12)
+
+      transfer.instance_variable_set :@id, 'fake-transfer-id'
+      transfer.files.each do |f|
+        f.instance_variable_set :@id, 'fake-file-id'
+        f.instance_variable_set :@multipart, multipart
+      end
+
       allow(communicator)
         .to receive(:complete_file)
 
       transfer.complete_file(file: file)
     end
 
-    it "if invoked with both a :name or a :file param, the :file is used" do
+    it "if invoked with both a :id or a :file param, the :file takes precedence" do
       allow(communicator)
         .to receive(:complete_file)
-
       expect(transfer)
         .to_not receive(:find_file)
 
-      transfer.complete_file(name: 'foo', file: file)
+      transfer.complete_file(id: 'fake-file-id', file: file)
     end
 
     it "needs to be invoked with either a :name or a :file kw param" do

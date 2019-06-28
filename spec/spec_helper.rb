@@ -27,3 +27,5 @@ RSpec.configure do |config|
 end
 
 RSpec::Mocks.configuration.verify_partial_doubles = true
+
+WeTransfer.logger = Logger.new(STDOUT)

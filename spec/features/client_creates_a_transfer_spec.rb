@@ -56,4 +56,44 @@ describe "transfer integration" do
     expect(transfer.url)
       .to match %r|https://we.tl/t-|
   end
+
+  # # This test uses different transfer objects for the 4 different steps, so we isolate behavior
+  # # of all cases as much as possible
+  # it "handles diacritics in file names well", :focus do
+  #   name_with_diacritics = "file-name-with-diacritics-äëüïö.jpg".freeze
+
+  #   transfer = client.create_transfer(message: "test transfer") do |transfer|
+  #     transfer.add_file(
+  #       name: name_with_diacritics,
+  #       size: 10,
+  #       io: StringIO.new("#" * 10)
+  #     )
+  #   end
+
+  #   transfer.upload_file(name: name_with_diacritics)
+  #   transfer.complete_file(name: name_with_diacritics)
+  #   transfer.finalize
+  # end
+
+  it "handles diacritics in file names well" do
+    name_with_diacritics = "file-name-with-diacritics-äëüïö.jpg".freeze
+
+    create_transfer = client.create_transfer(message: "test transfer") do |transfer|
+      transfer.add_file(
+        name: name_with_diacritics,
+        size: 10,
+      )
+    end
+
+    file_id = create_transfer.find_file(name_with_diacritics).id
+
+    upload_file_transfer = client.find_transfer(create_transfer.id)
+    upload_file_transfer.upload_file(id: file_id, io: StringIO.new("#" * 10))
+
+    complete_file_transfer = client.find_transfer(create_transfer.id)
+    complete_file_transfer.complete_file(id: file_id)
+
+    finalize_transfer = client.find_transfer(create_transfer.id)
+    finalize_transfer.finalize
+  end
 end

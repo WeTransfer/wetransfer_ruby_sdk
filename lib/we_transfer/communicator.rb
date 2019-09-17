@@ -183,11 +183,11 @@ module WeTransfer
       logger.error(response)
       case response.status
       when 400..499
-        raise WeTransfer::CommunicationError, JSON.parse(response.body)["message"]
+        raise WeTransfer::CommunicationError, "Response had a #{response.status} status code, message was '#{JSON.parse(response.body)["message"]}'."
       when 500..504
-        raise WeTransfer::CommunicationError, "Response had a #{response.status} code, we could retry"
+        raise WeTransfer::CommunicationError, "Response had a #{response.status} status code, we could retry"
       end
-      raise WeTransfer::CommunicationError, "Response had a #{response.status} code, no idea what to do with that"
+      raise WeTransfer::CommunicationError, "Response had a #{response.status} status code, no idea what to do with that"
     end
 
     def authorize_if_no_bearer_token!

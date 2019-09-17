@@ -69,7 +69,7 @@ describe WeTransfer::Communicator do
 
       it "showing the error from the API to the user" do
         expect { subject.find_transfer('fake-transfer-id') }
-        .to raise_error('fake message')
+          .to raise_error(%r|Response had a \d\d\d status code, message was 'fake message'\.|)
       end
     end
 
@@ -90,7 +90,7 @@ describe WeTransfer::Communicator do
 
       it "is telling we can try again" do
         expect { subject.find_transfer('fake-transfer-id') }
-          .to raise_error(%r|had a 501 code.*could retry|)
+          .to raise_error(%r|had a 501 status code.*could retry|)
       end
 
       context "everything else" do
@@ -110,7 +110,7 @@ describe WeTransfer::Communicator do
 
         it "includes the error code in the message" do
           expect { subject.find_transfer('fake-transfer-id') }
-            .to raise_error(%r|had a 302 code|)
+            .to raise_error(%r|had a 302 status code|)
         end
 
         it "informs the user we have no way how to continue" do

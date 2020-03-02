@@ -42,9 +42,7 @@ module WeTransfer
     end
 
     def check_for_file_duplicates(files, new_file)
-      if files.select { |file| file.name == new_file.name }.size != 1
-        raise ArgumentError, 'Duplicate file entry'
-      end
+      raise ArgumentError, 'Duplicate file entry' if files.select { |file| file.name == new_file.name }.size != 1
     end
 
     def put_io_in_parts(object:, file:, io:)
@@ -76,9 +74,7 @@ module WeTransfer
       response = faraday.post('/v2/authorize', '{}', 'Content-Type' => 'application/json', 'X-API-Key' => @api_key)
       ensure_ok_status!(response)
       @bearer_token = JSON.parse(response.body, symbolize_names: true)[:token]
-      if @bearer_token.nil? || @bearer_token.empty?
-        raise Error, "The authorization call returned #{response.body} and no usable :token key could be found there"
-      end
+      raise Error, "The authorization call returned #{response.body} and no usable :token key could be found there" if @bearer_token.nil? || @bearer_token.empty?
     end
 
     def auth_headers

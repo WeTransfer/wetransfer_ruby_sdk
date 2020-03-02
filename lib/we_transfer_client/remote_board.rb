@@ -35,13 +35,11 @@ class RemoteBoard
 
   def to_instances(items:)
     items.map do |item|
-      begin
         remote_class = "Remote#{item[:type].capitalize}"
         Module.const_get(remote_class)
           .new(item)
-      rescue NameError
+    rescue NameError
         raise ItemTypeError, "Cannot instantiate item with type '#{item[:type]}' and id '#{item[:id]}'"
-      end
     end
   end
 end

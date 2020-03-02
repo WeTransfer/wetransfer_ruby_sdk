@@ -13,7 +13,8 @@ describe RemoteFile do
         chunk_size: RemoteBoard::CHUNK_SIZE,
       },
       type: 'file',
-    }}
+    }
+}
 
   describe '#initializer' do
     it 'initialized when no url is given' do

@@ -1,3 +1,5 @@
+This project is now archived as the Public WeTransfer API is no longer maintained.
+
 # WeTransfer Ruby SDK
 
 The Ruby SDK that makes interacting with WeTransfer's Public API a breeze

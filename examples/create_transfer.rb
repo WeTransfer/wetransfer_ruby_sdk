@@ -1,4 +1,4 @@
-require_relative 'we_transfer_client'
+require_relative 'we_transfer'
 require 'dotenv'
 Dotenv.load
 

@@ -26,7 +26,10 @@ For your API key and additional info please visit our [developer portal](https:/
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'wetransfer', version: '0.9.0.beta2'
+gem 'wetransfer', version: '0.10.0.beta1'
+
+# If you need Board support, as found in WeTransfer's Collect app, use version 0.9.x)
+gem 'wetransfer', version: '0.9.0.beta3'
 ```
 
 And then execute:
@@ -59,7 +62,7 @@ Open the file in your text editor and add this line:
 
     WT_API_KEY=<your api key>
 
-Make sure to replace `<your api key>` by your actual api key. Don't include the pointy brackets!
+Make sure to replace `<your api key>` with your actual api key. Don't include the pointy brackets!
 
 Great! Now you can go to your project file and use the client.
 
@@ -69,7 +72,7 @@ A transfer is a collection of files that can be created once, and downloaded unt
 
 ```ruby
 # In your project file:
-require 'we_transfer_client'
+require 'we_transfer'
 
 client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
@@ -77,21 +80,91 @@ client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 Now that you've got the client set up you can use  `create_transfer_and_upload_files` to, well, create a transfer, and upload all files!
 
 ```ruby
-transfer = client.create_transfer_and_upload_files(message: 'All the Things') do |upload|
-  upload.add_file_at(path: '/path/to/local/file.jpg')
-  upload.add_file_at(path: '/path/to/another/local/file.jpg')
-  upload.add_file(name: 'README.txt', io: StringIO.new("You should read All the Things!"))
+transfer = client.create_transfer_and_upload_files(message: 'All the Things') do |transfer|
+  # Add a file using File.open. If you do it like this, :name and :io params are optional
+  transfer.add_file(io: File.open('Gemfile'))
+
+  # Add a file with File.open, but give it a different name inside the transfer
+  transfer.add_file(
+    name: 'hello_world.rb',
+    io: File.open('path/to/file/with/different_name.rb')
+  )
+
+  # Using :name, :size and :io params.
+  # Specifying the size is not very useful in this case, but feel free to explicitly
+  # communicate the size of the coming io.
+  #
+  # The :name param is compulsory if it cannot be derived from the IO.
+  transfer.add_file(
+    name: 'README.txt',
+    size: 31,
+    io: StringIO.new("You should read All the Things!")
+  )
 end
 
 # To get a link to your transfer, call `url` on your transfer object:
-transfer.url => "https://we.tl/t-123234="
+transfer.url # => "https://we.tl/t-1232346"
+
+# Or inspect the whole transfer:
+transfer.to_h # =>
+# {
+#   :id => "0d5ce492c0cd935b5376c7858b0ff5ae20190307162739",
+#   :state => "processing",
+#   :url => "https://we.tl/t-CVINGH30C4",
+#   :message => "test transfer",
+#   :files => [
+#     {
+#       :name => "README.txt",
+#       :size => 31,
+#       :id => "0e04833491a31776770ac4dcf83d1f4a20190307162739",
+#       :multipart => {
+#         :chunks => 1,
+#         :chunk_size => 31
+#       }
+#     }, {
+#       :name => "hello_world.rb",
+#       :size => 166,
+#       :id => "22423dd4b44300641a4659203ba5d1bb20190307162739",
+#       :multipart => {
+#         :chunks => 1,
+#         :chunk_size => 166
+#       }
+#     }
+#   ]
+# }
 ```
 
 The upload will be performed at the end of the block. Depending on your file sizes and network connection speed, this might take some time.
 
 What are you waiting for? Open that link in your browser! Chop chop.
 
+If you want to have more control over which files uploads when, it is also possible.
+
+```ruby
+# Create a transfer that consists of 1 file.
+transfer = client.create_transfer(message: "test transfer") do |transfer|
+  # When creating a transfer, at least the name and the size of the file(s)
+  # must be known.
+  transfer.add_file(name: "small_file", size: 80)
+end
+
+# Upload the file. The Ruby SDK will upload the file in chunks.
+transfer.upload_file(name: "small_file", io: StringIO.new("#" * 80))
+
+# Mark the file as completely uploaded. All the chunks of the file will be joined
+# together to recreate the file
+transfer.complete_file(name: "small_file")
+
+# Mark the transfer as completely done, so your customers can start downloading it
+transfer.finalize
+
+# Inspect your transfer. Use transfer.to_h or transfer.to_json, depending on your scenario
+transfer.to_h
+```
+
 ## Boards
+
+**NOTE**: **Boards are disabled from version 0.10.x** of the Ruby SDK. The latest releases that include **board support is found in version 0.9.x**
 
 A board is a collection of files and links, but it is open for modifications. Like your portfolio: While working, you can make adjustments to it. A board is a fantastic place for showcasing your work in progress.
 
@@ -99,7 +172,7 @@ Boards need a WeTransfer Client to be present, just like transfers.
 
 ```ruby
 # In your project file:
-require 'we_transfer_client'
+require 'we_transfer'
 
 client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
@@ -108,10 +181,10 @@ After you create your client, you can
 
 ### Create a board and upload items
 
-
 ```ruby
 board = client.create_board(name: 'Meow', description: 'On Cats') do |items|
-  items.add_file(name: 'big file.jpg', io: File.open('/path/to/huge_file.jpg', 'rb')items.add_file_at(path: '/path/to/another/file.txt')
+  items.add_file(name: 'big file.jpg', io: File.open('/path/to/huge_file.jpg')
+  items.add_file_at(path: '/path/to/another/file.txt')
   items.add_web_url(url: 'http://wepresent.wetransfer.com', title: 'Time well spent')
 end
 
@@ -152,7 +225,7 @@ Hooray!
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/wetransfer/wetransfer_ruby_sdk. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct. More extensive contribution guidelines can be found [here](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CONTRIBUTING.md).
+Bug reports and pull requests are welcome on GitHub at <https://github.com/wetransfer/wetransfer_ruby_sdk.> This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct. More extensive contribution guidelines can be found [here](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CONTRIBUTING.md).
 
 ## License
 
@@ -160,4 +233,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the WeTransfer Ruby SDK project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CODE_OF_CONDUCT.md).
+Everyone interacting in the WeTransfer Ruby SDK project’s code bases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/.github/CODE_OF_CONDUCT.md).

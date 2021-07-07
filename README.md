@@ -76,28 +76,36 @@ client = WeTransfer::Client.new(api_key: ENV.fetch('WT_API_KEY'))
 ```
 
 Now that you've got the client set up you can use  `create_transfer_and_upload_files` to, well, create a transfer, and upload all files!
+The upload of all files will be performed at the end of the block. Depending on your file sizes and network connection speed, this might take some time.
 
 ```ruby
 transfer = client.create_transfer_and_upload_files(message: 'All the Things') do |transfer|
-  # Add a file using File.open. If you do it like this, :name and :io params are optional
-  transfer.add_file(io: File.open('Gemfile'))
+  # Add files to the transfer, using add_file.
 
-  # Add a file with File.open, but give it a different name inside the transfer
-  transfer.add_file(
-    name: 'hello_world.rb',
-    io: File.open('path/to/file/with/different_name.rb')
-  )
-
-  # Using :name, :size and :io params.
+  # Making use of :name, :size and :io params.
   # Specifying the size is not very useful in this case, but feel free to explicitly
   # communicate the size of the coming io.
+  # Probably it is safer to not use the size param. But if you do use it, make sure it is correct!
   #
-  # The :name param is compulsory if it cannot be derived from the IO.
+  # The :name param is compulsory, since it cannot be derived from the IO.
   transfer.add_file(
     name: 'README.txt',
     size: 31,
     io: StringIO.new("You should read All the Things!")
   )
+
+  # Add a file with File.open, renaming the file inside the transfer.
+  # If you omit the size param, the SDK calls `size` on the io, and uses that.
+  transfer.add_file(
+    name: 'hello_world.rb',
+    io: File.open('path/to/file/with/different_name.rb')
+  )
+
+  # If you invoke add_file that has a File instance in the io param, the :name and :io params are
+  # optional.
+  # Using add_file like this will result in the SDK calling guessing the name of the io,
+  # by invoking `File.basename(io)`.
+  transfer.add_file(io: File.open('Gemfile'))
 end
 
 # To get a link to your transfer, call `url` on your transfer object:
@@ -132,9 +140,7 @@ transfer.to_h # =>
 # }
 ```
 
-The upload will be performed at the end of the block. Depending on your file sizes and network connection speed, this might take some time.
-
-What are you waiting for? Open that link in your browser! Chop chop.
+What are you waiting for? Create a transfer. Add some files. Open that link in your browser! Chop chop.
 
 If you want to have more control over which files uploads when, it is also possible.
 
@@ -227,7 +233,7 @@ Bug reports and pull requests are welcome on GitHub at <https://github.com/wetra
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT) - the in-repo version of the license is [here](https://github.com/WeTransfer/wetransfer_ruby_sdk/blob/master/LICENSE.txt).
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT) - the in-repo version of the license is [here](https://github.com/WeTransfer/EmbedExamples/blob/master/LICENSE.txt).
 
 ## Code of Conduct
 

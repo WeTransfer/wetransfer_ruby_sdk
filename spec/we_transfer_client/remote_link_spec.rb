@@ -3,10 +3,10 @@ require 'spec_helper'
 describe RemoteLink do
   let(:params) {
     {
-      id:     SecureRandom.uuid,
-      url:    'http://www.wetransfer.com',
-      meta:   {title:  'wetransfer.com'},
-      type:   'link',
+      id: SecureRandom.uuid,
+      url: 'http://www.wetransfer.com',
+      meta: {title:  'wetransfer.com'},
+      type: 'link',
     }
   }
 
